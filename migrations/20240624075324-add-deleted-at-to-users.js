@@ -7,9 +7,15 @@ module.exports = {
       type: Sequelize.DATE,
       allowNull: true,
     });
+
+    await queryInterface.addColumn("Words", "deletedAt", {
+      type: Sequelize.DATE,
+      allowNull: true,
+    });
   },
 
   down: async (queryInterface, Sequelize) => {
     await queryInterface.removeColumn("Users", "deletedAt");
+    await queryInterface.removeColumn("Words", "deletedAt");
   },
 };
