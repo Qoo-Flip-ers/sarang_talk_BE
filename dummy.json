@@ -1,0 +1,68 @@
+[
+  {
+    "id": 1,
+    "korean": "한국어1",
+    "description": "설명1 (인도네시아어)",
+    "pronunciation": "발음1 (인도네시아어)",
+    "example_1": "예문1-1",
+    "example_2": "예문2-1",
+    "example_3": "예문3-1",
+    "level": 1,
+    "type": "type1"
+  },
+  {
+    "id": 2,
+    "korean": "한국어2",
+    "description": "설명2 (인도네시아어)",
+    "pronunciation": "발음2 (인도네시아어)",
+    "example_1": "예문1-2",
+    "example_2": "예문2-2",
+    "example_3": "예문3-2",
+    "level": 2,
+    "type": "type2"
+  },
+  {
+    "id": 3,
+    "korean": "한국어3",
+    "description": "설명3 (인도네시아어)",
+    "pronunciation": "발음3 (인도네시아어)",
+    "example_1": "예문1-3",
+    "example_2": "예문2-3",
+    "example_3": "예문3-3",
+    "level": 3,
+    "type": "type3"
+  },
+  {
+    "id": 4,
+    "korean": "한국어4",
+    "description": "설명4 (인도네시아어)",
+    "pronunciation": "발음4 (인도네시아어)",
+    "example_1": "예문1-4",
+    "example_2": "예문2-4",
+    "example_3": "예문3-4",
+    "level": 4,
+    "type": "type4"
+  },
+  {
+    "id": 5,
+    "korean": "한국어5",
+    "description": "설명5 (인도네시아어)",
+    "pronunciation": "발음5 (인도네시아어)",
+    "example_1": "예문1-5",
+    "example_2": "예문2-5",
+    "example_3": "예문3-5",
+    "level": 5,
+    "type": "type5"
+  },
+  {
+    "id": 6,
+    "korean": "한국어6",
+    "description": "설명6 (인도네시아어)",
+    "pronunciation": "발음6 (인도네시아어)",
+    "example_1": "예문1-6",
+    "example_2": "예문2-6",
+    "example_3": "예문3-6",
+    "level": 1,
+    "type": "type6"
+  }
+]
