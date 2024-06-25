@@ -184,7 +184,7 @@ router.delete("/:id", async (req, res) => {
   try {
     const user = await db.User.findByPk(req.params.id);
     if (user) {
-      await user.update({ deletedAt: new Date() });
+      await user.destroy();
       res.json({ message: "User soft deleted" });
     } else {
       res.status(404).json({ error: "User not found" });
