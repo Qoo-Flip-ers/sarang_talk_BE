@@ -36,7 +36,7 @@ router.get("/", async (req, res) => {
     res.json(result);
   } catch (error) {
     console.log(error);
-    res.status(500).json({ error: "Something went wrong" });
+    res.status(500).json({ error: error.message });
   }
 });
 
@@ -71,7 +71,7 @@ router.get("/:id", async (req, res) => {
       res.status(404).json({ error: "User not found" });
     }
   } catch (error) {
-    res.status(500).json({ error: "Something went wrong" });
+    res.status(500).json({ error: error.message });
   }
 });
 
@@ -113,12 +113,12 @@ router.post("/", async (req, res) => {
     const newUser = await db.User.create({
       name: req.body.name,
       phoneNumber: req.body.phoneNumber,
-      status: req.body.status
+      status: req.body.status,
     });
     res.json(newUser);
   } catch (error) {
     console.log(error);
-    res.status(500).json({ error: "Something went wrong" });
+    res.status(500).json({ error: error.message });
   }
 });
 
@@ -154,7 +154,7 @@ router.put("/:id", async (req, res) => {
       res.status(404).json({ error: "User not found" });
     }
   } catch (error) {
-    res.status(500).json({ error: "Something went wrong" });
+    res.status(500).json({ error: error.message });
   }
 });
 
@@ -190,7 +190,7 @@ router.delete("/:id", async (req, res) => {
       res.status(404).json({ error: "User not found" });
     }
   } catch (error) {
-    res.status(500).json({ error: "Something went wrong" });
+    res.status(500).json({ error: error.message });
   }
 });
 

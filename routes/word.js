@@ -47,7 +47,7 @@ router.get("/", async (req, res) => {
 
     res.json(result);
   } catch (error) {
-    res.status(500).json({ error: "Something went wrong" });
+    res.status(500).json({ error: error.message });
   }
 });
 
@@ -81,7 +81,7 @@ router.get("/:id", async (req, res) => {
       res.status(404).json({ error: "Word not found" });
     }
   } catch (error) {
-    res.status(500).json({ error: "Something went wrong" });
+    res.status(500).json({ error: error.message });
   }
 });
 
@@ -147,11 +147,11 @@ router.post("/", async (req, res) => {
       example_2: req.body.example_2,
       example_3: req.body.example_3,
       level: req.body.level,
-      type: req.body.type
+      type: req.body.type,
     });
     res.json(newWord);
   } catch (error) {
-    res.status(500).json({ error: "Something went wrong" });
+    res.status(500).json({ error: error.message });
   }
 });
 /**
@@ -195,7 +195,7 @@ router.put("/:id", async (req, res) => {
       res.status(404).json({ error: "Word not found" });
     }
   } catch (error) {
-    res.status(500).json({ error: "Something went wrong" });
+    res.status(500).json({ error: error.message });
   }
 });
 
@@ -230,7 +230,7 @@ router.delete("/:id", async (req, res) => {
       res.status(404).json({ error: "Word not found" });
     }
   } catch (error) {
-    res.status(500).json({ error: "Something went wrong" });
+    res.status(500).json({ error: error.message });
   }
 });
 

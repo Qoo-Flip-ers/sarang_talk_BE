@@ -70,7 +70,7 @@ router.post("/send-message", async (req, res) => {
     });
   } catch (error) {
     console.log(error.response.data);
-    res.status(500).json({ error: "Something went wrong" });
+    res.status(500).json({ error: error.message });
   }
 });
 
