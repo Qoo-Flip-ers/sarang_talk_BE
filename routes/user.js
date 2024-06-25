@@ -82,6 +82,26 @@ router.get("/:id", async (req, res) => {
  *   post:
  *     summary: 사용자 생성
  *     description: 새로운 사용자를 생성합니다.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *               - phoneNumber
+ *               - status
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 description: 사용자 이름
+ *               phoneNumber:
+ *                 type: string
+ *                 description: 사용자 전화번호
+ *               status:
+ *                 type: string
+ *                 description: 사용자 상태
  *     responses:
  *       200:
  *         description: 성공적으로 생성된 사용자 정보
@@ -90,9 +110,14 @@ router.get("/:id", async (req, res) => {
  */
 router.post("/", async (req, res) => {
   try {
-    const newUser = await db.User.create(req.body);
+    const newUser = await db.User.create({
+      name: req.body.name,
+      phoneNumber: req.body.phoneNumber,
+      status: req.body.status
+    });
     res.json(newUser);
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: "Something went wrong" });
   }
 });
