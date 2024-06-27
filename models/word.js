@@ -13,6 +13,8 @@ module.exports = (sequelize, DataTypes) => {
       example_3: { type: DataTypes.STRING, allowNull: true }, // 예문 3
       level: { type: DataTypes.INTEGER, allowNull: true },
       type: { type: DataTypes.STRING, allowNull: true }, // 카테고리 구분
+      source: { type: DataTypes.STRING, allowNull: true }, // 출처
+      imageUrl: { type: DataTypes.STRING, allowNull: true }, // 이미지 URL
     },
     {
       sequelize,
