@@ -10,6 +10,7 @@ const cors = require("cors");
 const userRouter = require("./routes/user");
 const wordRouter = require("./routes/word");
 const whatsappRouter = require("./routes/whatsapp");
+const webhookRouter = require("./routes/webhook");
 
 app.use(express.json());
 app.use(cors({ origin: "http://localhost:3001" }));
@@ -17,14 +18,29 @@ app.use(cors({ origin: "http://localhost:3001" }));
 app.use("/users", userRouter);
 app.use("/words", wordRouter);
 app.use("/whatsapp", whatsappRouter);
+app.use("/webhook", webhookRouter);
 
 app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 
 db.sequelize.sync().then(() => {
-  app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
-    swaggerDocs(app, port);
-  });
+  console.log("데이터베이스 연결 성공");
+});
+
+const server = app.listen(port, () => {
+  console.log(`서버가 ${port}번 포트에서 실행 중입니다.`);
+  swaggerDocs(app, port);
+
+  if (process.send) {
+    process.send("ready");
+  }
+});
+
+// pm2로부터 종료 신호(SIGINT)를 받으면 서버를 안전하게 종료합니다.
+process.on("SIGINT", async () => {
+  console.log("서버를 종료합니다.");
+  server.close();
+  console.log("Express 앱이 성공적으로 종료되었습니다.");
+  process.exit(0);
 });

@@ -148,6 +148,8 @@ router.post("/", async (req, res) => {
       example_3: req.body.example_3,
       level: req.body.level,
       type: req.body.type,
+      source: req.body.source,
+      imageUrl: req.body.imageUrl,
     });
     res.json(newWord);
   } catch (error) {

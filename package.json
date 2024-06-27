@@ -6,6 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
+    "start:dev": "pm2 start ecosystem.config.js --env development",
+    "start:prd": "pm2 start ecosystem.config.js --env production",
     "dev": "nodemon index.js",
     "migration": "npx sequelize-cli db:migrate:undo && npx sequelize-cli db:migrate"
   },
@@ -14,6 +16,7 @@
   "dependencies": {
     "axios": "^1.7.2",
     "cors": "^2.8.5",
+    "discord.js": "^14.15.3",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "sequelize": "^6.37.3",

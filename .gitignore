@@ -41,3 +41,5 @@ Thumbs.db
 
 *.sqlite
 database.sqlite
+
+ecosystem.config.js
