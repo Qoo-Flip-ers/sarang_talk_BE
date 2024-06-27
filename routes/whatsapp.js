@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const db = require("../models");
 const axios = require("axios").create({
-  baseURL: "https://graph.facebook.com/v19.0/110677915346811",
+  baseURL: "https://graph.facebook.com/v17.0/110677915346811",
 });
 
 /**
@@ -42,21 +42,42 @@ router.post("/send-message", async (req, res) => {
     // WhatsApp 메시지 발송 API 호출
     const response = await axios.post(
       "/messages",
+
       {
+        // "messaging_product": "whatsapp",
+        // "recipient_type": "individual",
+        // "to": "<WHATSAPP_USER_PHONE_NUMBER>",
+        // "type": "text",
+        // "text": {
+        //   "preview_url": <ENABLE_LINK_PREVIEW>,
+        //   "body": "<BODY_TEXT>"
+        // }
+
         messaging_product: "whatsapp",
+        preview_url: false,
+        recipient_type: "individual",
         to: phoneNumber,
-        type: "template",
-        template: {
-          name: "hello_world",
-          language: {
-            code: "en_US",
-          },
+        type: "text",
+        text: {
+          body: "Hello, My name is brooks.",
         },
+        language: { code: "en_US" },
       },
+      // {
+      //   messaging_product: "whatsapp",
+      //   to: phoneNumber,
+      //   type: "template",
+      //   template: {
+      //     name: "hello_world",
+      //     language: {
+      //       code: "en_US",
+      //     },
+      //   },
+      // },
       {
         headers: {
           Authorization:
-            "Bearer EABw1aapKBTcBOzKB0WGiFzBnSSssOXZCrKFKqPchVWAbEkgcH6xBfZCaDypQgUxmBVKr4ZBWJfwVz8MZBeSeZArC3jITrbDkg65SFcKFwYWf4ZB8IWtMweEfmMckEdUiTWlKZCQBd7ZC2Q4NJwrBdoX0N0lxqyADc9eEJTHeBgBLr8T0tHF34CdBWlDQyc9VelfuKxkEJsnn44dGZCzKr3QZAoKOm2WxZCS",
+            "Bearer EABw1aapKBTcBO0LxjPNLuKah3c6PnQvUJLZAjLocZB8Ri9ogFuDaISK1Glgz7rhyfZBLTrnnbuitoR628F6paeD1NUGZCjjTRt34TOvQ1QKj8LlmQ1BBJJPAhIzTYcd19zNZAeZCyvdtRaTw7JhtTvFpbetywE8ZAu5iPPP3FHGiguLRuWWeDjxF0Pj0WKTddzKywEfpEefAfqJ8z3ZAJZA2wGmKnVeQZD",
           "Content-Type": "application/json",
         },
       }
@@ -69,7 +90,6 @@ router.post("/send-message", async (req, res) => {
       response: data,
     });
   } catch (error) {
-    console.log(error.response.data);
     res.status(500).json({ error: "Something went wrong" });
   }
 });

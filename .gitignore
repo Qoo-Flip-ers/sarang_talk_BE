@@ -38,3 +38,6 @@ out/
 # Miscellaneous
 .DS_Store
 Thumbs.db
+
+*.sqlite
+database.sqlite
