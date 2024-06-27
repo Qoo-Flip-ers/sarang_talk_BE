@@ -13,7 +13,7 @@ const whatsappRouter = require("./routes/whatsapp");
 const webhookRouter = require("./routes/webhook");
 
 app.use(express.json());
-app.use(cors({ origin: "http://localhost:3001" }));
+app.use(cors({ origin: process.env.CORS_ORIGIN_URL }));
 
 app.use("/users", userRouter);
 app.use("/words", wordRouter);

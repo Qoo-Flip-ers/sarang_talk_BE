@@ -9,7 +9,8 @@
     "start:dev": "pm2 start ecosystem.config.js --env development",
     "start:prd": "pm2 start ecosystem.config.js --env production",
     "dev": "nodemon index.js",
-    "migration": "npx sequelize-cli db:migrate:undo && npx sequelize-cli db:migrate"
+    "migration": "npx sequelize-cli db:migrate:undo && npx sequelize-cli db:migrate",
+    "deploy": "./deploy-server.sh"
   },
   "author": "",
   "license": "ISC",

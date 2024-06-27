@@ -43,3 +43,4 @@ Thumbs.db
 database.sqlite
 
 ecosystem.config.js
+deploy-server.sh
