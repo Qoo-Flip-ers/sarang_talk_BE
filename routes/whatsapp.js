@@ -191,6 +191,17 @@ router.post("/welcome", async (req, res) => {
       console.log(error);
     }
   );
+
+  // client.messages
+  //     .create({
+  //        contentSid: 'HXXXXXXXXX',
+  //        from: 'MGXXXXXXXX',
+  //        contentVariables: JSON.stringify({
+  //          1: 'Name'
+  //        }),
+  //        to: 'whatsapp:+18551234567'
+  //      })
+  //     .then(message => console.log(message.sid));
   return;
   console.log(process.env.TEMPLATE_WELCOME);
   try {
