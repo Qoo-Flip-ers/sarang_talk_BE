@@ -1,9 +1,16 @@
 const express = require("express");
 const router = express.Router();
 const db = require("../models");
+const twilio = require("twilio");
 const axios = require("axios").create({
-  baseURL: "https://graph.facebook.com/v17.0/110677915346811",
+  // baseURL: "https://graph.facebook.com/v19.0/354463551082624",
+  baseURL: "https://graph.facebook.com/v19.0/176451042228268",
 });
+
+const client = twilio(
+  process.env.TWILIO_ACCOUNT_SID,
+  process.env.TWILIO_AUTH_TOKEN
+);
 
 const sendDailyConversation = async (phoneNumber) => {
   const data = await db.Word.findOne({
@@ -172,11 +179,63 @@ router.post("/send-message", async (req, res) => {
  *       500:
  *         description: 서버 오류
  */
+
 router.post("/welcome", async (req, res) => {
+  await client.messages.create(
+    {
+      from: "whatsapp:+821028919002",
+      to: "whatsapp:+821063393916",
+      body: "hello world \n hello world2",
+    },
+    (error) => {
+      console.log(error);
+    }
+  );
+  return;
+  console.log(process.env.TEMPLATE_WELCOME);
   try {
-    const activeUsers = await db.User.findAll({
-      where: { status: "active" },
-    });
+    const response = await axios.post(
+      "/messages",
+      {
+        messaging_product: "whatsapp",
+        to: "+821020252266",
+        type: "template",
+        template: {
+          // name: "hello_world",
+          name: "match_done_2",
+          language: { code: "id_ID" },
+        },
+      },
+      // {
+      //   messaging_product: "whatsapp",
+      //   to: "+821020252266",
+      //   type: "template",
+      //   recipient_type: "individual",
+      //   template: {
+      //     name: process.env.TEMPLATE_WELCOME,
+      //     language: {
+      //       code: "id_ID",
+      //     },
+      //   },
+      // },
+      {
+        headers: {
+          // Authorization: `Bearer EAADpaovzgNUBOZCpJm8ZAWgZAeKVwvFN8UJNbNt4WBtbW5spJkISvW2f97cHhC7ZB3W6mHgs5TkNpWDZARwUgwEKq969doiV6iaKbsYUTwf856aj9DTGqfcWPOsi40EpGdHotdDSqGndsNZBcU0QitsK0NDU0KlaIloTHCpC2Kc1RXhNbw0ZBxhvdY4VFZCZAZAhTzcZBfZBuX6ekkXsjXPJ3UTyZAZCxJrBll`,
+          Authorization: `Bearer ${process.env.META_ACCESS_TOKEN}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    console.log(response);
+    return res.json(response.data);
+  } catch (e) {
+    console.error(e);
+    return res.status(500).json({ error: e.message });
+  }
+  try {
+    // const activeUsers = await db.User.findAll({
+    //   where: { status: "active" },
+    // });
 
     const result = [];
     for (const user of activeUsers) {
@@ -186,7 +245,7 @@ router.post("/welcome", async (req, res) => {
         "/messages",
         {
           messaging_product: "whatsapp",
-          to: phoneNumber,
+          to: "+821020252266",
           type: "template",
           template: {
             name: process.env.TEMPLATE_WELCOME,

@@ -24,7 +24,8 @@
     "sqlite3": "^5.1.7",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
-    "tedious": "^18.2.1"
+    "tedious": "^18.2.1",
+    "twilio": "^5.2.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.4",
