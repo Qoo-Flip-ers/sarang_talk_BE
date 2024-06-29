@@ -138,6 +138,7 @@ router.post("/send-message", async (req, res) => {
       response: result,
     });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -209,6 +210,7 @@ router.post("/welcome", async (req, res) => {
       response: result,
     });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: error.message });
   }
 });
