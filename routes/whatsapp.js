@@ -185,7 +185,21 @@ router.post("/welcome", async (req, res) => {
   await client.messages.create(
     {
       from: process.env.FROM_PHONE_NUMBER,
-      to: "whatsapp:+821063393916",
+      to: "whatsapp:+821033308957",
+      contentSid: process.env.TEMPLATE_WELCOME,
+      messagingServiceSid: "MGc11b68678a2fa216588c979110f444fe",
+      // contentVariables: JSON.stringify({
+      //   1: "Name",
+      // }),
+    },
+    (error) => {
+      console.log(error);
+    }
+  );
+  await client.messages.create(
+    {
+      from: process.env.FROM_PHONE_NUMBER,
+      to: "whatsapp:+821045709002",
       contentSid: process.env.TEMPLATE_WELCOME,
       messagingServiceSid: "MGc11b68678a2fa216588c979110f444fe",
       // contentVariables: JSON.stringify({
