@@ -12,7 +12,7 @@ const options = {
     },
     servers: [
       {
-        url: "http://localhost:3000",
+        url: process.env.SERVICE_DOMAIL || "http://localhost:3000",
       },
     ],
   },
