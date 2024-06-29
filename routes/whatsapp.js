@@ -147,6 +147,8 @@ router.post("/send-message", async (req, res) => {
  *   post:
  *     summary: 활성 사용자에게 환영 메시지를 WhatsApp으로 발송
  *     description: 활성 상태인 모든 사용자에게 WhatsApp을 통해 환영 메시지를 보냅니다.
+ *     tags:
+ *       - WhatsApp
  *     responses:
  *       200:
  *         description: 메시지가 성공적으로 발송되었습니다.
