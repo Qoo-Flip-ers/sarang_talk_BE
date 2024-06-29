@@ -185,7 +185,7 @@ router.post("/welcome", async (req, res) => {
   await client.messages.create(
     {
       from: process.env.FROM_PHONE_NUMBER,
-      to: "whatsapp:+821020252266",
+      to: "whatsapp:+821063393916",
       contentSid: process.env.TEMPLATE_WELCOME,
       messagingServiceSid: "MGc11b68678a2fa216588c979110f444fe",
       // contentVariables: JSON.stringify({
