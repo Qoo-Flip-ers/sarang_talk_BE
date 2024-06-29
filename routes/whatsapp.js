@@ -184,7 +184,7 @@ router.post("/welcome", async (req, res) => {
   await client.messages.create(
     {
       from: "whatsapp:+821028919002",
-      to: "whatsapp:+821063393916",
+      to: "whatsapp:+821020252266",
       body: "hello world \n hello world2",
     },
     (error) => {
