@@ -143,7 +143,7 @@ router.post("/send-message", async (req, res) => {
 });
 /**
  * @swagger
- * /welcome:
+ * /whatsapp/welcome:
  *   post:
  *     summary: 활성 사용자에게 환영 메시지를 WhatsApp으로 발송
  *     description: 활성 상태인 모든 사용자에게 WhatsApp을 통해 환영 메시지를 보냅니다.
