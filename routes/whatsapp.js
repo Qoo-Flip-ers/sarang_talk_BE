@@ -639,6 +639,7 @@ async function fetchSubscriptionsStartingToday() {
   const todayEnd = new Date();
   todayEnd.setHours(23, 59, 59, 999); // 오늘의 종료 시간 설정
 
+  console.log(todayStart, todayEnd);
   try {
     const response = await db.Subscription.findAll({
       where: {
