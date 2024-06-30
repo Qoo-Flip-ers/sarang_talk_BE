@@ -359,7 +359,7 @@ const sendTodayWord = async () => {
       //     },
       //   }
       // );
-      result.push(response.data);
+      // result.push(response.data);
     }
   } catch (error) {
     console.log(error);
