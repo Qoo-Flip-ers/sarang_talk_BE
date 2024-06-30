@@ -192,8 +192,8 @@ router.post("/welcome", async (req, res) => {
       to: "whatsapp:+821020252266",
       contentSid: process.env.TEMPLATE_TOPIK_VARIATION_MEDIA,
       messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
-      scheduleType: "fixed",
-      sendAt: new Date(new Date().setHours(7, 20, 0, 0)).toISOString(),
+      // scheduleType: "fixed",
+      // sendAt: new Date(new Date().setHours(7, 20, 0, 0)).toISOString(),
       contentVariables: JSON.stringify({
         1: "July_2.png",
         2: "다음을 읽고 내용이 같은 것을 고르십시오.", // 질문
