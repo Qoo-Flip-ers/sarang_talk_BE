@@ -635,8 +635,10 @@ const processCategorySubscriptions = async (category, subscriptions) => {
 
 async function fetchSubscriptionsStartingToday() {
   const todayStart = new Date();
+  todayStart.setFullYear(2024, 6, 1); // 7월 1일로 설정 (월은 0부터 시작하므로 6은 7월을 의미)
   todayStart.setHours(0, 0, 0, 0); // 오늘의 시작 시간 설정
   const todayEnd = new Date();
+  todayEnd.setFullYear(2024, 6, 1); // 7월 1일로 설정
   todayEnd.setHours(23, 59, 59, 999); // 오늘의 종료 시간 설정
 
   console.log(todayStart, todayEnd);
