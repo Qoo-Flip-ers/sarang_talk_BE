@@ -3,10 +3,14 @@ const router = express.Router();
 const db = require("../models");
 const twilio = require("twilio");
 const cron = require("node-cron");
-const axios = require("axios").create({
+const slack = require("axios").create({
   // baseURL: "https://graph.facebook.com/v19.0/354463551082624",
-  baseURL: "https://graph.facebook.com/v19.0/176451042228268",
+  // baseURL: "https://graph.facebook.com/v19.0/176451042228268",
+  baseURL: "https://hooks.slack.com/services",
 });
+
+const SLACK_URL =
+  "https://hooks.slack.com/services/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";
 
 const client = twilio(
   process.env.TWILIO_ACCOUNT_SID,
@@ -182,7 +186,21 @@ router.post("/send-message", async (req, res) => {
  */
 
 router.post("/welcome", async (req, res) => {
-  return sendWelcomeMessage();
+  const response = await client.messages.create(
+    {
+      from: process.env.FROM_PHONE_NUMBER,
+      to: "whatsapp:+821020252266",
+      contentSid: process.env.TEMPLATE_WELCOME,
+      messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
+      scheduleType: "fixed",
+      sendAt: new Date(Date.now() + 16 * 60000),
+    },
+    (error) => {
+      console.log(error);
+    }
+  );
+  // sendWelcomeMessage();
+  return res.json({ message: "WhatsApp 메시지가 성공적으로 발송되었습니다." });
   // return sendTodayWord();
   console.log(process.env.TEMPLATE_WELCOME);
   await client.messages.create(
@@ -424,6 +442,28 @@ const sendDailyMessage = async () => {
   });
 };
 
+// if (category === "daily_conversation") {
+//   subscriptions.forEach(async (subscription) => {
+//     const to = `whatsapp:${subscription.User.phoneNumber}`;
+//     try {
+//       const response = await client.messages.create({
+//         from: process.env.FROM_PHONE_NUMBER,
+//         to,
+//         body: "오늘의 대화 주제: 오늘의 날씨는 어떤가요?",
+//         messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
+//         scheduleType: "fixed",
+//         sendAt: new Date(Date.now() + 10 * 60000), // 10분 후 메시지 전송
+//       });
+//       console.log("Scheduled message sent to", subscription.User.name);
+//     } catch (error) {
+//       console.error(
+//         `Error sending scheduled message to ${subscription.User.name}: `,
+//         error
+//       );
+//     }
+//   });
+// }
+
 async function fetchSubscriptionsStartingToday() {
   const todayStart = new Date();
   todayStart.setHours(0, 0, 0, 0); // 오늘의 시작 시간 설정
@@ -449,6 +489,19 @@ async function fetchSubscriptionsStartingToday() {
 // Twilio를 사용하여 환영 메시지를 보내는 함수
 async function sendWelcomeMessage() {
   const activeSubscriptions = await fetchSubscriptionsStartingToday();
+  if (activeSubscriptions.length === 0) {
+    sendSlack("오늘 구독 시작하는 사용자가 없습니다.");
+    console.log("오늘 구독 시작하는 사용자가 없습니다.");
+    return;
+  } else {
+    console.log(
+      `오늘 구독 시작하는 사용자가 ${activeSubscriptions.length}명(구독 기준) 있습니다. `
+    );
+    sendSlack(
+      `오늘 구독 시작하는 사용자가 ${activeSubscriptions.length}명(구독 기준) 있습니다. `
+    );
+  }
+
   activeSubscriptions.forEach(async (subscription) => {
     const to = `whatsapp:${subscription.User.phoneNumber}`;
     try {
@@ -475,5 +528,15 @@ async function sendWelcomeMessage() {
     }
   });
 }
+
+const sendSlack = async (text) => {
+  const response = await slack.post(
+    "/T0684TBHDKQ/B07AEG61MR8/HnFpkqFfqpXIBgeTzTklvKJQ",
+    {
+      text,
+    }
+  );
+  console.log(response);
+};
 
 module.exports = router;
