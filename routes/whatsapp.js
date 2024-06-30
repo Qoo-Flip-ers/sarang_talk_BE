@@ -182,7 +182,8 @@ router.post("/send-message", async (req, res) => {
  */
 
 router.post("/welcome", async (req, res) => {
-  return sendTodayWord();
+  return sendWelcomeMessage();
+  // return sendTodayWord();
   console.log(process.env.TEMPLATE_WELCOME);
   await client.messages.create(
     {
@@ -324,7 +325,9 @@ const sendTodayWord = async () => {
           from: process.env.FROM_PHONE_NUMBER,
           to: `whatsapp:${phoneNumber}`,
           contentSid: process.env.TEMPLATE_DAILY_CONVERSATION,
-          messagingServiceSid: "MGc11b68678a2fa216588c979110f444fe",
+          messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
+          scheduleType: "fixed",
+          sendAt: new Date("2021-11-30 20:36:27"),
           contentVariables: JSON.stringify({
             1: todayWord.korean?.trim(), // korean
             2: todayWord.pronunciation?.trim(), // pronunciation
@@ -371,5 +374,106 @@ const sendTodayWord = async () => {
 //     sendTodayWord();
 //   }
 // });
+// const db = require("../models");
+
+// 구독기간이 현재 진행 중인 사용자 목록을 가져오는 함수
+async function fetchActiveSubscriptions() {
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0); // 로컬 시간으로 설정
+  const todayEnd = new Date();
+  todayEnd.setHours(23, 59, 59, 999); // 로컬 시간으로 설정
+  console.log(todayStart, todayEnd);
+
+  return await db.Subscription.findAll({
+    where: {
+      subscriptionDate: {
+        [db.Sequelize.Op.lte]: todayEnd,
+      },
+      expirationDate: {
+        [db.Sequelize.Op.gte]: todayStart,
+      },
+    },
+    include: [
+      {
+        model: db.User,
+        attributes: ["id", "name", "phoneNumber"],
+      },
+    ],
+  });
+}
+
+const sendDailyMessage = async () => {
+  const categorizedSubscriptions = {};
+
+  // 구독기간이 현재 진행 중인 사용자 목록을 카테고리별로 분류
+  const activeSubscriptions = await fetchActiveSubscriptions();
+  activeSubscriptions.forEach((subscription) => {
+    const category = subscription.preferredCategory || "기타";
+    if (!categorizedSubscriptions[category]) {
+      categorizedSubscriptions[category] = [];
+    }
+    categorizedSubscriptions[category].push(subscription);
+  });
+
+  // 카테고리별로 함수 실행
+  Object.keys(categorizedSubscriptions).forEach((category) => {
+    const subscriptions = categorizedSubscriptions[category];
+    console.log(`카테고리: ${category}, 구독자 수: ${subscriptions.length}`);
+    // 여기에 카테고리별로 실행할 함수를 호출할 수 있습니다.
+    // 예: processCategorySubscriptions(category, subscriptions);
+  });
+};
+
+async function fetchSubscriptionsStartingToday() {
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0); // 오늘의 시작 시간 설정
+  const todayEnd = new Date();
+  todayEnd.setHours(23, 59, 59, 999); // 오늘의 종료 시간 설정
+
+  return await db.Subscription.findAll({
+    where: {
+      subscriptionDate: {
+        [db.Sequelize.Op.gte]: todayStart,
+        [db.Sequelize.Op.lte]: todayEnd,
+      },
+    },
+    include: [
+      {
+        model: db.User,
+        attributes: ["id", "name", "phoneNumber"],
+      },
+    ],
+  });
+}
+
+// Twilio를 사용하여 환영 메시지를 보내는 함수
+async function sendWelcomeMessage() {
+  const activeSubscriptions = await fetchSubscriptionsStartingToday();
+  activeSubscriptions.forEach(async (subscription) => {
+    const to = `whatsapp:${subscription.User.phoneNumber}`;
+    try {
+      const response = await client.messages.create(
+        {
+          from: process.env.FROM_PHONE_NUMBER,
+          to,
+          contentSid: process.env.TEMPLATE_WELCOME,
+          messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
+          scheduleType: "fixed",
+          sendAt: new Date(Date.now() + 16 * 60000),
+        },
+        (error) => {
+          console.log(error);
+        }
+      );
+
+      console.log(" -> ", response);
+    } catch (error) {
+      console.error(
+        `Error sending welcome message to ${subscription.User.name}: `,
+        error
+      );
+    }
+  });
+}
 
 module.exports = router;
