@@ -186,22 +186,34 @@ router.post("/send-message", async (req, res) => {
  */
 
 router.post("/welcome", async (req, res) => {
-  // sendWelcomeMessage();
-
   const response = await client.messages.create(
     {
       from: process.env.FROM_PHONE_NUMBER,
-      to: "whatsapp:+821063393916",
-      contentSid: process.env.TEMPLATE_WELCOME,
+      to: "whatsapp:+821020252266",
+      contentSid: process.env.TEMPLATE_TOPIK_VARIATION_MEDIA,
       messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
-      // scheduleType: "fixed",
-      // sendAt: new Date(Date.now() + 16 * 60000),
+      scheduleType: "fixed",
+      sendAt: new Date(new Date().setHours(7, 20, 0, 0)).toISOString(),
+      contentVariables: JSON.stringify({
+        1: "July_2.png",
+        2: "다음을 읽고 내용이 같은 것을 고르십시오.", // 질문
+        3: `저는 친구와 함께 기숙사에 삽니다. 우리는 기숙사에서 한국 아이돌의 노래를 매일 듣습니다. 주말에는 같이 노래방에 갑니다.
+
+① 주말에는 각자 쉽니다.
+② 우리는 한국 노래를 가끔 듣습니다.
+③ 친구는 저와 함께 삽니다.
+④ 친구는 혼자 노래방에 갑니다.`, // 보기
+        4: "③ 친구는 저와 함께 삽니다.", // 정답
+        5: `Jawaban yang benar adalah ③ 친구는 저와 함께 삽니다 (Teman saya tinggal bersama saya). 
+Bagian tersebut menyatakan bahwa pembicara tinggal di asrama bersama seorang teman, mendengarkan lagu K-pop setiap hari, dan pergi karaoke bersama.`, // 해설
+      }),
     },
     (error) => {
       console.log(error);
     }
   );
 
+  // sendWelcomeMessage();
   return res.json({ message: "WhatsApp 메시지가 성공적으로 발송되었습니다." });
   // return sendTodayWord();
   console.log(process.env.TEMPLATE_WELCOME);
@@ -452,6 +464,7 @@ const processCategorySubscriptions = async (category, subscriptions) => {
           id: {
             [db.Sequelize.Op.gt]: subscription.lastWordId,
           },
+          type: "daily_conversation",
         },
         order: [["id", "ASC"]],
         limit: 1,
@@ -476,6 +489,9 @@ const processCategorySubscriptions = async (category, subscriptions) => {
           }),
         });
         console.log("Scheduled message sent to", subscription.User.name);
+
+        // 메시지 전송 후 lastWordId 업데이트
+        await subscription.update({ lastWordId: todayWord.id });
       } catch (error) {
         console.error(
           `Error sending scheduled message to ${subscription.User.name}: `,
@@ -485,6 +501,17 @@ const processCategorySubscriptions = async (category, subscriptions) => {
     });
   } else if (category === "kpop_lyrics") {
     subscriptions.forEach(async (subscription) => {
+      const todayWord = await db.Word.findOne({
+        where: {
+          id: {
+            [db.Sequelize.Op.gt]: subscription.lastWordId,
+          },
+          type: "kpop_lyrics",
+        },
+        order: [["id", "ASC"]],
+        limit: 1,
+      });
+
       const to = `whatsapp:${subscription.User.phoneNumber}`;
       try {
         const response = await client.messages.create({
@@ -494,9 +521,19 @@ const processCategorySubscriptions = async (category, subscriptions) => {
           messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
           scheduleType: "fixed",
           sendAt: new Date(Date.now() + 10 * 60000), // 10분 후 메시지 전송
-          contentVariables: JSON.stringify({}),
+          contentVariables: JSON.stringify({
+            1: todayWord.korean?.trim(), // korean
+            2: todayWord.pronunciation?.trim(), // pronunciation
+            3: todayWord.description?.trim(), // description
+            4: todayWord.source?.trim(), // 출처
+            5: todayWord.example_1?.trim(), // example_1 (예문)
+            6: todayWord.example_2?.trim(), // example_2 (에문 발음기호)
+            7: todayWord.example_3?.trim(), // example_3 (에문 설명)
+          }),
         });
         console.log("Scheduled message sent to", subscription.User.name);
+
+        await subscription.update({ lastWordId: todayWord.id });
       } catch (error) {
         console.error(
           `Error sending scheduled message to ${subscription.User.name}: `,
@@ -506,6 +543,17 @@ const processCategorySubscriptions = async (category, subscriptions) => {
     });
   } else if (category === "topik_word") {
     subscriptions.forEach(async (subscription) => {
+      const todayWord = await db.Word.findOne({
+        where: {
+          id: {
+            [db.Sequelize.Op.gt]: subscription.lastWordId,
+          },
+          type: "topik_word",
+        },
+        order: [["id", "ASC"]],
+        limit: 1,
+      });
+
       const to = `whatsapp:${subscription.User.phoneNumber}`;
       try {
         const response = await client.messages.create({
@@ -515,9 +563,18 @@ const processCategorySubscriptions = async (category, subscriptions) => {
           messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
           scheduleType: "fixed",
           sendAt: new Date(Date.now() + 10 * 60000), // 10분 후 메시지 전송
-          contentVariables: JSON.stringify({}),
+          contentVariables: JSON.stringify({
+            1: todayWord.korean?.trim(), // korean
+            2: todayWord.pronunciation?.trim(), // pronunciation
+            3: todayWord.description?.trim(), // description
+            4: todayWord.example_1?.trim(), // example_1
+            5: todayWord.example_2?.trim(), // example_2 (예문 발음기호)
+            6: todayWord.example_3?.trim(), // example_3 (에문 설명)
+          }),
         });
         console.log("Scheduled message sent to", subscription.User.name);
+
+        await subscription.update({ lastWordId: todayWord.id });
       } catch (error) {
         console.error(
           `Error sending scheduled message to ${subscription.User.name}: `,
@@ -527,18 +584,52 @@ const processCategorySubscriptions = async (category, subscriptions) => {
     });
   } else if (category === "topik_variation") {
     subscriptions.forEach(async (subscription) => {
+      const todayQuestion = await db.Question.findOne({
+        where: {
+          id: {
+            [db.Sequelize.Op.gt]: subscription.lastWordId,
+          },
+          type: "topik_variation",
+        },
+        order: [["id", "ASC"]],
+        limit: 1,
+      });
+
       const to = `whatsapp:${subscription.User.phoneNumber}`;
+      const hasImage = todayQuestion.imageUrl ? true : false;
+
+      const contentVariables = hasImage
+        ? JSON.stringify({
+            1: todayQuestion.imageUrl?.trim(), // 이미지
+            2: todayQuestion.title?.trim(), // 질문
+            3: todayQuestion.description?.trim(), // 보기
+            4: todayQuestion.answer?.trim(), // 정답
+            5: todayQuestion.explanation?.trim(), // 해설
+          })
+        : JSON.stringify({
+            1: todayQuestion.title?.trim(), // 질문
+            2: todayQuestion.description?.trim(), // 보기
+            3: todayQuestion.answer?.trim(), // 정답
+            4: todayQuestion.explanation?.trim(), // 해설
+          });
+
+      const contentSid = hasImage
+        ? process.env.TEMPLATE_TOPIK_VARIATION_MEDIA
+        : process.env.TEMPLATE_TOPIK_VARIATION_TEXT;
+
       try {
         const response = await client.messages.create({
           from: process.env.FROM_PHONE_NUMBER,
           to,
-          contentSid: process.env.TEMPLATE_TOPIK_VARIATION_TEXT,
+          contentSid,
           messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
           scheduleType: "fixed",
           sendAt: new Date(Date.now() + 10 * 60000), // 10분 후 메시지 전송
-          contentVariables: JSON.stringify({}),
+          contentVariables,
         });
         console.log("Scheduled message sent to", subscription.User.name);
+
+        await subscription.update({ lastWordId: todayQuestion.id });
       } catch (error) {
         console.error(
           `Error sending scheduled message to ${subscription.User.name}: `,
@@ -548,28 +639,6 @@ const processCategorySubscriptions = async (category, subscriptions) => {
     });
   }
 };
-
-// if (category === "daily_conversation") {
-//   subscriptions.forEach(async (subscription) => {
-//     const to = `whatsapp:${subscription.User.phoneNumber}`;
-//     try {
-//       const response = await client.messages.create({
-//         from: process.env.FROM_PHONE_NUMBER,
-//         to,
-//         body: "오늘의 대화 주제: 오늘의 날씨는 어떤가요?",
-//         messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
-//         scheduleType: "fixed",
-//         sendAt: new Date(Date.now() + 10 * 60000), // 10분 후 메시지 전송
-//       });
-//       console.log("Scheduled message sent to", subscription.User.name);
-//     } catch (error) {
-//       console.error(
-//         `Error sending scheduled message to ${subscription.User.name}: `,
-//         error
-//       );
-//     }
-//   });
-// }
 
 async function fetchSubscriptionsStartingToday() {
   const todayStart = new Date();
