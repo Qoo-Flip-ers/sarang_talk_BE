@@ -326,12 +326,12 @@ const sendTodayWord = async () => {
           contentSid: process.env.TEMPLATE_DAILY_CONVERSATION,
           messagingServiceSid: "MGc11b68678a2fa216588c979110f444fe",
           contentVariables: JSON.stringify({
-            1: todayWord.korean, // korean
-            2: todayWord.pronunciation, // pronunciation
-            3: todayWord.description, // description
-            4: todayWord.example_1, // example_1
-            5: todayWord.example_2, // example_2 (예문 발음기호)
-            6: todayWord.example_3, // example_3 (에문 설명)
+            1: todayWord.korean?.trim(), // korean
+            2: todayWord.pronunciation?.trim(), // pronunciation
+            3: todayWord.description?.trim(), // description
+            4: todayWord.example_1?.trim(), // example_1
+            5: todayWord.example_2?.trim(), // example_2 (예문 발음기호)
+            6: todayWord.example_3?.trim(), // example_3 (에문 설명)
           }),
         },
         (error) => {
