@@ -90,6 +90,250 @@ const sendDailyConversation = async (phoneNumber) => {
 
 /**
  * @swagger
+ * /whatsapp/daily-conversation:
+ *   post:
+ *     summary: 일일 대화 메시지 발송
+ *     description: 등록된 사용자의 전화번호로 일일 대화 관련 WhatsApp 메시지를 발송합니다.
+ *     tags:
+ *       - WhatsApp
+ *     operationId: sendDailyConversationMessage
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               userId:
+ *                 type: string
+ *                 description: 사용자의 고유 식별자
+ *     responses:
+ *       200:
+ *         description: 메시지가 성공적으로 발송되었습니다.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "메시지가 성공적으로 발송되었습니다."
+ *                 response:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       status:
+ *                         type: string
+ *                         example: "sent"
+ *       404:
+ *         description: 요청한 사용자를 찾을 수 없습니다.
+ *       500:
+ *         description: 서버 내부 오류로 인해 메시지를 발송할 수 없습니다.
+ */
+router.post("/daily-conversation", async (req, res) => {
+  try {
+    const result = await sendDailyMessage("daily_conversation");
+    res.status(200).json({
+      message: "메시지가 성공적으로 발송되었습니다.",
+      response: result,
+    });
+  } catch (error) {
+    if (error.status === 404) {
+      res.status(404).json({ message: "요청한 사용자를 찾을 수 없습니다." });
+    } else {
+      res
+        .status(500)
+        .json({ message: "서버 오류로 인해 메시지를 발송할 수 없습니다." });
+    }
+  }
+});
+
+/**
+ * @swagger
+ * /whatsapp/kpop_lyrics:
+ *   post:
+ *     summary: 일일 대화 메시지 발송
+ *     description: 등록된 사용자의 전화번호로 일일 대화 관련 WhatsApp 메시지를 발송합니다.
+ *     tags:
+ *       - WhatsApp
+ *     operationId: sendDailyConversationMessage
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               userId:
+ *                 type: string
+ *                 description: 사용자의 고유 식별자
+ *     responses:
+ *       200:
+ *         description: 메시지가 성공적으로 발송되었습니다.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "메시지가 성공적으로 발송되었습니다."
+ *                 response:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       status:
+ *                         type: string
+ *                         example: "sent"
+ *       404:
+ *         description: 요청한 사용자를 찾을 수 없습니다.
+ *       500:
+ *         description: 서버 내부 오류로 인해 메시지를 발송할 수 없습니다.
+ */
+router.post("/kpop_lyrics", async (req, res) => {
+  try {
+    const result = await sendDailyMessage("kpop_lyrics");
+    res.status(200).json({
+      message: "메시지가 성공적으로 발송되었습니다.",
+      response: result,
+    });
+  } catch (error) {
+    if (error.status === 404) {
+      res.status(404).json({ message: "요청한 사용자를 찾을 수 없습니다." });
+    } else {
+      res
+        .status(500)
+        .json({ message: "서버 오류로 인해 메시지를 발송할 수 없습니다." });
+    }
+  }
+});
+
+/**
+ * @swagger
+ * /whatsapp/topik_word:
+ *   post:
+ *     summary: 일일 대화 메시지 발송
+ *     description: 등록된 사용자의 전화번호로 일일 대화 관련 WhatsApp 메시지를 발송합니다.
+ *     tags:
+ *       - WhatsApp
+ *     operationId: sendDailyConversationMessage
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               userId:
+ *                 type: string
+ *                 description: 사용자의 고유 식별자
+ *     responses:
+ *       200:
+ *         description: 메시지가 성공적으로 발송되었습니다.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "메시지가 성공적으로 발송되었습니다."
+ *                 response:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       status:
+ *                         type: string
+ *                         example: "sent"
+ *       404:
+ *         description: 요청한 사용자를 찾을 수 없습니다.
+ *       500:
+ *         description: 서버 내부 오류로 인해 메시지를 발송할 수 없습니다.
+ */
+router.post("/topik_word", async (req, res) => {
+  try {
+    const result = await sendDailyMessage("topik_word");
+    res.status(200).json({
+      message: "메시지가 성공적으로 발송되었습니다.",
+      response: result,
+    });
+  } catch (error) {
+    if (error.status === 404) {
+      res.status(404).json({ message: "요청한 사용자를 찾을 수 없습니다." });
+    } else {
+      res
+        .status(500)
+        .json({ message: "서버 오류로 인해 메시지를 발송할 수 없습니다." });
+    }
+  }
+});
+
+/**
+ * @swagger
+ * /whatsapp/topik_variation:
+ *   post:
+ *     summary: 일일 대화 메시지 발송
+ *     description: 등록된 사용자의 전화번호로 일일 대화 관련 WhatsApp 메시지를 발송합니다.
+ *     tags:
+ *       - WhatsApp
+ *     operationId: sendDailyConversationMessage
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               userId:
+ *                 type: string
+ *                 description: 사용자의 고유 식별자
+ *     responses:
+ *       200:
+ *         description: 메시지가 성공적으로 발송되었습니다.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "메시지가 성공적으로 발송되었습니다."
+ *                 response:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       status:
+ *                         type: string
+ *                         example: "sent"
+ *       404:
+ *         description: 요청한 사용자를 찾을 수 없습니다.
+ *       500:
+ *         description: 서버 내부 오류로 인해 메시지를 발송할 수 없습니다.
+ */
+router.post("/topik_variation", async (req, res) => {
+  try {
+    const result = await sendDailyMessage("topik_variation");
+    res.status(200).json({
+      message: "메시지가 성공적으로 발송되었습니다.",
+      response: result,
+    });
+  } catch (error) {
+    if (error.status === 404) {
+      res.status(404).json({ message: "요청한 사용자를 찾을 수 없습니다." });
+    } else {
+      res
+        .status(500)
+        .json({ message: "서버 오류로 인해 메시지를 발송할 수 없습니다." });
+    }
+  }
+});
+
+/**
+ * @swagger
  * /whatsapp/send-message:
  *   post:
  *     summary: WhatsApp 메시지 발송
@@ -402,10 +646,12 @@ const sendTodayWord = async () => {
 // const db = require("../models");
 
 // 구독기간이 현재 진행 중인 사용자 목록을 가져오는 함수
-async function fetchActiveSubscriptions() {
+async function fetchActiveSubscriptions(category) {
   const todayStart = new Date();
+  todayStart.setFullYear(2024, 6, 1); // 7월 1일로 설정 (월은 0부터 시작하므로 6은 7월을 의미)
   todayStart.setHours(0, 0, 0, 0); // 로컬 시간으로 설정
   const todayEnd = new Date();
+  todayEnd.setFullYear(2024, 6, 1); // 7월 1일로 설정
   todayEnd.setHours(23, 59, 59, 999); // 로컬 시간으로 설정
   console.log(todayStart, todayEnd);
 
@@ -417,6 +663,7 @@ async function fetchActiveSubscriptions() {
       expirationDate: {
         [db.Sequelize.Op.gte]: todayStart,
       },
+      type: category,
     },
     include: [
       {
@@ -427,11 +674,11 @@ async function fetchActiveSubscriptions() {
   });
 }
 
-const sendDailyMessage = async () => {
+const sendDailyMessage = async (category) => {
   const categorizedSubscriptions = {};
 
   // 구독기간이 현재 진행 중인 사용자 목록을 카테고리별로 분류
-  const activeSubscriptions = await fetchActiveSubscriptions();
+  const activeSubscriptions = await fetchActiveSubscriptions(category);
   activeSubscriptions.forEach((subscription) => {
     const category = subscription.type || "daily_conversation";
     if (!categorizedSubscriptions[category]) {
@@ -443,25 +690,38 @@ const sendDailyMessage = async () => {
   // 카테고리별로 함수 실행
   Object.keys(categorizedSubscriptions).forEach((category) => {
     const subscriptions = categorizedSubscriptions[category];
+    sendSlack(`카테고리: ${category}, 구독자 수: ${subscriptions.length}`);
     console.log(`카테고리: ${category}, 구독자 수: ${subscriptions.length}`);
     // 여기에 카테고리별로 실행할 함수를 호출할 수 있습니다.
-    processCategorySubscriptions(category, subscriptions);
+    subscriptions.forEach((subscription, index) => {
+      setTimeout(() => {
+        processCategorySubscriptions(category, [subscription]);
+      }, index * 500); // 0.5초 간격으로 호출
+    });
   });
 };
 
 const processCategorySubscriptions = async (category, subscriptions) => {
   if (category === "daily_conversation") {
     subscriptions.forEach(async (subscription) => {
+      console.log("subscription.lastWordId", subscription.lastWordId);
       const todayWord = await db.Word.findOne({
         where: {
           id: {
-            [db.Sequelize.Op.gt]: subscription.lastWordId,
+            [db.Sequelize.Op.gt]: subscription.lastWordId || 0,
           },
-          type: "daily_conversation",
+          type: {
+            [db.Sequelize.Op.eq]: "daily_conversation",
+          },
         },
         order: [["id", "ASC"]],
         limit: 1,
       });
+      console.log("todayWord", todayWord);
+      if (!todayWord) {
+        sendSlack(`오늘의 단어가 없습니다.`);
+        return;
+      }
 
       const to = `whatsapp:${subscription.User.phoneNumber}`;
       try {
@@ -471,7 +731,8 @@ const processCategorySubscriptions = async (category, subscriptions) => {
           contentSid: process.env.TEMPLATE_DAILY_CONVERSATION,
           messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
           scheduleType: "fixed",
-          sendAt: new Date(Date.now() + 10 * 60000), // 10분 후 메시지 전송
+          // sendAt: new Date(Date.now() + 10 * 60000), // 10분 후 메시지 전송
+          sendAt: new Date(Date.UTC(2024, 6, 1, 2, 0, 0, 0)).toISOString(), // UTC 기준으로 한국 시간 오전 11시로 설정
           contentVariables: JSON.stringify({
             1: todayWord.korean?.trim(), // korean
             2: todayWord.pronunciation?.trim(), // pronunciation
@@ -485,6 +746,13 @@ const processCategorySubscriptions = async (category, subscriptions) => {
 
         // 메시지 전송 후 lastWordId 업데이트
         await subscription.update({ lastWordId: todayWord.id });
+
+        // ReceivedWords에 기록 추가
+        await db.ReceivedWords.create({
+          userId: subscription.userId,
+          wordId: todayWord.id,
+          receivedDate: new Date(),
+        });
       } catch (error) {
         console.error(
           `Error sending scheduled message to ${subscription.User.name}: `,
@@ -497,13 +765,21 @@ const processCategorySubscriptions = async (category, subscriptions) => {
       const todayWord = await db.Word.findOne({
         where: {
           id: {
-            [db.Sequelize.Op.gt]: subscription.lastWordId,
+            [db.Sequelize.Op.gt]: subscription.lastWordId || 0,
           },
-          type: "kpop_lyrics",
+          type: {
+            [db.Sequelize.Op.eq]: "kpop_lyrics",
+          },
         },
         order: [["id", "ASC"]],
         limit: 1,
       });
+
+      console.log("todayWord", todayWord);
+      if (!todayWord) {
+        sendSlack(`오늘의 단어가 없습니다.`);
+        return;
+      }
 
       const to = `whatsapp:${subscription.User.phoneNumber}`;
       try {
@@ -513,7 +789,8 @@ const processCategorySubscriptions = async (category, subscriptions) => {
           contentSid: process.env.TEMPLATE_KPOP_LYRICS,
           messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
           scheduleType: "fixed",
-          sendAt: new Date(Date.now() + 10 * 60000), // 10분 후 메시지 전송
+          // sendAt: new Date(Date.now() + 10 * 60000), // 10분 후 메시지 전송
+          sendAt: new Date(Date.UTC(2024, 6, 1, 2, 0, 0, 0)).toISOString(), // UTC 기준으로 한국 시간 오전 11시로 설정
           contentVariables: JSON.stringify({
             1: todayWord.korean?.trim(), // korean
             2: todayWord.pronunciation?.trim(), // pronunciation
@@ -527,6 +804,13 @@ const processCategorySubscriptions = async (category, subscriptions) => {
         console.log("Scheduled message sent to", subscription.User.name);
 
         await subscription.update({ lastWordId: todayWord.id });
+
+        // ReceivedWords에 기록 추가
+        await db.ReceivedWords.create({
+          userId: subscription.userId,
+          wordId: todayWord.id,
+          receivedDate: new Date(),
+        });
       } catch (error) {
         console.error(
           `Error sending scheduled message to ${subscription.User.name}: `,
@@ -539,13 +823,21 @@ const processCategorySubscriptions = async (category, subscriptions) => {
       const todayWord = await db.Word.findOne({
         where: {
           id: {
-            [db.Sequelize.Op.gt]: subscription.lastWordId,
+            [db.Sequelize.Op.gt]: subscription.lastWordId || 0,
           },
-          type: "topik_word",
+          type: {
+            [db.Sequelize.Op.eq]: "topik_word",
+          },
         },
         order: [["id", "ASC"]],
         limit: 1,
       });
+
+      console.log("todayWord", todayWord);
+      if (!todayWord) {
+        sendSlack(`오늘의 단어가 없습니다.`);
+        return;
+      }
 
       const to = `whatsapp:${subscription.User.phoneNumber}`;
       try {
@@ -555,7 +847,8 @@ const processCategorySubscriptions = async (category, subscriptions) => {
           contentSid: process.env.TEMPLATE_TOPIK_WORD,
           messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
           scheduleType: "fixed",
-          sendAt: new Date(Date.now() + 10 * 60000), // 10분 후 메시지 전송
+          // sendAt: new Date(Date.now() + 10 * 60000), // 10분 후 메시지 전송
+          sendAt: new Date(Date.UTC(2024, 6, 1, 2, 0, 0, 0)).toISOString(), // UTC 기준으로 한국 시간 오전 11시로 설정
           contentVariables: JSON.stringify({
             1: todayWord.korean?.trim(), // korean
             2: todayWord.pronunciation?.trim(), // pronunciation
@@ -568,6 +861,13 @@ const processCategorySubscriptions = async (category, subscriptions) => {
         console.log("Scheduled message sent to", subscription.User.name);
 
         await subscription.update({ lastWordId: todayWord.id });
+
+        // ReceivedWords에 기록 추가
+        await db.ReceivedWords.create({
+          userId: subscription.userId,
+          wordId: todayWord.id,
+          receivedDate: new Date(),
+        });
       } catch (error) {
         console.error(
           `Error sending scheduled message to ${subscription.User.name}: `,
@@ -580,13 +880,21 @@ const processCategorySubscriptions = async (category, subscriptions) => {
       const todayQuestion = await db.Question.findOne({
         where: {
           id: {
-            [db.Sequelize.Op.gt]: subscription.lastWordId,
+            [db.Sequelize.Op.gt]: subscription.lastWordId || 0,
           },
-          type: "topik_variation",
+          type: {
+            [db.Sequelize.Op.eq]: "topik_variation",
+          },
         },
         order: [["id", "ASC"]],
         limit: 1,
       });
+
+      console.log("todayWord", todayQuestion);
+      if (!todayQuestion) {
+        sendSlack(`오늘의 문제가 없습니다.`);
+        return;
+      }
 
       const to = `whatsapp:${subscription.User.phoneNumber}`;
       const hasImage = todayQuestion.imageUrl ? true : false;
@@ -617,12 +925,20 @@ const processCategorySubscriptions = async (category, subscriptions) => {
           contentSid,
           messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
           scheduleType: "fixed",
-          sendAt: new Date(Date.now() + 10 * 60000), // 10분 후 메시지 전송
+          // sendAt: new Date(Date.now() + 10 * 60000), // 10분 후 메시지 전송
+          sendAt: new Date(Date.UTC(2024, 6, 1, 2, 0, 0, 0)).toISOString(), // UTC 기준으로 한국 시간 오전 11시로 설정
           contentVariables,
         });
         console.log("Scheduled message sent to", subscription.User.name);
 
         await subscription.update({ lastWordId: todayQuestion.id });
+
+        // ReceivedWords에 기록 추가
+        await db.ReceivedQuestions.create({
+          userId: subscription.userId,
+          wordId: todayWord.id,
+          receivedDate: new Date(),
+        });
       } catch (error) {
         console.error(
           `Error sending scheduled message to ${subscription.User.name}: `,
@@ -649,6 +965,7 @@ async function fetchSubscriptionsStartingToday() {
           [db.Sequelize.Op.gte]: todayStart,
           [db.Sequelize.Op.lte]: todayEnd,
         },
+        deletedAt: { [db.Sequelize.Op.is]: null },
       },
       include: [
         {
