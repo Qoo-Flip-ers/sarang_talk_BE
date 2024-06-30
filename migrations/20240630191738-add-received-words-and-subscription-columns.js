@@ -49,17 +49,11 @@ module.exports = {
       type: Sequelize.INTEGER,
       defaultValue: 0,
     });
-
-    await queryInterface.addColumn("Subscriptions", "preferredCategory", {
-      type: Sequelize.STRING,
-      allowNull: true,
-    });
   },
 
   down: async (queryInterface, Sequelize) => {
     // 마이그레이션 롤백
     await queryInterface.removeColumn("Subscriptions", "lastWordId");
-    await queryInterface.removeColumn("Subscriptions", "preferredCategory");
     await queryInterface.dropTable("ReceivedWords");
     await queryInterface.dropTable("ReceivedQuestions");
   },

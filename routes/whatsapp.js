@@ -186,20 +186,22 @@ router.post("/send-message", async (req, res) => {
  */
 
 router.post("/welcome", async (req, res) => {
+  // sendWelcomeMessage();
+
   const response = await client.messages.create(
     {
       from: process.env.FROM_PHONE_NUMBER,
       to: "whatsapp:+821020252266",
       contentSid: process.env.TEMPLATE_WELCOME,
       messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
-      scheduleType: "fixed",
-      sendAt: new Date(Date.now() + 16 * 60000),
+      // scheduleType: "fixed",
+      // sendAt: new Date(Date.now() + 16 * 60000),
     },
     (error) => {
       console.log(error);
     }
   );
-  // sendWelcomeMessage();
+
   return res.json({ message: "WhatsApp 메시지가 성공적으로 발송되었습니다." });
   // return sendTodayWord();
   console.log(process.env.TEMPLATE_WELCOME);
@@ -426,7 +428,7 @@ const sendDailyMessage = async () => {
   // 구독기간이 현재 진행 중인 사용자 목록을 카테고리별로 분류
   const activeSubscriptions = await fetchActiveSubscriptions();
   activeSubscriptions.forEach((subscription) => {
-    const category = subscription.preferredCategory || "기타";
+    const category = subscription.type || "daily_conversation";
     if (!categorizedSubscriptions[category]) {
       categorizedSubscriptions[category] = [];
     }
@@ -438,8 +440,113 @@ const sendDailyMessage = async () => {
     const subscriptions = categorizedSubscriptions[category];
     console.log(`카테고리: ${category}, 구독자 수: ${subscriptions.length}`);
     // 여기에 카테고리별로 실행할 함수를 호출할 수 있습니다.
-    // 예: processCategorySubscriptions(category, subscriptions);
+    processCategorySubscriptions(category, subscriptions);
   });
+};
+
+const processCategorySubscriptions = async (category, subscriptions) => {
+  if (category === "daily_conversation") {
+    subscriptions.forEach(async (subscription) => {
+      const todayWord = await db.Word.findOne({
+        where: {
+          id: {
+            [db.Sequelize.Op.gt]: subscription.lastWordId,
+          },
+        },
+        order: [["id", "ASC"]],
+        limit: 1,
+      });
+
+      const to = `whatsapp:${subscription.User.phoneNumber}`;
+      try {
+        const response = await client.messages.create({
+          from: process.env.FROM_PHONE_NUMBER,
+          to,
+          contentSid: process.env.TEMPLATE_DAILY_CONVERSATION,
+          messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
+          scheduleType: "fixed",
+          sendAt: new Date(Date.now() + 10 * 60000), // 10분 후 메시지 전송
+          contentVariables: JSON.stringify({
+            1: todayWord.korean?.trim(), // korean
+            2: todayWord.pronunciation?.trim(), // pronunciation
+            3: todayWord.description?.trim(), // description
+            4: todayWord.example_1?.trim(), // example_1
+            5: todayWord.example_2?.trim(), // example_2 (예문 발음기호)
+            6: todayWord.example_3?.trim(), // example_3 (에문 설명)
+          }),
+        });
+        console.log("Scheduled message sent to", subscription.User.name);
+      } catch (error) {
+        console.error(
+          `Error sending scheduled message to ${subscription.User.name}: `,
+          error
+        );
+      }
+    });
+  } else if (category === "kpop_lyrics") {
+    subscriptions.forEach(async (subscription) => {
+      const to = `whatsapp:${subscription.User.phoneNumber}`;
+      try {
+        const response = await client.messages.create({
+          from: process.env.FROM_PHONE_NUMBER,
+          to,
+          contentSid: process.env.TEMPLATE_KPOP_LYRICS,
+          messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
+          scheduleType: "fixed",
+          sendAt: new Date(Date.now() + 10 * 60000), // 10분 후 메시지 전송
+          contentVariables: JSON.stringify({}),
+        });
+        console.log("Scheduled message sent to", subscription.User.name);
+      } catch (error) {
+        console.error(
+          `Error sending scheduled message to ${subscription.User.name}: `,
+          error
+        );
+      }
+    });
+  } else if (category === "topik_word") {
+    subscriptions.forEach(async (subscription) => {
+      const to = `whatsapp:${subscription.User.phoneNumber}`;
+      try {
+        const response = await client.messages.create({
+          from: process.env.FROM_PHONE_NUMBER,
+          to,
+          contentSid: process.env.TEMPLATE_TOPIK_WORD,
+          messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
+          scheduleType: "fixed",
+          sendAt: new Date(Date.now() + 10 * 60000), // 10분 후 메시지 전송
+          contentVariables: JSON.stringify({}),
+        });
+        console.log("Scheduled message sent to", subscription.User.name);
+      } catch (error) {
+        console.error(
+          `Error sending scheduled message to ${subscription.User.name}: `,
+          error
+        );
+      }
+    });
+  } else if (category === "topik_variation") {
+    subscriptions.forEach(async (subscription) => {
+      const to = `whatsapp:${subscription.User.phoneNumber}`;
+      try {
+        const response = await client.messages.create({
+          from: process.env.FROM_PHONE_NUMBER,
+          to,
+          contentSid: process.env.TEMPLATE_TOPIK_VARIATION_TEXT,
+          messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
+          scheduleType: "fixed",
+          sendAt: new Date(Date.now() + 10 * 60000), // 10분 후 메시지 전송
+          contentVariables: JSON.stringify({}),
+        });
+        console.log("Scheduled message sent to", subscription.User.name);
+      } catch (error) {
+        console.error(
+          `Error sending scheduled message to ${subscription.User.name}: `,
+          error
+        );
+      }
+    });
+  }
 };
 
 // if (category === "daily_conversation") {
@@ -511,8 +618,8 @@ async function sendWelcomeMessage() {
           to,
           contentSid: process.env.TEMPLATE_WELCOME,
           messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
-          scheduleType: "fixed",
-          sendAt: new Date(Date.now() + 16 * 60000),
+          // scheduleType: "fixed",
+          // sendAt: new Date(Date.now() + 16 * 60000),
         },
         (error) => {
           console.log(error);
@@ -529,14 +636,16 @@ async function sendWelcomeMessage() {
   });
 }
 
-const sendSlack = async (text) => {
+const sendSlack = async (message) => {
+  let text = `${
+    process.env.NODE_ENV === "development" ? "[테스트 환경]" : ""
+  }${message}`;
   const response = await slack.post(
     "/T0684TBHDKQ/B07AEG61MR8/HnFpkqFfqpXIBgeTzTklvKJQ",
     {
       text,
     }
   );
-  console.log(response);
 };
 
 module.exports = router;
