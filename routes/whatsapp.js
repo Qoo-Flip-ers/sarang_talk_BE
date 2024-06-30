@@ -639,20 +639,27 @@ async function fetchSubscriptionsStartingToday() {
   const todayEnd = new Date();
   todayEnd.setHours(23, 59, 59, 999); // 오늘의 종료 시간 설정
 
-  return await db.Subscription.findAll({
-    where: {
-      subscriptionDate: {
-        [db.Sequelize.Op.gte]: todayStart,
-        [db.Sequelize.Op.lte]: todayEnd,
+  try {
+    const response = await db.Subscription.findAll({
+      where: {
+        subscriptionDate: {
+          [db.Sequelize.Op.gte]: todayStart,
+          [db.Sequelize.Op.lte]: todayEnd,
+        },
       },
-    },
-    include: [
-      {
-        model: db.User,
-        attributes: ["id", "name", "phoneNumber"],
-      },
-    ],
-  });
+      include: [
+        {
+          model: db.User,
+          attributes: ["id", "name", "phoneNumber"],
+        },
+      ],
+    });
+    console.log(response.length);
+    return response;
+  } catch (error) {
+    console.error("Error fetching subscriptions: ", error);
+    return [];
+  }
 }
 
 // Twilio를 사용하여 환영 메시지를 보내는 함수
