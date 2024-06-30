@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const db = require("../models");
 const twilio = require("twilio");
+const cron = require("node-cron");
 const axios = require("axios").create({
   // baseURL: "https://graph.facebook.com/v19.0/354463551082624",
   baseURL: "https://graph.facebook.com/v19.0/176451042228268",
@@ -181,6 +182,7 @@ router.post("/send-message", async (req, res) => {
  */
 
 router.post("/welcome", async (req, res) => {
+  return sendTodayWord();
   console.log(process.env.TEMPLATE_WELCOME);
   await client.messages.create(
     {
@@ -303,5 +305,71 @@ router.post("/welcome", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+
+const sendTodayWord = async () => {
+  try {
+    const activeUsers = await db.User.findAll({
+      where: { status: "active" },
+    });
+
+    const todayWord = await db.Word.findOne({
+      where: { id: 1 },
+    });
+
+    const result = [];
+    for (const user of activeUsers) {
+      const phoneNumber = user.phoneNumber; // 가정: User 모델에 phoneNumber 필드가 있다고 가정합니다.
+      await client.messages.create(
+        {
+          from: process.env.FROM_PHONE_NUMBER,
+          to: `whatsapp:${phoneNumber}`,
+          contentSid: process.env.TEMPLATE_DAILY_CONVERSATION,
+          messagingServiceSid: "MGc11b68678a2fa216588c979110f444fe",
+          contentVariables: JSON.stringify({
+            1: todayWord.korean, // korean
+            2: todayWord.pronunciation, // pronunciation
+            3: todayWord.description, // description
+            4: todayWord.example_1, // example_1
+            5: todayWord.example_2, // example_2 (예문 발음기호)
+            6: todayWord.example_3, // example_3 (에문 설명)
+          }),
+        },
+        (error) => {
+          console.log(error);
+        }
+      );
+      // // WhatsApp 메시지 발송 API 호출
+      // const response = await axios.post(
+      //   "/messages",
+      //   {
+      //     messaging_product: "whatsapp",
+      //     to: "+821020252266",
+      //     type: "template",
+      //     template: {
+      //       name: process.env.TEMPLATE_WELCOME,
+      //       language: {
+      //         code: "id_ID",
+      //       },
+      //     },
+      //   },
+      //   {
+      //     headers: {
+      //       Authorization: `Bearer ${process.env.META_ACCESS_TOKEN}`,
+      //       "Content-Type": "application/json",
+      //     },
+      //   }
+      // );
+      result.push(response.data);
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+// cron.schedule("40 1 * * *", () => {
+//   if (process.env.NODE_ENV === "production") {
+//     sendTodayWord();
+//   }
+// });
 
 module.exports = router;
