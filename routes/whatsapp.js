@@ -190,21 +190,17 @@ router.post("/welcome", async (req, res) => {
     {
       from: process.env.FROM_PHONE_NUMBER,
       to: "whatsapp:+821020252266",
-      contentSid: process.env.TEMPLATE_TOPIK_VARIATION_TEXT,
+      contentSid: process.env.TEMPLATE_TOPIK_WORD,
       messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
       // scheduleType: "fixed",
       // sendAt: new Date(new Date().setHours(7, 20, 0, 0)).toISOString(),
       contentVariables: JSON.stringify({
-        1: "다음을 읽고 내용이 같은 것을 고르십시오.", // 질문
-        2: `저는 친구와 함께 기숙사에 삽니다. 우리는 기숙사에서 한국 아이돌의 노래를 매일 듣습니다. 주말에는 같이 노래방에 갑니다.
-
-① 주말에는 각자 쉽니다.
-② 우리는 한국 노래를 가끔 듣습니다.
-③ 친구는 저와 함께 삽니다.
-④ 친구는 혼자 노래방에 갑니다.`, // 보기
-        3: "③ 친구는 저와 함께 삽니다.", // 정답
-        4: `Jawaban yang benar adalah ③ 친구는 저와 함께 삽니다 (Teman saya tinggal bersama saya). 
-Bagian tersebut menyatakan bahwa pembicara tinggal di asrama bersama seorang teman, mendengarkan lagu K-pop setiap hari, dan pergi karaoke bersama.`, // 해설
+        1: "익숙하다", // 질문
+        2: "iksukada", // 보기
+        3: "sudah biasa, tidak canggung untuk melakukan sesuatu karena sudah sering melakukan.", // 정답
+        4: "이 길은 내가 익숙한 길이라서 길을 잃지 않을 거야.", // 해설
+        5: "i gireun naega iksukan giriraseo gireul ilchi aneul geoya",
+        6: "Jalan ini tidak asing lagi bagi saya, jadi saya tidak akan tersesat.",
       }),
     },
     (error) => {
