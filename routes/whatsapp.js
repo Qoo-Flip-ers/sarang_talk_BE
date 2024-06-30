@@ -691,7 +691,7 @@ async function sendWelcomeMessage() {
           contentSid: process.env.TEMPLATE_WELCOME,
           messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
           scheduleType: "fixed",
-          sendAt: new Date(new Date().setHours(11, 0, 0, 0)).toISOString(),
+          sendAt: new Date(Date.UTC(2024, 6, 1, 2, 0, 0, 0)).toISOString(), // UTC 기준으로 한국 시간 오전 11시로 설정
         },
         (error) => {
           console.log(error);
