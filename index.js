@@ -9,6 +9,7 @@ const cors = require("cors");
 
 const userRouter = require("./routes/user");
 const wordRouter = require("./routes/word");
+const questionRouter = require("./routes/question");
 const whatsappRouter = require("./routes/whatsapp");
 const webhookRouter = require("./routes/webhook");
 
@@ -17,6 +18,7 @@ app.use(cors());
 
 app.use("/users", userRouter);
 app.use("/words", wordRouter);
+app.use("/questions", questionRouter);
 app.use("/whatsapp", whatsappRouter);
 app.use("/webhook", webhookRouter);
 
