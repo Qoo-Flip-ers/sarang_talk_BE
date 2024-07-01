@@ -155,6 +155,7 @@ router.post("/", async (req, res) => {
       example_1: req.body.example_1,
       example_2: req.body.example_2,
       example_3: req.body.example_3,
+      example_4: req.body.example_4,
       type: req.body.type,
       level: req.body.level,
       imageUrl: req.body.imageUrl,
