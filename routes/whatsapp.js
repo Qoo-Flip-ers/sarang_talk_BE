@@ -901,17 +901,22 @@ const processCategorySubscriptions = async (category, subscriptions) => {
 
       const contentVariables = hasImage
         ? JSON.stringify({
-            1: todayQuestion.imageUrl?.trim(), // 이미지
+            1: "Annyeong-WA-98e5a1b50c334a2f85e24bf927d857d7?pvs=4",
+            2: todayQuestion.imageUrl?.trim(), // 이미지
+            3: todayQuestion.title?.trim(), // 질문
+            4: todayQuestion.answer?.trim(), // 정답
+            5: todayQuestion.example_1?.trim(), // 해설
+            6: todayQuestion.example_2?.trim(), // 해설
+            7: todayQuestion.example_3?.trim(), // 해설
+          })
+        : JSON.stringify({
+            1: "Annyeong-WA-98e5a1b50c334a2f85e24bf927d857d7?pvs=4",
             2: todayQuestion.title?.trim(), // 질문
             3: todayQuestion.description?.trim(), // 보기
             4: todayQuestion.answer?.trim(), // 정답
-            5: todayQuestion.explanation?.trim(), // 해설
-          })
-        : JSON.stringify({
-            1: todayQuestion.title?.trim(), // 질문
-            2: todayQuestion.description?.trim(), // 보기
-            3: todayQuestion.answer?.trim(), // 정답
-            4: todayQuestion.explanation?.trim(), // 해설
+            5: todayQuestion.example_1?.trim(), // 해설
+            6: todayQuestion.example_2?.trim(), // 해설
+            7: todayQuestion.example_3?.trim(), // 해설
           });
 
       const contentSid = hasImage
