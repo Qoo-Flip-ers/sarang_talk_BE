@@ -430,6 +430,43 @@ router.post("/send-message", async (req, res) => {
  */
 
 router.post("/welcome", async (req, res) => {
+  sendWelcomeMessage();
+  return res.json({ message: "WhatsApp 메시지가 성공적으로 발송되었습니다." });
+  // const response = await client.messages.create(
+  //   {
+  //     from: process.env.FROM_PHONE_NUMBER,
+  //     to: "whatsapp:+6281319705099",
+  //     contentSid: process.env.TEMPLATE_DAILY_CONVERSATION,
+  //     messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
+  //     contentVariables: JSON.stringify({
+  //       1: "답답하다", // korean
+  //       2: "dapdapada", // pronunciation
+  //       3: "Perasaan tertekan, jengkel, frustasi", // description
+  //       4: "이 상황이 정말 답답해요.", // example_1
+  //       5: "i sanghwangi jeongmal dapdapaeyo", // example_2 (예문 발음기호)
+  //       6: "Situasi ini sangat membuat frustrasi", // example_3 (에문 설명)
+  //     }),
+  //     // scheduleType: "fixed",
+  //     // sendAt: new Date(Date.UTC(2024, 6, 1, 2, 0, 0, 0)).toISOString(), // UTC 기준으로 한국 시간 오전 11시로 설정
+  //   },
+  //   (error) => {
+  //     console.log(error);
+  //   }
+  // );
+  // const response2 = await client.messages.create(
+  //   {
+  //     from: process.env.FROM_PHONE_NUMBER,
+  //     to: "whatsapp:+6281324602755",
+  //     contentSid: process.env.TEMPLATE_WELCOME,
+  //     messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
+  //     // scheduleType: "fixed",
+  //     // sendAt: new Date(Date.UTC(2024, 6, 1, 2, 0, 0, 0)).toISOString(), // UTC 기준으로 한국 시간 오전 11시로 설정
+  //   },
+  //   (error) => {
+  //     console.log(error);
+  //   }
+  // );
+  // return;
   //   {
   //     from: process.env.FROM_PHONE_NUMBER,
   //     to: "whatsapp:+821020252266",
@@ -452,209 +489,15 @@ router.post("/welcome", async (req, res) => {
   //     console.log(error);
   //   }
   // );
-
-  sendWelcomeMessage();
-  return res.json({ message: "WhatsApp 메시지가 성공적으로 발송되었습니다." });
-  // return sendTodayWord();
-  console.log(process.env.TEMPLATE_WELCOME);
-  await client.messages.create(
-    {
-      from: process.env.FROM_PHONE_NUMBER,
-      to: "whatsapp:+821041225996",
-      contentSid: process.env.TEMPLATE_WELCOME,
-      messagingServiceSid: "MGc11b68678a2fa216588c979110f444fe",
-      // contentVariables: JSON.stringify({
-      //   1: "Name",
-      // }),
-    },
-    (error) => {
-      console.log(error);
-    }
-  );
-  // await client.messages.create(
-  //   {
-  //     from: process.env.FROM_PHONE_NUMBER,
-  //     to: "whatsapp:+821045709002",
-  //     contentSid: process.env.TEMPLATE_WELCOME,
-  //     messagingServiceSid: "MGc11b68678a2fa216588c979110f444fe",
-  //     // contentVariables: JSON.stringify({
-  //     //   1: "Name",
-  //     // }),
-  //   },
-  //   (error) => {
-  //     console.log(error);
-  //   }
-  // );
-
-  // client.messages
-  //     .create({
-  //        contentSid: 'HXXXXXXXXX',
-  //        from: 'MGXXXXXXXX',
-  //        contentVariables: JSON.stringify({
-  //          1: 'Name'
-  //        }),
-  //        to: 'whatsapp:+18551234567'
-  //      })
-  //     .then(message => console.log(message.sid));
-  return;
-  console.log(process.env.TEMPLATE_WELCOME);
-  try {
-    const response = await axios.post(
-      "/messages",
-      {
-        messaging_product: "whatsapp",
-        to: "+821020252266",
-        type: "template",
-        template: {
-          // name: "hello_world",
-          name: "match_done_2",
-          language: { code: "id_ID" },
-        },
-      },
-      // {
-      //   messaging_product: "whatsapp",
-      //   to: "+821020252266",
-      //   type: "template",
-      //   recipient_type: "individual",
-      //   template: {
-      //     name: process.env.TEMPLATE_WELCOME,
-      //     language: {
-      //       code: "id_ID",
-      //     },
-      //   },
-      // },
-      {
-        headers: {
-          // Authorization: `Bearer EAADpaovzgNUBOZCpJm8ZAWgZAeKVwvFN8UJNbNt4WBtbW5spJkISvW2f97cHhC7ZB3W6mHgs5TkNpWDZARwUgwEKq969doiV6iaKbsYUTwf856aj9DTGqfcWPOsi40EpGdHotdDSqGndsNZBcU0QitsK0NDU0KlaIloTHCpC2Kc1RXhNbw0ZBxhvdY4VFZCZAZAhTzcZBfZBuX6ekkXsjXPJ3UTyZAZCxJrBll`,
-          Authorization: `Bearer ${process.env.META_ACCESS_TOKEN}`,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-    console.log(response);
-    return res.json(response.data);
-  } catch (e) {
-    console.error(e);
-    return res.status(500).json({ error: e.message });
-  }
-  try {
-    // const activeUsers = await db.User.findAll({
-    //   where: { status: "active" },
-    // });
-
-    const result = [];
-    for (const user of activeUsers) {
-      const phoneNumber = user.phoneNumber; // 가정: User 모델에 phoneNumber 필드가 있다고 가정합니다.
-      // WhatsApp 메시지 발송 API 호출
-      const response = await axios.post(
-        "/messages",
-        {
-          messaging_product: "whatsapp",
-          to: "+821020252266",
-          type: "template",
-          template: {
-            name: process.env.TEMPLATE_WELCOME,
-            language: {
-              code: "id_ID",
-            },
-          },
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${process.env.META_ACCESS_TOKEN}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      result.push(response.data);
-    }
-
-    res.json({
-      message: "WhatsApp 메시지가 성공적으로 발송되었습니다.",
-      response: result,
-    });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: error.message });
-  }
 });
-
-const sendTodayWord = async () => {
-  try {
-    const activeUsers = await db.User.findAll({
-      where: { status: "active" },
-    });
-
-    const todayWord = await db.Word.findOne({
-      where: { id: 1 },
-    });
-
-    const result = [];
-    for (const user of activeUsers) {
-      const phoneNumber = user.phoneNumber; // 가정: User 모델에 phoneNumber 필드가 있다고 가정합니다.
-      await client.messages.create(
-        {
-          from: process.env.FROM_PHONE_NUMBER,
-          to: `whatsapp:${phoneNumber}`,
-          contentSid: process.env.TEMPLATE_DAILY_CONVERSATION,
-          messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
-          scheduleType: "fixed",
-          sendAt: new Date("2021-11-30 20:36:27"),
-          contentVariables: JSON.stringify({
-            1: todayWord.korean?.trim(), // korean
-            2: todayWord.pronunciation?.trim(), // pronunciation
-            3: todayWord.description?.trim(), // description
-            4: todayWord.example_1?.trim(), // example_1
-            5: todayWord.example_2?.trim(), // example_2 (예문 발음기호)
-            6: todayWord.example_3?.trim(), // example_3 (에문 설명)
-          }),
-        },
-        (error) => {
-          console.log(error);
-        }
-      );
-      // // WhatsApp 메시지 발송 API 호출
-      // const response = await axios.post(
-      //   "/messages",
-      //   {
-      //     messaging_product: "whatsapp",
-      //     to: "+821020252266",
-      //     type: "template",
-      //     template: {
-      //       name: process.env.TEMPLATE_WELCOME,
-      //       language: {
-      //         code: "id_ID",
-      //       },
-      //     },
-      //   },
-      //   {
-      //     headers: {
-      //       Authorization: `Bearer ${process.env.META_ACCESS_TOKEN}`,
-      //       "Content-Type": "application/json",
-      //     },
-      //   }
-      // );
-      // result.push(response.data);
-    }
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-// cron.schedule("40 1 * * *", () => {
-//   if (process.env.NODE_ENV === "production") {
-//     sendTodayWord();
-//   }
-// });
-// const db = require("../models");
 
 // 구독기간이 현재 진행 중인 사용자 목록을 가져오는 함수
 async function fetchActiveSubscriptions(category) {
   const todayStart = new Date();
-  todayStart.setFullYear(2024, 6, 1); // 7월 1일로 설정 (월은 0부터 시작하므로 6은 7월을 의미)
+  todayStart.setFullYear(2024, 6, 2); // 7월 1일로 설정 (월은 0부터 시작하므로 6은 7월을 의미)
   todayStart.setHours(0, 0, 0, 0); // 로컬 시간으로 설정
   const todayEnd = new Date();
-  todayEnd.setFullYear(2024, 6, 1); // 7월 1일로 설정
+  todayEnd.setFullYear(2024, 6, 2); // 7월 1일로 설정
   todayEnd.setHours(23, 59, 59, 999); // 로컬 시간으로 설정
   console.log(todayStart, todayEnd);
 
@@ -734,8 +577,7 @@ const processCategorySubscriptions = async (category, subscriptions) => {
           contentSid: process.env.TEMPLATE_DAILY_CONVERSATION,
           messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
           scheduleType: "fixed",
-          // sendAt: new Date(Date.now() + 10 * 60000), // 10분 후 메시지 전송
-          sendAt: new Date(Date.UTC(2024, 6, 1, 2, 0, 0, 0)).toISOString(), // UTC 기준으로 한국 시간 오전 11시로 설정
+          sendAt: getSendAt(),
           contentVariables: JSON.stringify({
             1: todayWord.korean?.trim(), // korean
             2: todayWord.pronunciation?.trim(), // pronunciation
@@ -792,8 +634,7 @@ const processCategorySubscriptions = async (category, subscriptions) => {
           contentSid: process.env.TEMPLATE_KPOP_LYRICS,
           messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
           scheduleType: "fixed",
-          // sendAt: new Date(Date.now() + 10 * 60000), // 10분 후 메시지 전송
-          sendAt: new Date(Date.UTC(2024, 6, 1, 2, 0, 0, 0)).toISOString(), // UTC 기준으로 한국 시간 오전 11시로 설정
+          sendAt: getSendAt(),
           contentVariables: JSON.stringify({
             1: todayWord.korean?.trim(), // korean
             2: todayWord.pronunciation?.trim(), // pronunciation
@@ -850,8 +691,7 @@ const processCategorySubscriptions = async (category, subscriptions) => {
           contentSid: process.env.TEMPLATE_TOPIK_WORD,
           messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
           scheduleType: "fixed",
-          // sendAt: new Date(Date.now() + 10 * 60000), // 10분 후 메시지 전송
-          sendAt: new Date(Date.UTC(2024, 6, 1, 2, 0, 0, 0)).toISOString(), // UTC 기준으로 한국 시간 오전 11시로 설정
+          sendAt: getSendAt(),
           contentVariables: JSON.stringify({
             1: todayWord.korean?.trim(), // korean
             2: todayWord.pronunciation?.trim(), // pronunciation
@@ -906,21 +746,21 @@ const processCategorySubscriptions = async (category, subscriptions) => {
         ? JSON.stringify({
             1: todayQuestion.imageUrl?.trim(), // 이미지
             2: todayQuestion.title?.trim(), // 질문
-            3: todayQuestion.answer?.trim(), // 정답
-            4: todayQuestion.example_1?.trim(), // 해설
-            5: todayQuestion.example_2?.trim(), // 해설
-            6: todayQuestion.example_3?.trim(), // 해설
-            7: todayQuestion.example_4?.trim(), // 해설
+            3: todayQuestion.example_1?.trim(), // 정답
+            4: todayQuestion.example_2?.trim(), // 해설
+            5: todayQuestion.example_3?.trim(), // 해설
+            6: todayQuestion.example_4?.trim(), // 해설
+            7: todayQuestion.answer?.trim(), // 해설
             8: todayQuestion.exaplanation?.trim(), // 해설
           })
         : JSON.stringify({
             1: todayQuestion.title?.trim(), // 질문
             2: todayQuestion.description?.trim(), // 보기
-            3: todayQuestion.answer?.trim(), // 정답
-            4: todayQuestion.example_1?.trim(), // 해설
-            5: todayQuestion.example_2?.trim(), // 해설
-            6: todayQuestion.example_3?.trim(), // 해설
-            7: todayQuestion.example_4?.trim(), // 해설
+            3: todayQuestion.example_1?.trim(), // 정답
+            4: todayQuestion.example_2?.trim(), // 해설
+            5: todayQuestion.example_3?.trim(), // 해설
+            6: todayQuestion.example_4?.trim(), // 해설
+            7: todayQuestion.amnswer?.trim(), // 해설
             8: todayQuestion.exaplanation?.trim(), // 해설
           });
 
@@ -935,7 +775,7 @@ const processCategorySubscriptions = async (category, subscriptions) => {
           contentSid,
           messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
           scheduleType: "fixed",
-          sendAt: new Date(Date.UTC(2024, 6, 1, 2, 0, 0, 0)).toISOString(), // UTC 기준으로 한국 시간 오전 11시로 설정
+          sendAt: getSendAt(),
           contentVariables,
         });
         console.log("Scheduled message sent to", subscription.User.name);
@@ -960,10 +800,10 @@ const processCategorySubscriptions = async (category, subscriptions) => {
 
 async function fetchSubscriptionsStartingToday() {
   const todayStart = new Date();
-  todayStart.setFullYear(2024, 6, 1); // 7월 1일로 설정 (월은 0부터 시작하므로 6은 7월을 의미)
+  todayStart.setFullYear(2024, 6, 2); // 7월 1일로 설정 (월은 0부터 시작하므로 6은 7월을 의미)
   todayStart.setHours(0, 0, 0, 0); // 오늘의 시작 시간 설정
   const todayEnd = new Date();
-  todayEnd.setFullYear(2024, 6, 1); // 7월 1일로 설정
+  todayEnd.setFullYear(2024, 6, 2); // 7월 1일로 설정
   todayEnd.setHours(23, 59, 59, 999); // 오늘의 종료 시간 설정
 
   console.log(todayStart, todayEnd);
@@ -1017,7 +857,7 @@ async function sendWelcomeMessage() {
           contentSid: process.env.TEMPLATE_WELCOME,
           messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
           scheduleType: "fixed",
-          sendAt: new Date(Date.UTC(2024, 6, 1, 2, 0, 0, 0)).toISOString(), // UTC 기준으로 한국 시간 오전 11시로 설정
+          sendAt: getSendAt(),
         },
         (error) => {
           console.log(error);
@@ -1044,6 +884,10 @@ const sendSlack = async (message) => {
       text,
     }
   );
+};
+
+const getSendAt = () => {
+  return new Date(Date.UTC(2024, 6, 2, 2, 0, 0, 0)).toISOString();
 };
 
 module.exports = router;
