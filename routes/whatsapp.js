@@ -904,13 +904,14 @@ const processCategorySubscriptions = async (category, subscriptions) => {
 
       const contentVariables = hasImage
         ? JSON.stringify({
-            1: "Annyeong-WA-98e5a1b50c334a2f85e24bf927d857d7?pvs=4",
-            2: todayQuestion.imageUrl?.trim(), // 이미지
-            3: todayQuestion.title?.trim(), // 질문
-            4: todayQuestion.answer?.trim(), // 정답
-            5: todayQuestion.example_1?.trim(), // 해설
-            6: todayQuestion.example_2?.trim(), // 해설
-            7: todayQuestion.example_3?.trim(), // 해설
+            1: todayQuestion.imageUrl?.trim(), // 이미지
+            2: todayQuestion.title?.trim(), // 질문
+            3: todayQuestion.answer?.trim(), // 정답
+            4: todayQuestion.example_1?.trim(), // 해설
+            5: todayQuestion.example_2?.trim(), // 해설
+            6: todayQuestion.example_3?.trim(), // 해설
+            7: todayQuestion.example_4?.trim(), // 해설
+            8: todayQuestion.exaplanation?.trim(), // 해설
           })
         : JSON.stringify({
             1: todayQuestion.title?.trim(), // 질문
@@ -933,9 +934,8 @@ const processCategorySubscriptions = async (category, subscriptions) => {
           to,
           contentSid,
           messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
-          // scheduleType: "fixed",
-          // sendAt: new Date(Date.now() + 10 * 60000), // 10분 후 메시지 전송
-          // sendAt: new Date(Date.UTC(2024, 6, 1, 2, 0, 0, 0)).toISOString(), // UTC 기준으로 한국 시간 오전 11시로 설정
+          scheduleType: "fixed",
+          sendAt: new Date(Date.UTC(2024, 6, 1, 2, 0, 0, 0)).toISOString(), // UTC 기준으로 한국 시간 오전 11시로 설정
           contentVariables,
         });
         console.log("Scheduled message sent to", subscription.User.name);
@@ -945,7 +945,7 @@ const processCategorySubscriptions = async (category, subscriptions) => {
         // ReceivedWords에 기록 추가
         await db.ReceivedQuestions.create({
           userId: subscription.userId,
-          wordId: todayQuestion.id,
+          questionId: todayQuestion.id,
           receivedDate: new Date(),
         });
       } catch (error) {
