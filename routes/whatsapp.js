@@ -941,7 +941,7 @@ const processCategorySubscriptions = async (category, subscriptions) => {
         // ReceivedWords에 기록 추가
         await db.ReceivedQuestions.create({
           userId: subscription.userId,
-          wordId: todayWord.id,
+          wordId: todayQuestion.id,
           receivedDate: new Date(),
         });
       } catch (error) {
