@@ -563,7 +563,7 @@ const processCategorySubscriptions = async (category, subscriptions) => {
         order: [["id", "ASC"]],
         limit: 1,
       });
-      console.log("todayWord", todayWord);
+
       if (!todayWord) {
         sendSlack(`오늘의 단어가 없습니다.`);
         return;
@@ -620,7 +620,6 @@ const processCategorySubscriptions = async (category, subscriptions) => {
         limit: 1,
       });
 
-      console.log("todayWord", todayWord);
       if (!todayWord) {
         sendSlack(`오늘의 단어가 없습니다.`);
         return;
@@ -677,7 +676,6 @@ const processCategorySubscriptions = async (category, subscriptions) => {
         limit: 1,
       });
 
-      console.log("todayWord", todayWord);
       if (!todayWord) {
         sendSlack(`오늘의 단어가 없습니다.`);
         return;
@@ -733,7 +731,6 @@ const processCategorySubscriptions = async (category, subscriptions) => {
         limit: 1,
       });
 
-      console.log("todayWord", todayQuestion);
       if (!todayQuestion) {
         sendSlack(`오늘의 문제가 없습니다.`);
         return;
