@@ -933,9 +933,9 @@ const processCategorySubscriptions = async (category, subscriptions) => {
           to,
           contentSid,
           messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
-          scheduleType: "fixed",
+          // scheduleType: "fixed",
           // sendAt: new Date(Date.now() + 10 * 60000), // 10분 후 메시지 전송
-          sendAt: new Date(Date.UTC(2024, 6, 1, 2, 0, 0, 0)).toISOString(), // UTC 기준으로 한국 시간 오전 11시로 설정
+          // sendAt: new Date(Date.UTC(2024, 6, 1, 2, 0, 0, 0)).toISOString(), // UTC 기준으로 한국 시간 오전 11시로 설정
           contentVariables,
         });
         console.log("Scheduled message sent to", subscription.User.name);
