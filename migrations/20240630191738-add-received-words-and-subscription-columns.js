@@ -4,45 +4,54 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     // ReceivedWords 테이블 생성
-    await queryInterface.createTable("ReceivedWords", {
-      id: {
-        type: Sequelize.INTEGER,
-        autoIncrement: true,
-        primaryKey: true,
-      },
-      userId: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-      },
-      wordId: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-      },
-      receivedAt: {
-        type: Sequelize.DATE,
-        defaultValue: Sequelize.NOW,
-      },
-    });
-    // ReceivedQuestions 테이블 생성
-    await queryInterface.createTable("ReceivedQuestions", {
-      id: {
-        type: Sequelize.INTEGER,
-        autoIncrement: true,
-        primaryKey: true,
-      },
-      userId: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-      },
-      questionId: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-      },
-      receivedAt: {
-        type: Sequelize.DATE,
-        defaultValue: Sequelize.NOW,
-      },
-    });
+    const tableDefinition = await queryInterface.describeTable("ReceivedWords");
+    if (!tableDefinition) {
+      await queryInterface.createTable("ReceivedWords", {
+        id: {
+          type: Sequelize.INTEGER,
+          autoIncrement: true,
+          primaryKey: true,
+        },
+        userId: {
+          type: Sequelize.INTEGER,
+          allowNull: false,
+        },
+        wordId: {
+          type: Sequelize.INTEGER,
+          allowNull: false,
+        },
+        receivedAt: {
+          type: Sequelize.DATE,
+          defaultValue: Sequelize.NOW,
+        },
+      });
+    }
+
+    const tableDefinition2 = await queryInterface.describeTable(
+      "ReceivedQuestions"
+    );
+    if (!tableDefinition2) {
+      // ReceivedQuestions 테이블 생성
+      await queryInterface.createTable("ReceivedQuestions", {
+        id: {
+          type: Sequelize.INTEGER,
+          autoIncrement: true,
+          primaryKey: true,
+        },
+        userId: {
+          type: Sequelize.INTEGER,
+          allowNull: false,
+        },
+        questionId: {
+          type: Sequelize.INTEGER,
+          allowNull: false,
+        },
+        receivedAt: {
+          type: Sequelize.DATE,
+          defaultValue: Sequelize.NOW,
+        },
+      });
+    }
 
     // Subscription 테이블에 새로운 컬럼 추가
     await queryInterface.addColumn("Subscriptions", "lastWordId", {

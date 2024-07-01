@@ -14,10 +14,10 @@
     "dialect": "mysql"
   },
   "production": {
-    "username": "root",
-    "password": null,
-    "database": "database_production",
-    "host": "127.0.0.1",
-    "dialect": "mysql"
+    "username": "manager",
+    "password": "@MvDg@b4YxJ@Zsm",
+    "database": "annyeong-wa-sql",
+    "host": "annyeong-wa.database.windows.net",
+    "dialect": "mssql"
   }
 }

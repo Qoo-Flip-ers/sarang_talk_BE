@@ -430,7 +430,6 @@ router.post("/send-message", async (req, res) => {
  */
 
 router.post("/welcome", async (req, res) => {
-  // const response = await client.messages.create(
   //   {
   //     from: process.env.FROM_PHONE_NUMBER,
   //     to: "whatsapp:+821020252266",
@@ -439,10 +438,14 @@ router.post("/welcome", async (req, res) => {
   //     // scheduleType: "fixed",
   //     // sendAt: new Date(new Date().setHours(7, 20, 0, 0)).toISOString(),
   //     contentVariables: JSON.stringify({
-  //       1: "다음을 읽고 내용이 같은 것을 고르십시오.", // 질문
-  //       2: "저는 친구와 함께 기숙사에 삽니다. 우리는 기숙사에서 한국 아이돌의 노래를 매일 듣습니다. 주말에는 같이 노래방에 갑니다.\n① 주말에는 각자 쉽니다.\n② 우리는 한국 노래를 가끔 듣습니다.\n③ 친구는 저와 함께 삽니다.\n④ 친구는 혼자 노래방에 갑니다.", // 보기
-  //       3: "③ 친구는 저와 함께 삽니다.", // 정답
-  //       4: "Jawaban yang benar adalah ③ 친구는 저와 함께 삽니다 (Teman saya tinggal bersama saya). Bagian tersebut menyatakan bahwa pembicara tinggal di asrama bersama seorang teman, mendengarkan lagu K-pop setiap hari, dan pergi karaoke bersama.", // 해설
+  //       1: "다음 밑줄 친 부분과 의미가 비슷한 것을 고르십시오", // 질문
+  //       2: "태어난 지 얼마 안 되어 서울로 왔으니 서울이 고향인 셈이다.", // 보기
+  //       3: "① 고향일 뿐이다", // 정답
+  //       4: "② 고향이면 좋겠다", // 정답
+  //       5: "③ 고향일 리가 없다", // 정답
+  //       6: "④ 고향이나 마찬가지이다", // 정답
+  //       7: "④ 고향이나 마찬가지이다", // 정답
+  //       8: "Jawaban yang benar adalah ④ 고향이나 마찬가지이다 (Sama dengan kampung halamanku) Dalam konteksnya, ungkapan ini berarti bahwa meskipun “Seoul” bukan tempat kelahiran pembicara, namun ia sudah lama tinggal di sana dan menganggapnya sebagai kampung halamannya.", // 해설
   //     }),
   //   },
   //   (error) => {
@@ -910,13 +913,14 @@ const processCategorySubscriptions = async (category, subscriptions) => {
             7: todayQuestion.example_3?.trim(), // 해설
           })
         : JSON.stringify({
-            1: "Annyeong-WA-98e5a1b50c334a2f85e24bf927d857d7?pvs=4",
-            2: todayQuestion.title?.trim(), // 질문
-            3: todayQuestion.description?.trim(), // 보기
-            4: todayQuestion.answer?.trim(), // 정답
-            5: todayQuestion.example_1?.trim(), // 해설
-            6: todayQuestion.example_2?.trim(), // 해설
-            7: todayQuestion.example_3?.trim(), // 해설
+            1: todayQuestion.title?.trim(), // 질문
+            2: todayQuestion.description?.trim(), // 보기
+            3: todayQuestion.answer?.trim(), // 정답
+            4: todayQuestion.example_1?.trim(), // 해설
+            5: todayQuestion.example_2?.trim(), // 해설
+            6: todayQuestion.example_3?.trim(), // 해설
+            7: todayQuestion.example_4?.trim(), // 해설
+            8: todayQuestion.exaplanation?.trim(), // 해설
           });
 
       const contentSid = hasImage
