@@ -36,6 +36,7 @@ router.get("/", async (req, res) => {
     const { count, rows } = await db.Word.findAndCountAll({
       limit: limit,
       offset: offset,
+      order: [["createdAt", "DESC"]],
     });
 
     const total = Math.ceil(count / limit);
