@@ -24,6 +24,7 @@ router.get("/", async (req, res) => {
     const { count, rows } = await db.User.findAndCountAll({
       limit: limit,
       offset: offset,
+      order: [["createdAt", "DESC"]],
     });
 
     const total = Math.ceil(count / limit);
