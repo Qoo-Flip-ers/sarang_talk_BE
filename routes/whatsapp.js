@@ -432,6 +432,37 @@ router.post("/send-message", async (req, res) => {
 router.post("/welcome", async (req, res) => {
   sendWelcomeMessage();
   return res.json({ message: "WhatsApp 메시지가 성공적으로 발송되었습니다." });
+  // const users = ["whatsapp:+6281324602755", "whatsapp:+6281319705099"];
+
+  // const sendTodayEmptyMessage = async (to) => {
+  //   await client.messages.create(
+  //     {
+  //       from: process.env.FROM_PHONE_NUMBER,
+  //       to,
+  //       contentSid: process.env.TEMPLATE_DAILY_CONVERSATION,
+  //       messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
+  //       contentVariables: JSON.stringify({
+  //         1: "힘내다", // korean
+  //         2: "himnaeda", // korean
+  //         3: "Bersemangat", // pronunciation
+  //         4: "시험 잘 보세요. 힘내세요!", // description
+  //         5: "siheom jal boseyo. himnaeseyo!", // example_1
+  //         6: "Semoga sukses ujianmu. Semangat!", // example_2
+  //       }),
+  //       // scheduleType: "fixed",
+  //       // sendAt: new Date(Date.UTC(2024, 6, 1, 2, 0, 0, 0)).toISOString(), // UTC 기준으로 한국 시간 오전 11시로 설정
+  //     },
+  //     (error) => {
+  //       console.log(error);
+  //     }
+  //   );
+  // };
+
+  // users.forEach(async (user) => {
+  //   sendTodayEmptyMessage(user);
+  // });
+  // return;
+
   // const response = await client.messages.create(
   //   {
   //     from: process.env.FROM_PHONE_NUMBER,
@@ -884,7 +915,7 @@ const sendSlack = async (message) => {
 };
 
 const getSendAt = () => {
-  return new Date(Date.UTC(2024, 6, 2, 2, 0, 0, 0)).toISOString();
+  return new Date(Date.UTC(2024, 6, 3, 2, 0, 0, 0)).toISOString();
 };
 
 module.exports = router;
