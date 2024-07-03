@@ -938,7 +938,163 @@ const sendSlack = async (message) => {
 };
 
 const getSendAt = () => {
-  return new Date(Date.UTC(2024, 6, 3, 2, 0, 0, 0)).toISOString();
+  // 현재 UTC 시간
+  const now = new Date();
+
+  // 한국 시간은 UTC+9, 현재 한국 시간 계산
+  const koreaOffset = 9 * 60 * 60 * 1000;
+  const koreaNow = new Date(now.getTime() + koreaOffset);
+
+  // 한국 시간 기준 현재 날짜
+  let year = koreaNow.getFullYear();
+  let month = koreaNow.getMonth();
+  let date = koreaNow.getDate();
+
+  // 한국 시간 기준 해당 날짜의 오전 11시를 UTC로 변환
+  let sendAt = new Date(
+    Date.UTC(year, month, date, 2, 0, 0, 0) + 2 * 60 * 60 * 1000
+  );
+
+  console.log(`Generated sendAt date: ${sendAt.toISOString()}`);
+  return sendAt.toISOString();
 };
+
+// DB 깨우기 (serverless 때문에)
+cron.schedule("0 15 * * *", async () => {
+  if (process.env.NODE_ENV === "development") {
+    return;
+  }
+  try {
+    const word = await db.Word.findByPk(1);
+    if (word) {
+      sendSlack("[준비] DB 깨우기 시도");
+    }
+  } catch (e) {
+    sendSlack("[준비] DB 깨우기 시도");
+  }
+});
+
+// DB 깨우기 (serverless 때문에)
+cron.schedule("2 15 * * *", async () => {
+  if (process.env.NODE_ENV === "development") {
+    return;
+  }
+  try {
+    const word = await db.Word.findByPk(1);
+    if (word) {
+      sendSlack("[준비] DB 깨우기 성공");
+    }
+  } catch (e) {
+    sendSlack("[준비] DB 깨우기 실패");
+  }
+});
+
+// 매일 한국 시간 오전 0시 5분에 작동하는 cron 작업을 설정합니다.
+// 한국 시간은 UTC+9이므로, UTC 시간으로는 오후 3시 5분입니다.
+cron.schedule("5 15 * * *", async () => {
+  if (process.env.NODE_ENV === "development") {
+    return;
+  }
+  try {
+    try {
+      const result = await sendDailyMessage("kpop_lyrics");
+
+      sendSlack(
+        `[일일 메시지] kpop_lyrics: ${result.length}명에게 메시지 발송`
+      );
+    } catch (error) {
+      if (error.status === 404) {
+        sendSlack(
+          "[일일 메시지] kpop_lyrics: 요청한 사용자를 찾을 수 없습니다."
+        );
+      } else {
+        sendSlack(
+          "[일일 메시지] kpop_lyrics: 서버 오류로 인해 메시지를 발송할 수 없습니다."
+        );
+      }
+    }
+  } catch (error) {
+    sendSlack("[일일 메시지] kpop_lyrics: 작업 중 오류 발생");
+  }
+});
+
+cron.schedule("6 15 * * *", async () => {
+  if (process.env.NODE_ENV === "development") {
+    return;
+  }
+  try {
+    try {
+      const result = await sendDailyMessage("topik_word");
+
+      sendSlack(`[일일 메시지] topik_word: ${result.length}명에게 메시지 발송`);
+    } catch (error) {
+      if (error.status === 404) {
+        sendSlack(
+          "[일일 메시지] topik_word: 요청한 사용자를 찾을 수 없습니다."
+        );
+      } else {
+        sendSlack(
+          "[일일 메시지] topik_word: 서버 오류로 인해 메시지를 발송할 수 없습니다."
+        );
+      }
+    }
+  } catch (error) {
+    sendSlack("[일일 메시지] topik_word: 작업 중 오류 발생");
+  }
+});
+
+cron.schedule("7 15 * * *", async () => {
+  if (process.env.NODE_ENV === "development") {
+    return;
+  }
+  try {
+    try {
+      const result = await sendDailyMessage("topik_variation");
+
+      sendSlack(
+        `[일일 메시지] topik_variation: ${result.length}명에게 메시지 발송`
+      );
+    } catch (error) {
+      if (error.status === 404) {
+        sendSlack(
+          "[일일 메시지] topik_variation: 요청한 사용자를 찾을 수 없습니다."
+        );
+      } else {
+        sendSlack(
+          "[일일 메시지] topik_variation: 서버 오류로 인해 메시지를 발송할 수 없습니다."
+        );
+      }
+    }
+  } catch (error) {
+    sendSlack("[일일 메시지] topik_variation: 작업 중 오류 발생");
+  }
+});
+
+cron.schedule("8 15 * * *", async () => {
+  if (process.env.NODE_ENV === "development") {
+    return;
+  }
+  try {
+    try {
+      const result = await sendDailyMessage("daily_conversation");
+
+      sendSlack(
+        `[일일 메시지] daily_conversation: ${result.length}명에게 메시지 발송`
+      );
+    } catch (error) {
+      if (error.status === 404) {
+        sendSlack(
+          "[일일 메시지] daily_conversation: 요청한 사용자를 찾을 수 없습니다."
+        );
+      } else {
+        sendSlack(
+          "[일일 메시지] daily_conversation: 서버 오류로 인해 메시지를 발송할 수 없습니다."
+        );
+      }
+    }
+  } catch (error) {
+    sendSlack("[일일 메시지] daily_conversation: 작업 중 오류 발생");
+  }
+});
 
 module.exports = router;
