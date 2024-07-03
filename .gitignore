@@ -44,3 +44,7 @@ database.sqlite
 
 ecosystem.config.js
 deploy-server.sh
+
+config/*
+config
+config/config.json
