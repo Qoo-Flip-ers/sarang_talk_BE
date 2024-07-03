@@ -951,9 +951,7 @@ const getSendAt = () => {
   let date = koreaNow.getDate();
 
   // 한국 시간 기준 해당 날짜의 오전 11시를 UTC로 변환
-  let sendAt = new Date(
-    Date.UTC(year, month, date, 2, 0, 0, 0) + 2 * 60 * 60 * 1000
-  );
+  let sendAt = new Date(Date.UTC(year, month, date, 2, 0, 0, 0));
 
   console.log(`Generated sendAt date: ${sendAt.toISOString()}`);
   return sendAt.toISOString();
