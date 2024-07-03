@@ -574,12 +574,20 @@ router.post("/welcome", async (req, res) => {
 
 // 구독기간이 현재 진행 중인 사용자 목록을 가져오는 함수
 async function fetchActiveSubscriptions(category) {
-  const todayStart = new Date();
-  todayStart.setFullYear(2024, 6, 2); // 7월 1일로 설정 (월은 0부터 시작하므로 6은 7월을 의미)
-  todayStart.setHours(0, 0, 0, 0); // 로컬 시간으로 설정
-  const todayEnd = new Date();
-  todayEnd.setFullYear(2024, 6, 2); // 7월 1일로 설정
-  todayEnd.setHours(23, 59, 59, 999); // 로컬 시간으로 설정
+  const now = new Date();
+
+  // 한국 시간은 UTC+9, 현재 한국 시간 계산
+  const koreaOffset = 9 * 60 * 60 * 1000;
+  const koreaNow = new Date(now.getTime() + koreaOffset);
+
+  // 한국 시간 기준 현재 날짜
+  let year = koreaNow.getFullYear();
+  let month = koreaNow.getMonth();
+  let date = koreaNow.getDate();
+
+  const todayStart = new Date(Date.UTC(year, month, date - 1, 15, 0, 0, 0)); // 한국 시간으로 설정
+  const todayEnd = new Date(Date.UTC(year, month, date, 14, 59, 59, 999)); // 한국 시간으로 설정
+
   console.log(todayStart, todayEnd);
 
   return await db.Subscription.findAll({
