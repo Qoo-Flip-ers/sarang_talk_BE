@@ -432,58 +432,85 @@ router.post("/send-message", async (req, res) => {
 router.post("/welcome", async (req, res) => {
   sendWelcomeMessage();
   return res.json({ message: "WhatsApp 메시지가 성공적으로 발송되었습니다." });
-  const users = [
-    // "+821020252266",
-    "+6287784039186",
-    "+6282196021955",
-    "+6281350486256",
-    "+6282124287932",
-    "+628895668019",
-    "+628114533384",
-    "+6285704604552",
-    "+6283114217689",
-    "+628567002423",
-    "+821033308957",
-    "+821045709002",
+
+  const messages = [
+    "MMb6846cfd2c181db2f3407e1431a9a469",
+    "MM1de4f433370f8292c19a34b82d2cf721",
+    "MM1b4ee12849cdf7fe39ac45302d270ed5",
+    "MM9aeb0bb74b734b4df19d841e37e3f85d",
+    "MM43f07df479c5a2804a776450907b3d2a",
+    // 5
+    "MM5105cb4a7c82d93806f6028036489c4c",
+    "MMfb2daa6bb3296b3d417b7d7763f7575b",
+    "MMfa8ad297ce8752ef7daade9dfd27947a",
+    "MM48a51b0a86e74c59610c21c0c819420b",
+    "MM9a35fdf40a4dc92940eb1fff823ad1a0",
+    // 10
+    "MMf955a20ecf6b0036ae4a50d4acfee29d",
+    "MM0d30bb1d5c30ee61f08c54d54d9dee90",
+    "MM79989d13cf665114d880a5d85e8a11bf",
+    "MMcf0858a035f1110dfdd1a7c6b9bbabef",
+    "MM6f1705d70ca1c94bd2c9aa677752d724",
+
+    "MM45d2f50dea6cb75f7fce3a9655007f44",
+    "MM88faf830517ea1f685dc04a230f995db",
   ];
 
-  const sendTodayEmptyMessage = async (to) => {
-    await client.messages.create(
-      {
-        from: process.env.FROM_PHONE_NUMBER,
-        to,
-        contentSid: process.env.TEMPLATE_TOPIK_VARIATION,
-        messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
-        contentVariables: JSON.stringify({
-          1: "다음을 순서에 맞게 배열한 것을 고르십시오.", // 질문
-          2: "(가) 과일이 싸고 좋아서 많이 샀습니다. (나) 지난 주말에 장을 보러 마트에 갔습니다. (다) 저렴하게 구입한데다 사은품까지 받아 기분이 좋았습니다. (라) 마트 행사 중이라 사은품도 받았습니다.", // 보기
-          3: "① (가) - (나) - (라) - (다)", // 정답
-          4: "② (나) - (가) - (라) - (다)", // 정답
-          5: "③ (가) - (다) - (나) - (라)", // 정답
-          6: "④ (나) - (다) - (라) - (가)", // 정답
-          7: "② (나) - (가) - (라) - (다)", // 정답
-          8: "Jawaban yang benar adalah ② (나) - (가) - (라) - (다). Urutan ini secara akurat mencerminkan urutan temporal peristiwa yang dijelaskan dalam kalimat. Pilihan lain tidak cocok karena salah mencerminkan urutan kronologis kejadian. ① (가) - (나) - (라) - (다): Urutan ini menyiratkan bahwa pembicara membeli buah terlebih dahulu dan kemudian pergi ke supermarket, yang tidak sesuai dengan konteksnya. ③ (가) - (다) - (나) - (라): Urutan ini menyiratkan bahwa pembicara pergi ke supermarket setelah menerima hadiah gratis, namun ini tidak sesuai dengan konteksnya. ④ (나) - (다) - (라) - (가): Urutan ini menyiratkan bahwa pembicara menerima hadiah gratis sebelum membeli buah tersebut, yang tidak sesuai dengan konteksnya.", // 해설
-        }),
-        // contentVariables: JSON.stringify({
-        //   1: "힘내다", // korean
-        //   2: "himnaeda", // korean
-        //   3: "Bersemangat", // pronunciation
-        //   4: "시험 잘 보세요. 힘내세요!", // description
-        //   5: "siheom jal boseyo. himnaeseyo!", // example_1
-        //   6: "Semoga sukses ujianmu. Semangat!", // example_2
-        // }),
-        // scheduleType: "fixed",
-        // sendAt: new Date(Date.UTC(2024, 6, 1, 2, 0, 0, 0)).toISOString(), // UTC 기준으로 한국 시간 오전 11시로 설정
-      },
-      (error) => {
-        console.log(error);
-      }
-    );
-  };
-
-  users.forEach(async (user) => {
-    sendTodayEmptyMessage(`whatsapp:${user}`);
+  messages.forEach(async (message) => {
+    await client.messages(message).update({ status: "canceled" });
   });
+  // const users = [
+  //   // "+821020252266",
+  //   "+6287784039186",
+  //   "+6282196021955",
+  //   "+6281350486256",
+  //   "+6282124287932",
+  //   "+628895668019",
+  //   "+628114533384",
+  //   "+6285704604552",
+  //   "+6283114217689",
+  //   "+628567002423",
+  //   "+821033308957",
+  //   "+821045709002",
+  // ];
+
+  // const sendTodayEmptyMessage = async (to) => {
+  //   await client.messages.create(
+  //     {
+  //       from: process.env.FROM_PHONE_NUMBER,
+  //       to,
+  //       contentSid: process.env.TEMPLATE_TOPIK_VARIATION,
+  //       messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
+  //       contentVariables: JSON.stringify({
+  //         1: "다음을 순서에 맞게 배열한 것을 고르십시오.", // 질문
+  //         2: "(가) 과일이 싸고 좋아서 많이 샀습니다. (나) 지난 주말에 장을 보러 마트에 갔습니다. (다) 저렴하게 구입한데다 사은품까지 받아 기분이 좋았습니다. (라) 마트 행사 중이라 사은품도 받았습니다.", // 보기
+  //         3: "① (가) - (나) - (라) - (다)", // 정답
+  //         4: "② (나) - (가) - (라) - (다)", // 정답
+  //         5: "③ (가) - (다) - (나) - (라)", // 정답
+  //         6: "④ (나) - (다) - (라) - (가)", // 정답
+  //         7: "② (나) - (가) - (라) - (다)", // 정답
+  //         8: "Jawaban yang benar adalah ② (나) - (가) - (라) - (다). Urutan ini secara akurat mencerminkan urutan temporal peristiwa yang dijelaskan dalam kalimat. Pilihan lain tidak cocok karena salah mencerminkan urutan kronologis kejadian. ① (가) - (나) - (라) - (다): Urutan ini menyiratkan bahwa pembicara membeli buah terlebih dahulu dan kemudian pergi ke supermarket, yang tidak sesuai dengan konteksnya. ③ (가) - (다) - (나) - (라): Urutan ini menyiratkan bahwa pembicara pergi ke supermarket setelah menerima hadiah gratis, namun ini tidak sesuai dengan konteksnya. ④ (나) - (다) - (라) - (가): Urutan ini menyiratkan bahwa pembicara menerima hadiah gratis sebelum membeli buah tersebut, yang tidak sesuai dengan konteksnya.", // 해설
+  //       }),
+  //       // contentVariables: JSON.stringify({
+  //       //   1: "힘내다", // korean
+  //       //   2: "himnaeda", // korean
+  //       //   3: "Bersemangat", // pronunciation
+  //       //   4: "시험 잘 보세요. 힘내세요!", // description
+  //       //   5: "siheom jal boseyo. himnaeseyo!", // example_1
+  //       //   6: "Semoga sukses ujianmu. Semangat!", // example_2
+  //       // }),
+  //       // scheduleType: "fixed",
+  //       // sendAt: new Date(Date.UTC(2024, 6, 1, 2, 0, 0, 0)).toISOString(), // UTC 기준으로 한국 시간 오전 11시로 설정
+  //     },
+  //     (error) => {
+  //       console.log(error);
+  //     }
+  //   );
+  // };
+
+  // users.forEach(async (user) => {
+  //   sendTodayEmptyMessage(`whatsapp:${user}`);
+  // });
   return;
 
   // const response = await client.messages.create(
