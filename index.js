@@ -12,6 +12,7 @@ const wordRouter = require("./routes/word");
 const questionRouter = require("./routes/question");
 const whatsappRouter = require("./routes/whatsapp");
 const webhookRouter = require("./routes/webhook");
+const subscriptionRouter = require("./routes/subscription");
 
 app.use(express.json());
 app.use(cors());
@@ -21,6 +22,7 @@ app.use("/words", wordRouter);
 app.use("/questions", questionRouter);
 app.use("/whatsapp", whatsappRouter);
 app.use("/webhook", webhookRouter);
+app.use("/subscription", subscriptionRouter);
 
 app.get("/", (req, res) => {
   res.send("Hello World!");

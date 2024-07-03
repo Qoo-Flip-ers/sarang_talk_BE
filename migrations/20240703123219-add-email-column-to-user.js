@@ -9,11 +9,11 @@ module.exports = {
      * Example:
      * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
      */
-    const tableDefinition = await queryInterface.describeTable("Questions");
-    if (!tableDefinition.example_4) {
-      await queryInterface.addColumn("Questions", "example_4", {
-        allowNull: true,
+    const tableDefinition = await queryInterface.describeTable("Users");
+    if (!tableDefinition.email) {
+      await queryInterface.addColumn("Users", "email", {
         type: Sequelize.STRING,
+        allowNull: true,
       });
     }
   },
@@ -26,6 +26,6 @@ module.exports = {
      * await queryInterface.dropTable('users');
      */
 
-    await queryInterface.removeColumn("Questions", "example_4");
+    await queryInterface.removeColumn("Users", "email");
   },
 };
