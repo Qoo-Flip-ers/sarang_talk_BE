@@ -9,7 +9,7 @@ cron.schedule("* * * * *", () => {
 
 // 매일 한국 시간 오후 4시 2분에 작동하는 cron 작업을 설정합니다.
 // 한국 시간은 UTC+9이므로, UTC 시간으로는 오전 7시 2분입니다.
-cron.schedule("2 7 * * *", async () => {
+cron.schedule("5 7 * * *", async () => {
   try {
     console.log("매일 오후 4시 2분에 작동하는 작업 시작");
 

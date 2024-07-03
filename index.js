@@ -6,6 +6,7 @@ const { Sequelize } = require("sequelize");
 const db = require("./models");
 const swaggerDocs = require("./swagger");
 const cors = require("cors");
+const cron = require("./cron");
 
 const userRouter = require("./routes/user");
 const wordRouter = require("./routes/word");
