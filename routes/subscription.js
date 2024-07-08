@@ -113,7 +113,7 @@ router.post("/", async (req, res) => {
     "topik_word",
     "topik_variation",
   ];
-  const transformedType = type.split(",");
+  const transformedType = type.split(",").map((t) => t.trim());
   if (
     transformedType.length === 0 ||
     transformedType.some((t) => !validTypes.includes(t))
@@ -142,7 +142,7 @@ router.post("/", async (req, res) => {
   );
 
   sendSlack(
-    `[예약완료] 새로운 사용자 등록: ${user.name} (${user.phoneNumber}) ${type} 이 예약되었습니다.`
+    `[예약완료] 새로운 사용자 등록: ${name} (${phoneNumber}) ${type} 이 예약되었습니다.`
   );
 
   try {
