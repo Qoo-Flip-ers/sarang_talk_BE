@@ -58,7 +58,7 @@ discordClient.login(process.env.DISCORD_BOT_TOKEN);
  *         description: 서버 오류
  */
 router.post("/whatsapp", async (req, res) => {
-  console.log(req);
+  console.log(req.body);
 
   return res.sendStatus(200);
   // Discord 채널로 메시지 전송
