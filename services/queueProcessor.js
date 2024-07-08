@@ -19,7 +19,7 @@ const sendSlack = async (message) => {
 
 // 서버리스 DB에 데이터 삽입 함수 (Sequelize 사용)
 async function insertIntoDatabase(data) {
-  const { name, phoneNumber, email, startDate, endDate } = data;
+  const { name, phoneNumber, email, startDate, endDate, type } = data;
 
   try {
     let user = await db.User.findOne({ where: { phoneNumber, email } });
@@ -33,11 +33,13 @@ async function insertIntoDatabase(data) {
       });
     }
 
-    const newSubscription = await db.Subscription.create({
-      userId: user.id,
-      type,
-      subscriptionDate: startDate,
-      expirationDate: endDate,
+    type.forEach(async (t) => {
+      const newSubscription = await db.Subscription.create({
+        userId: user.id,
+        type: t,
+        subscriptionDate: startDate,
+        expirationDate: endDate,
+      });
     });
 
     // twilio 시작 안내 메세지 발송 필요

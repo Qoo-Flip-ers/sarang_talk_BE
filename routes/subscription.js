@@ -112,7 +112,11 @@ router.post("/", async (req, res) => {
     "topik_word",
     "topik_variation",
   ];
-  if (!Array.isArray(type) || type.some((t) => !validTypes.includes(t))) {
+  const transformedType = type.split(",");
+  if (
+    transformedType.length === 0 ||
+    transformedType.some((t) => !validTypes.includes(t))
+  ) {
     return res
       .status(400)
       .json({ error: "유효하지 않은 구독 타입이 포함되어 있습니다." });
@@ -129,7 +133,7 @@ router.post("/", async (req, res) => {
     JSON.stringify({
       name,
       phoneNumber,
-      type,
+      type: transformedType,
       email,
       startDate,
       endDate,
