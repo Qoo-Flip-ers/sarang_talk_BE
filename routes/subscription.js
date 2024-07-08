@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const db = require("../models");
 const checkToken = require("../middlewares/checkToken");
+const redis = require("../redis");
 const slack = require("axios").create({
   baseURL: "https://hooks.slack.com/services",
 });
@@ -111,48 +112,77 @@ router.post("/", async (req, res) => {
     "topik_word",
     "topik_variation",
   ];
-  if (!validTypes.includes(type)) {
-    return res.status(400).json({ error: "유효하지 않은 구독 타입입니다." });
+  if (!Array.isArray(type) || type.some((t) => !validTypes.includes(t))) {
+    return res
+      .status(400)
+      .json({ error: "유효하지 않은 구독 타입이 포함되어 있습니다." });
   }
+
+  const startDate = new Date();
+  startDate.setDate(startDate.getDate() + 1);
+  const endDate = new Date(startDate);
+  endDate.setMonth(endDate.getMonth() + 1);
+
+  // Redis 주입
+  await redis.lpush(
+    "request_subscription",
+    JSON.stringify({
+      name,
+      phoneNumber,
+      type,
+      email,
+      startDate,
+      endDate,
+    })
+  );
+
+  sendSlack(
+    `[예약완료] 새로운 사용자 등록: ${user.name} (${user.phoneNumber}) ${type} 이 예약되었습니다.`
+  );
 
   try {
-    let user = await db.User.findOne({ where: { phoneNumber, email } });
-
-    if (!user) {
-      user = await db.User.create({
-        name,
-        phoneNumber,
-        email,
-        status: "active",
-      });
-    }
-
-    const startDate = new Date();
-    startDate.setDate(startDate.getDate() + 1);
-    const endDate = new Date(startDate);
-    endDate.setMonth(endDate.getMonth() + 1);
-
-    const newSubscription = await db.Subscription.create({
-      userId: user.id,
-      type,
-      subscriptionDate: startDate,
-      expirationDate: endDate,
+    const user = await db.User.findOne({
+      where: { id: 1 },
     });
 
-    sendSlack(
-      `[유저 등록] 새로운 사용자 등록: ${user.name} (${user.phoneNumber}) ${type}`
-    );
-
-    // 시작 안내 메세지 발송
-    res.json(newSubscription);
-  } catch (error) {
-    sendSlack(
-      `[유저 등록 에러] 새로운 사용자 등록 중에 에러가 발생했습니다: ${user.name} (${user.phoneNumber}) ${type}`
-    );
-
-    console.error("Error creating user or subscription: ", error);
-    res.status(500).json({ error: "서버 오류가 발생했습니다." });
+    sendSlack("[DB 깨우기] 사용자 예약을 위한 DB 깨우기 시도");
+  } catch (e) {
+    sendSlack("[DB 깨우기] 사용자 예약을 위한 DB 깨우기 시도");
   }
+
+  res.status(200).json({
+    message:
+      "사용자 등록이 예약되었습니다. 1분 이내로 안내 메세지가 발송됩니다.",
+  });
+  // try {
+  //   let user = await db.User.findOne({ where: { phoneNumber, email } });
+
+  //   if (!user) {
+  //     user = await db.User.create({
+  //       name,
+  //       phoneNumber,
+  //       email,
+  //       status: "active",
+  //     });
+  //   }
+
+  //   const newSubscription = await db.Subscription.create({
+  //     userId: user.id,
+  //     type,
+  //     subscriptionDate: startDate,
+  //     expirationDate: endDate,
+  //   });
+
+  //   // 시작 안내 메세지 발송
+  //   res.json(newSubscription);
+  // } catch (error) {
+  //   sendSlack(
+  //     `[유저 등록 에러] 새로운 사용자 등록 중에 에러가 발생했습니다: ${user.name} (${user.phoneNumber}) ${type}`
+  //   );
+
+  //   console.error("Error creating user or subscription: ", error);
+  //   res.status(500).json({ error: "서버 오류가 발생했습니다." });
+  // }
 });
 
 module.exports = router;

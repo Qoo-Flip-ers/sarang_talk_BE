@@ -6,6 +6,7 @@ const { Sequelize } = require("sequelize");
 const db = require("./models");
 const swaggerDocs = require("./swagger");
 const cors = require("cors");
+require("./services/cronJobs"); // Cron 작업을 초기화합니다.
 
 const userRouter = require("./routes/user");
 const wordRouter = require("./routes/word");
