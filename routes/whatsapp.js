@@ -610,6 +610,7 @@ async function fetchActiveSubscriptions(category) {
 }
 
 const sendDailyMessage = async (category) => {
+  let count = 0;
   const categorizedSubscriptions = {};
 
   // 구독기간이 현재 진행 중인 사용자 목록을 카테고리별로 분류
@@ -630,10 +631,12 @@ const sendDailyMessage = async (category) => {
     // 여기에 카테고리별로 실행할 함수를 호출할 수 있습니다.
     subscriptions.forEach((subscription, index) => {
       setTimeout(() => {
-        processCategorySubscriptions(category, [subscription]);
+        count += processCategorySubscriptions(category, [subscription]);
       }, index * 500); // 0.5초 간격으로 호출
     });
   });
+
+  return count;
 };
 
 const processCategorySubscriptions = async (category, subscriptions) => {
@@ -882,6 +885,11 @@ const processCategorySubscriptions = async (category, subscriptions) => {
       }
     });
   }
+
+  const result = subscriptions.map((subscription) => subscription.userId);
+  // uniqueId 개수
+  const uniqueResult = [...new Set(result)];
+  return uniqueResult.length;
 };
 
 async function fetchSubscriptionsStartingToday() {
@@ -1030,11 +1038,9 @@ cron.schedule("5 15 * * *", async () => {
   }
   try {
     try {
-      const result = await sendDailyMessage("kpop_lyrics");
+      const count = await sendDailyMessage("kpop_lyrics");
 
-      sendSlack(
-        `[일일 메시지] kpop_lyrics: ${result.length}명에게 메시지 발송`
-      );
+      sendSlack(`[일일 메시지] kpop_lyrics: ${count}명에게 메시지 발송`);
     } catch (error) {
       if (error.status === 404) {
         sendSlack(
@@ -1058,9 +1064,9 @@ cron.schedule("6 15 * * *", async () => {
   }
   try {
     try {
-      const result = await sendDailyMessage("topik_word");
+      const count = await sendDailyMessage("topik_word");
 
-      sendSlack(`[일일 메시지] topik_word: ${result.length}명에게 메시지 발송`);
+      sendSlack(`[일일 메시지] topik_word: ${count}명에게 메시지 발송`);
     } catch (error) {
       if (error.status === 404) {
         sendSlack(
@@ -1084,11 +1090,9 @@ cron.schedule("7 15 * * *", async () => {
   }
   try {
     try {
-      const result = await sendDailyMessage("topik_variation");
+      const count = await sendDailyMessage("topik_variation");
 
-      sendSlack(
-        `[일일 메시지] topik_variation: ${result.length}명에게 메시지 발송`
-      );
+      sendSlack(`[일일 메시지] topik_variation: ${count}명에게 메시지 발송`);
     } catch (error) {
       if (error.status === 404) {
         sendSlack(
@@ -1112,11 +1116,9 @@ cron.schedule("8 15 * * *", async () => {
   }
   try {
     try {
-      const result = await sendDailyMessage("daily_conversation");
+      const count = await sendDailyMessage("daily_conversation");
 
-      sendSlack(
-        `[일일 메시지] daily_conversation: ${result.length}명에게 메시지 발송`
-      );
+      sendSlack(`[일일 메시지] daily_conversation: ${count}명에게 메시지 발송`);
     } catch (error) {
       if (error.status === 404) {
         sendSlack(
