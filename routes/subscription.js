@@ -106,15 +106,15 @@ router.post("/", async (req, res) => {
   if (!emailRegex.test(email)) {
     return res.status(400).json({ error: "이메일 형식이 올바르지 않습니다." });
   }
-
   const validTypes = [
+    "basic",
     "daily_conversation",
     "kpop_lyrics",
     "topik_word",
     "topik_variation",
   ];
 
-  if (type.length === 0 || type.some((t) => !validTypes.includes(t))) {
+  if (type.length === 0 || !type.every((t) => validTypes.includes(t))) {
     return res
       .status(400)
       .json({ error: "유효하지 않은 구독 타입이 포함되어 있습니다." });
