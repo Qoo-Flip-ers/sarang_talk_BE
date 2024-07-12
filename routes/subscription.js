@@ -87,10 +87,10 @@ router.post("/", async (req, res) => {
     console.log("테스트");
     return;
   }
-  const { name, phoneNumber, email, type } = req.body;
+  const { name, phoneNumber, email, type, quiz, zoom, plan } = req.body;
   console.log(req.body);
 
-  if (!name || !phoneNumber || !email || !type) {
+  if (!name || !phoneNumber || !email || !type || !plan) {
     return res.status(400).json({ error: "모든 필드를 입력해주세요." });
   }
 
@@ -113,14 +113,25 @@ router.post("/", async (req, res) => {
     "topik_word",
     "topik_variation",
   ];
-  const transformedType = type.split(",").map((t) => t.trim());
-  if (
-    transformedType.length === 0 ||
-    transformedType.some((t) => !validTypes.includes(t))
-  ) {
+
+  if (type.length === 0 || type.some((t) => !validTypes.includes(t))) {
     return res
       .status(400)
       .json({ error: "유효하지 않은 구독 타입이 포함되어 있습니다." });
+  }
+
+  const validPlans = [
+    "telegram_1",
+    "telegram_3",
+    "telegram_12",
+    "whatsapp_1",
+    "whatsapp_3",
+    "whatsapp_12",
+  ];
+  if (plan.length === 0 || !validPlans.includes(plan)) {
+    return res
+      .status(400)
+      .json({ error: "유효하지 않은 플랜이 포함되어 있습니다." });
   }
 
   const startDate = new Date();
@@ -134,10 +145,13 @@ router.post("/", async (req, res) => {
     JSON.stringify({
       name,
       phoneNumber,
-      type: transformedType,
+      type,
+      plan,
       email,
       startDate,
       endDate,
+      quiz,
+      zoom,
     })
   );
 
