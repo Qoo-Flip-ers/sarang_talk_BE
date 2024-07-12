@@ -134,9 +134,13 @@ router.post("/", async (req, res) => {
       .json({ error: "유효하지 않은 플랜이 포함되어 있습니다." });
   }
 
-  const startDate = new Date();
+  let startDate = new Date();
   startDate.setDate(startDate.getDate() + 1);
 
+  const comparisonDate = new Date("2024-08-01");
+  if (startDate < comparisonDate) {
+    startDate = comparisonDate;
+  }
   const month = Number(plan.split("_")[1]);
 
   const endDate = new Date(startDate);
