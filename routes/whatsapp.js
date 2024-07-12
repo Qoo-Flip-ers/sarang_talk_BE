@@ -1042,7 +1042,8 @@ cron.schedule("5 15 * * *", async () => {
         );
       } else {
         sendSlack(
-          "[일일 메시지] kpop_lyrics: 서버 오류로 인해 메시지를 발송할 수 없습니다."
+          "[일일 메시지] kpop_lyrics: 서버 오류로 인해 메시지를 발송할 수 없습니다." +
+            error.message
         );
       }
     }
@@ -1067,7 +1068,8 @@ cron.schedule("6 15 * * *", async () => {
         );
       } else {
         sendSlack(
-          "[일일 메시지] topik_word: 서버 오류로 인해 메시지를 발송할 수 없습니다."
+          "[일일 메시지] topik_word: 서버 오류로 인해 메시지를 발송할 수 없습니다." +
+            error.message
         );
       }
     }
@@ -1094,7 +1096,8 @@ cron.schedule("7 15 * * *", async () => {
         );
       } else {
         sendSlack(
-          "[일일 메시지] topik_variation: 서버 오류로 인해 메시지를 발송할 수 없습니다."
+          "[일일 메시지] topik_variation: 서버 오류로 인해 메시지를 발송할 수 없습니다." +
+            error.message
         );
       }
     }
@@ -1121,7 +1124,8 @@ cron.schedule("8 15 * * *", async () => {
         );
       } else {
         sendSlack(
-          "[일일 메시지] daily_conversation: 서버 오류로 인해 메시지를 발송할 수 없습니다."
+          "[일일 메시지] daily_conversation: 서버 오류로 인해 메시지를 발송할 수 없습니다." +
+            error.message
         );
       }
     }
