@@ -60,7 +60,7 @@ async function insertIntoDatabase(data) {
         expirationDate: endDate,
         plan,
         quiz: newQuiz,
-        zoom,
+        zoom: newZoom,
       });
     });
 
