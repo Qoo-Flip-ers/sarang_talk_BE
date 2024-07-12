@@ -172,9 +172,11 @@ router.post("/", async (req, res) => {
     sendSlack("[DB 깨우기] 사용자 예약을 위한 DB 깨우기 시도");
   }
 
+  const code = "M1GJ978F";
   res.status(200).json({
     message:
       "사용자 등록이 예약되었습니다. 1분 이내로 안내 메세지가 발송됩니다.",
+    code: plan.includes("telegram") ? code : null,
   });
   // try {
   //   let user = await db.User.findOne({ where: { phoneNumber, email } });
