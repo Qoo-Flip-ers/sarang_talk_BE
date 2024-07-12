@@ -19,7 +19,17 @@ const sendSlack = async (message) => {
 
 // 서버리스 DB에 데이터 삽입 함수 (Sequelize 사용)
 async function insertIntoDatabase(data) {
-  const { name, phoneNumber, email, startDate, endDate, type } = data;
+  const {
+    name,
+    phoneNumber,
+    email,
+    startDate,
+    endDate,
+    type,
+    plan,
+    quiz,
+    zoom,
+  } = data;
 
   try {
     let user = await db.User.findOne({ where: { phoneNumber, email } });
@@ -34,11 +44,23 @@ async function insertIntoDatabase(data) {
     }
 
     type.forEach(async (t) => {
+      let newQuiz;
+      let newZoom;
+      if (quiz && Array.isArray(quiz)) {
+        quiz.includes(t + "_quiz") && (newQuiz = t + "_quiz");
+      }
+      if (zoom && Array.isArray(zoom)) {
+        newZoom = zoom.join(",");
+      }
+
       const newSubscription = await db.Subscription.create({
         userId: user.id,
         type: t,
         subscriptionDate: startDate,
         expirationDate: endDate,
+        plan,
+        quiz: newQuiz,
+        zoom,
       });
     });
 

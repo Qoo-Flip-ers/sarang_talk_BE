@@ -136,8 +136,11 @@ router.post("/", async (req, res) => {
 
   const startDate = new Date();
   startDate.setDate(startDate.getDate() + 1);
+
+  const month = Number(plan.split("_")[1]);
+
   const endDate = new Date(startDate);
-  endDate.setMonth(endDate.getMonth() + 1);
+  endDate.setMonth(startDate.getMonth() + month);
 
   // Redis 주입
   await redis.lpush(
