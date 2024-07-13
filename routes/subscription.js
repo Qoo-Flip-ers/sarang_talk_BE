@@ -88,7 +88,7 @@ router.post("/", async (req, res) => {
     return;
   }
   const { name, phoneNumber, email, type, quiz, zoom, plan } = req.body;
-  console.log(req.body);
+  console.log("new", req.body);
 
   if (!name || !phoneNumber || !email || !type || !plan) {
     return res.status(400).json({ error: "모든 필드를 입력해주세요." });
