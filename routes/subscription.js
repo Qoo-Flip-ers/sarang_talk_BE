@@ -117,7 +117,14 @@ router.post("/", async (req, res) => {
     "topik_variation",
   ];
 
-  if (type.length === 0 || !type.every((t) => validTypes.includes(t))) {
+  const formattingType = type.split(",").map((t) => t.trim());
+  const formattingQuiz = quiz ? quiz.split(",").map((t) => t.trim()) : [];
+  const formattingZoom = zoom ? zoom.split(",").map((t) => t.trim()) : [];
+
+  if (
+    formattingType.length === 0 ||
+    !formattingType.every((t) => validTypes.includes(t))
+  ) {
     console.log("[error] 유효하지 않은 구독 타입이 포함되어 있습니다.");
     return res
       .status(400)
@@ -157,13 +164,13 @@ router.post("/", async (req, res) => {
     JSON.stringify({
       name,
       phoneNumber,
-      type,
+      type: formattingType,
       plan,
       email,
       startDate,
       endDate,
-      quiz,
-      zoom,
+      quiz: formattingQuiz,
+      zoom: formattingZoom,
     })
   );
 
