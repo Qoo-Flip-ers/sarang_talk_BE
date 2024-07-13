@@ -91,11 +91,13 @@ router.post("/", async (req, res) => {
   console.log("new", req.body);
 
   if (!name || !phoneNumber || !email || !type || !plan) {
+    console.log("[error] 모든 필드를 입력해주세요.");
     return res.status(400).json({ error: "모든 필드를 입력해주세요." });
   }
 
   const phoneNumberRegex = /^\+\d{1,3}\d{7,14}$/;
   if (!phoneNumberRegex.test(phoneNumber)) {
+    console.log("[error] 전화번호 형식이 올바르지 않습니다.");
     return res.status(400).json({
       error:
         "전화번호 형식이 올바르지 않습니다. 국가번호와 숫자만 포함되어야 합니다.",
@@ -104,6 +106,7 @@ router.post("/", async (req, res) => {
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
+    console.log("[error] 이메일 형식이 올바르지 않습니다.");
     return res.status(400).json({ error: "이메일 형식이 올바르지 않습니다." });
   }
   const validTypes = [
@@ -115,6 +118,7 @@ router.post("/", async (req, res) => {
   ];
 
   if (type.length === 0 || !type.every((t) => validTypes.includes(t))) {
+    console.log("[error] 유효하지 않은 구독 타입이 포함되어 있습니다.");
     return res
       .status(400)
       .json({ error: "유효하지 않은 구독 타입이 포함되어 있습니다." });
@@ -129,6 +133,7 @@ router.post("/", async (req, res) => {
     "whatsapp_12",
   ];
   if (plan.length === 0 || !validPlans.includes(plan)) {
+    console.log("[error] 유효하지 않은 플랜이 포함되어 있습니다.");
     return res
       .status(400)
       .json({ error: "유효하지 않은 플랜이 포함되어 있습니다." });
