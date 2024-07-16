@@ -24,6 +24,7 @@ router.get("/", async (req, res) => {
     const { count, rows } = await db.User.findAndCountAll({
       limit: limit,
       offset: offset,
+      include: db.Subscription,
     });
 
     const total = Math.ceil(count / limit);
