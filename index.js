@@ -6,19 +6,27 @@ const { Sequelize } = require("sequelize");
 const db = require("./models");
 const swaggerDocs = require("./swagger");
 const cors = require("cors");
+require("./services/cronJobs"); // Cron 작업을 초기화합니다.
+require("./redis"); // Redis 서버에 연결합니다.
 
 const userRouter = require("./routes/user");
 const wordRouter = require("./routes/word");
+const questionRouter = require("./routes/question");
 const whatsappRouter = require("./routes/whatsapp");
 const webhookRouter = require("./routes/webhook");
+const subscriptionRouter = require("./routes/subscription");
+const authRouter = require("./routes/auth");
 
 app.use(express.json());
 app.use(cors());
 
 app.use("/users", userRouter);
 app.use("/words", wordRouter);
+app.use("/questions", questionRouter);
 app.use("/whatsapp", whatsappRouter);
 app.use("/webhook", webhookRouter);
+app.use("/subscription", subscriptionRouter);
+app.use("/auth", authRouter);
 
 app.get("/", (req, res) => {
   res.send("Hello World!");

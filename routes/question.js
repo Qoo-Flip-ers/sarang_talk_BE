@@ -4,10 +4,10 @@ const db = require("../models");
 
 /**
  * @swagger
- * /words:
+ * /questions:
  *   get:
- *     summary: 모든 단어 가져오기
- *     description: 페이지네이션을 사용하여 모든 단어를 가져옵니다.
+ *     summary: 모든 질문 가져오기
+ *     description: 페이지네이션을 사용하여 모든 질문을 가져옵니다.
  *     parameters:
  *       - in: query
  *         name: page
@@ -23,7 +23,7 @@ const db = require("../models");
  *         description: 페이지 당 항목 수
  *     responses:
  *       200:
- *         description: 단어 목록 반환
+ *         description: 질문 목록 반환
  *       500:
  *         description: 서버 오류
  */
@@ -33,7 +33,7 @@ router.get("/", async (req, res) => {
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
 
-    const { count, rows } = await db.Word.findAndCountAll({
+    const { count, rows } = await db.Question.findAndCountAll({
       limit: limit,
       offset: offset,
       order: [["createdAt", "DESC"]],
@@ -43,7 +43,7 @@ router.get("/", async (req, res) => {
     const result = {
       totalPage: total,
       totalCount: count,
-      words: rows,
+      questions: rows,
     };
 
     res.json(result);
@@ -54,32 +54,32 @@ router.get("/", async (req, res) => {
 
 /**
  * @swagger
- * /words/{id}:
+ * /questions/{id}:
  *   get:
- *     summary: 특정 단어 가져오기
- *     description: ID를 사용하여 특정 단어를 가져옵니다.
+ *     summary: 특정 질문 가져오기
+ *     description: ID를 사용하여 특정 질문을 가져옵니다.
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         description: 단어 ID
+ *         description: 질문 ID
  *         schema:
  *           type: integer
  *     responses:
  *       200:
- *         description: 단어 반환
+ *         description: 질문 반환
  *       404:
- *         description: 단어를 찾을 수 없음
+ *         description: 질문을 찾을 수 없음
  *       500:
  *         description: 서버 오류
  */
 router.get("/:id", async (req, res) => {
   try {
-    const word = await db.Word.findByPk(req.params.id);
-    if (word) {
-      res.json(word);
+    const question = await db.Question.findByPk(req.params.id);
+    if (question) {
+      res.json(question);
     } else {
-      res.status(404).json({ error: "Word not found" });
+      res.status(404).json({ error: "question not found" });
     }
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -88,10 +88,10 @@ router.get("/:id", async (req, res) => {
 
 /**
  * @swagger
- * /words:
+ * /questions:
  *   post:
- *     summary: 단어 생성
- *     description: 새로운 단어를 생성합니다.
+ *     summary: 질문 생성
+ *     description: 새로운 질문을 생성합니다.
  *     requestBody:
  *       required: true
  *       content:
@@ -99,24 +99,29 @@ router.get("/:id", async (req, res) => {
  *           schema:
  *             type: object
  *             required:
- *               - korean
+ *               - title
  *               - description
- *               - pronunciation
+ *               - answer
+ *               - explanation
  *               - example_1
  *               - example_2
  *               - example_3
- *               - level
  *               - type
+ *               - level
+ *               - imageUrl
  *             properties:
- *               korean:
+ *               title:
  *                 type: string
- *                 description: 단어 (한국어)
+ *                 description: 질문 제목
  *               description:
  *                 type: string
- *                 description: 설명 (인도네시아어)
- *               pronunciation:
+ *                 description: 질문 설명
+ *               answer:
  *                 type: string
- *                 description: 발음 (인도네시아어)
+ *                 description: 질문의 답
+ *               explanation:
+ *                 type: string
+ *                 description: 답 설명
  *               example_1:
  *                 type: string
  *                 description: 예문 1
@@ -126,48 +131,52 @@ router.get("/:id", async (req, res) => {
  *               example_3:
  *                 type: string
  *                 description: 예문 3
+ *               type:
+ *                 type: string
+ *                 description: 질문 유형
  *               level:
  *                 type: integer
  *                 description: 난이도 레벨
- *               type:
+ *               imageUrl:
  *                 type: string
- *                 description: 단어 유형
+ *                 description: 이미지 URL
  *     responses:
  *       200:
- *         description: 생성된 단어 반환
+ *         description: 생성된 질문 반환
  *       500:
  *         description: 서버 오류
  */
 router.post("/", async (req, res) => {
   try {
-    const newWord = await db.Word.create({
-      korean: req.body.korean,
+    const newQuestion = await db.Question.create({
+      title: req.body.title,
       description: req.body.description,
-      pronunciation: req.body.pronunciation,
+      answer: req.body.answer,
+      explanation: req.body.explanation,
       example_1: req.body.example_1,
       example_2: req.body.example_2,
       example_3: req.body.example_3,
-      level: req.body.level,
+      example_4: req.body.example_4,
       type: req.body.type,
-      source: req.body.source,
+      level: req.body.level,
       imageUrl: req.body.imageUrl,
     });
-    res.json(newWord);
+    res.json(newQuestion);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 /**
  * @swagger
- * /words/{id}:
+ * /questions/{id}:
  *   put:
- *     summary: 단어 업데이트
- *     description: 특정 단어의 정보를 업데이트합니다.
+ *     summary: 질문 업데이트
+ *     description: 특정 질문의 정보를 업데이트합니다.
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         description: 단어 ID
+ *         description: 질문 ID
  *         schema:
  *           type: integer
  *     requestBody:
@@ -177,25 +186,25 @@ router.post("/", async (req, res) => {
  *           schema:
  *             type: object
  *             properties:
- *               word:
+ *               question:
  *                 type: string
- *                 description: 업데이트할 단어
+ *                 description: 업데이트할 질문
  *     responses:
  *       200:
- *         description: 업데이트된 단어 반환
+ *         description: 업데이트된 질문 반환
  *       404:
- *         description: 단어를 찾을 수 없음
+ *         description: 질문을 찾을 수 없음
  *       500:
  *         description: 서버 오류
  */
 router.put("/:id", async (req, res) => {
   try {
-    const word = await db.Word.findByPk(req.params.id);
-    if (word) {
-      await word.update(req.body);
-      res.json(word);
+    const question = await db.Question.findByPk(req.params.id);
+    if (question) {
+      await question.update(req.body);
+      res.json(question);
     } else {
-      res.status(404).json({ error: "Word not found" });
+      res.status(404).json({ error: "Question not found" });
     }
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -204,33 +213,33 @@ router.put("/:id", async (req, res) => {
 
 /**
  * @swagger
- * /words/{id}:
+ * /questions/{id}:
  *   delete:
- *     summary: 단어 삭제
- *     description: 특정 단어를 삭제합니다.
+ *     summary: 질문 삭제
+ *     description: 특정 질문을 삭제합니다.
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
- *         description: 단어 ID
+ *         description: 질문 ID
  *         schema:
  *           type: integer
  *     responses:
  *       200:
- *         description: 단어 삭제 성공 메시지 반환
+ *         description: 질문 삭제 성공 메시지 반환
  *       404:
- *         description: 단어를 찾을 수 없음
+ *         description: 질문을 찾을 수 없음
  *       500:
  *         description: 서버 오류
  */
 router.delete("/:id", async (req, res) => {
   try {
-    const word = await db.Word.findByPk(req.params.id);
-    if (word) {
-      await word.destroy(); // soft delete를 위해 destroy 메소드 사용
-      res.json({ message: "Word soft deleted" });
+    const question = await db.Question.findByPk(req.params.id);
+    if (question) {
+      await question.destroy(); // soft delete를 위해 destroy 메소드 사용
+      res.json({ message: "question soft deleted" });
     } else {
-      res.status(404).json({ error: "Word not found" });
+      res.status(404).json({ error: "question not found" });
     }
   } catch (error) {
     res.status(500).json({ error: error.message });

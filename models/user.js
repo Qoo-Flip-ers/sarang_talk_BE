@@ -7,7 +7,8 @@ module.exports = (sequelize, DataTypes) => {
       id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
       name: { type: DataTypes.STRING, allowNull: true },
       phoneNumber: { type: DataTypes.STRING, allowNull: true },
-      status: { type: DataTypes.STRING, allowNull: false },
+      email: { type: DataTypes.STRING, allowNull: true },
+      status: { type: DataTypes.STRING, allowNull: false, default: "active" },
     },
     {
       sequelize,

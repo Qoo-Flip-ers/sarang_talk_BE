@@ -29,6 +29,24 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.DATE,
         allowNull: false,
       },
+      lastWordId: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        defaultValue: 0,
+      },
+
+      plan: {
+        type: DataTypes.STRING,
+        defaultValue: "whatsapp_1",
+      },
+      quiz: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      zoom: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
     },
     {
       sequelize,

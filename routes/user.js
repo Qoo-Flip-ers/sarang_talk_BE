@@ -25,6 +25,7 @@ router.get("/", async (req, res) => {
       limit: limit,
       offset: offset,
       include: db.Subscription,
+      order: [["createdAt", "DESC"]],
     });
 
     const total = Math.ceil(count / limit);
