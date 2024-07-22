@@ -6,6 +6,7 @@ const redis = require("../redis");
 const slack = require("axios").create({
   baseURL: "https://hooks.slack.com/services",
 });
+const { v4: uuidv4 } = require("uuid");
 
 const sendSlack = async (message) => {
   let text = `${
@@ -158,6 +159,14 @@ router.post("/", async (req, res) => {
   const endDate = new Date(startDate);
   endDate.setMonth(startDate.getMonth() + month);
 
+  let code;
+  let codeGeneratedAt;
+
+  if (plan.includes("telegram")) {
+    code = uuidv4();
+    codeGeneratedAt = new Date();
+  }
+
   // Redis 주입
   await redis.lpush(
     "request_subscription",
@@ -173,9 +182,13 @@ router.post("/", async (req, res) => {
       zoom: formattingZoom,
     })
   );
+  // code,
+  // codeGeneratedAt,
 
   sendSlack(
-    `[예약완료] 새로운 사용자 등록: ${name} (${phoneNumber}) ${type} 이 예약되었습니다.`
+    `[예약완료] 새로운 사용자 등록: ${name} (${phoneNumber}) ${type} 이 예약되었습니다. ${
+      code ? `(코드: ${code})` : ""
+    }`
   );
 
   try {
@@ -188,7 +201,6 @@ router.post("/", async (req, res) => {
     sendSlack("[DB 깨우기] 사용자 예약을 위한 DB 깨우기 시도");
   }
 
-  const code = "M1GJ978F";
   res.status(200).json({
     message:
       "사용자 등록이 예약되었습니다. 1분 이내로 안내 메세지가 발송됩니다.",

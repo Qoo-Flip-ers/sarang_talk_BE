@@ -8,6 +8,7 @@ const swaggerDocs = require("./swagger");
 const cors = require("cors");
 require("./services/cronJobs"); // Cron 작업을 초기화합니다.
 require("./redis"); // Redis 서버에 연결합니다.
+require("./services/telegramBot"); // 텔레그램 봇을 초기화합니다.
 
 const userRouter = require("./routes/user");
 const wordRouter = require("./routes/word");
