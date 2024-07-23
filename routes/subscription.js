@@ -88,7 +88,7 @@ router.post("/", async (req, res) => {
     console.log("테스트");
     return;
   }
-  const { name, phoneNumber, email, type, quiz, zoom, plan } = req.body;
+  const { name, phoneNumber, email, type, quiz, zoom, plan, test } = req.body;
   console.log("new", req.body);
 
   if (!name || !phoneNumber || !email || !type || !plan) {
@@ -165,6 +165,16 @@ router.post("/", async (req, res) => {
   if (plan.includes("telegram")) {
     code = uuidv4();
     codeGeneratedAt = new Date();
+  }
+
+  if (test) {
+    sendSlack(`[테스트] 테스트 값이 들어왔습니다. ${test} , ${typeof test}`);
+    console.log("테스트모드");
+    return res.status(200).json({
+      message:
+        "사용자 등록이 예약되었습니다. 1분 이내로 안내 메세지가 발송됩니다.",
+      code: plan.includes("telegram") ? code : null,
+    });
   }
 
   // Redis 주입
