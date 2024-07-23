@@ -4,6 +4,7 @@ const retry = require("async-retry");
 const slack = require("axios").create({
   baseURL: "https://hooks.slack.com/services",
 });
+const { bot } = require("./telegramBot");
 
 const sendSlack = async (message) => {
   let text = `${
@@ -29,6 +30,8 @@ async function insertIntoDatabase(data) {
     plan,
     quiz,
     zoom,
+    code,
+    codeGeneratedAt,
   } = data;
 
   try {
@@ -40,6 +43,8 @@ async function insertIntoDatabase(data) {
         phoneNumber,
         email,
         status: "active",
+        code,
+        codeGeneratedAt,
       });
     }
 
@@ -124,6 +129,85 @@ async function processQueue() {
   }
 }
 
+const checkUserCodeForTelegram = async (data) => {
+  const { chatId, code } = data;
+
+  try {
+    let user = await db.User.findOne({ where: { code } });
+
+    if (!user) {
+      sendSlack(`[텔레그램 봇] 코드가 일치하지 않습니다. 코드: ${code}`);
+      // await bot.sendMessage(chatId, "Code does not match.");
+      return;
+    }
+
+    user.chatId = chatId;
+    await user.save();
+
+    await bot.sendMessage(
+      chatId,
+      "Pendaftaran berhasil! Mulai besok, Anda akan menerima kata dalam Bahasa Korea setiap hari pukul 9 pagi. Terima kasih."
+    );
+
+    // 시작 안내 메세지 발송
+    sendSlack(
+      `[등록완료] 텔레그렘에 새로운 사용자 등록이 완료되었습니다: ${user.name} (${user.phoneNumber})`
+    );
+  } catch (error) {
+    sendSlack(
+      `[등록에러] 텔레그렘 새로운 사용자 등록 중에 에러가 발생했습니다: ${user.name} (${user.phoneNumber})`
+    );
+  }
+};
+
+let isProcessingQueueForTelegramBot = false;
+
+const processQueueForTelegramBot = async () => {
+  if (isProcessingQueueForTelegramBot) {
+    console.log("Queue processing is already in progress. Skipping this run.");
+    return;
+  }
+
+  isProcessingQueueForTelegramBot = true;
+
+  try {
+    const data = await redis.rpop("request_confirm_code");
+
+    if (data) {
+      const requestData = JSON.parse(data);
+      console.log("Processing request:", requestData);
+
+      await retry(
+        async (bail) => {
+          try {
+            await checkUserCodeForTelegram(requestData);
+          } catch (err) {
+            console.error("Error inserting into database:", err);
+            throw err;
+          }
+        },
+        {
+          retries: 10,
+          minTimeout: 70000,
+          onRetry: (err, attempt) => {
+            console.error(`Attempt ${attempt} failed:`, err);
+            sendSlack(
+              `[DB 에러] DB 잠자는 중. telegram cron job 시도중. ${err.message}`
+            );
+          },
+        }
+      );
+
+      console.log("Request processed successfully");
+    }
+  } catch (err) {
+    console.error("Error processing queue:", err);
+  } finally {
+    isProcessingQueueForTelegramBot = false;
+  }
+};
+
 module.exports = {
   processQueue,
+  processQueueForTelegramBot,
 };

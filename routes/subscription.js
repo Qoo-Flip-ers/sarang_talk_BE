@@ -190,10 +190,10 @@ router.post("/", async (req, res) => {
       endDate,
       quiz: formattingQuiz,
       zoom: formattingZoom,
+      code,
+      codeGeneratedAt,
     })
   );
-  // code,
-  // codeGeneratedAt,
 
   sendSlack(
     `[예약완료] 새로운 사용자 등록: ${name} (${phoneNumber}) ${type} 이 예약되었습니다. ${

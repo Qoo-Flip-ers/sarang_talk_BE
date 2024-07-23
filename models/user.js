@@ -9,6 +9,9 @@ module.exports = (sequelize, DataTypes) => {
       phoneNumber: { type: DataTypes.STRING, allowNull: true },
       email: { type: DataTypes.STRING, allowNull: true },
       status: { type: DataTypes.STRING, allowNull: false, default: "active" },
+      code: { type: DataTypes.STRING, allowNull: true },
+      chatId: { type: DataTypes.STRING, allowNull: true },
+      codeGeneratedAt: { type: DataTypes.DATE, allowNull: true },
     },
     {
       sequelize,

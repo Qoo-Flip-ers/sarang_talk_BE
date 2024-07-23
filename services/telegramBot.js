@@ -24,20 +24,21 @@ bot.onText(/\/code (.+)/, async (msg, match) => {
   const code = match[1];
 
   try {
+    // 코드 입력 후 안내 메시지
     bot.sendMessage(
       chatId,
-      "Code saved successfully. You will receive a message daily at 9:00 AM."
+      "Kode sedang diverifikasi. Mohon tunggu sebentar. Verifikasi dapat memakan waktu hingga 1 menit."
     );
 
     sendSlack(`[텔레그렘 봇] 코드를 입력했습니다. 코드: ${code}`);
 
-    // await redis.lpush(
-    //   "request_confirm_code",
-    //   JSON.stringify({
-    //     chatId,
-    //     code,
-    //   })
-    // );
+    await redis.lpush(
+      "request_confirm_code",
+      JSON.stringify({
+        chatId,
+        code,
+      })
+    );
   } catch (error) {
     console.error("Database error:", error);
     bot.sendMessage(chatId, "Error saving code.");
@@ -54,4 +55,8 @@ const sendSlack = async (message) => {
       text,
     }
   );
+};
+
+module.exports = {
+  bot,
 };

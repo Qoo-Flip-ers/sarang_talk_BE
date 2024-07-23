@@ -1,9 +1,13 @@
 const cron = require("node-cron");
-const { processQueue } = require("./queueProcessor");
+const {
+  processQueue,
+  processQueueForTelegramBot,
+} = require("./queueProcessor");
 
 // 매 분마다 큐를 확인하여 처리
-cron.schedule("* * * * *", () => {
+cron.schedule("* * * * *", async () => {
   if (process.env.NODE_ENV === "production") {
-    processQueue();
+    await processQueue();
+    await processQueueForTelegramBot();
   }
 });
