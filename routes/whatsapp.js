@@ -1054,14 +1054,14 @@ const sendWeeklyQuiz = async (platform) => {
           [db.Sequelize.Op.gte]: todayStart,
         },
         quiz: {
-          [Op.ne]: null,
+          [db.Sequelize.Op.ne]: null,
         },
         plan: {
-          [Op.or]: [
-            { [Op.like]: `${platform}_1` },
-            { [Op.like]: `${platform}_3` },
-            { [Op.like]: `${platform}_6` },
-            { [Op.like]: `${platform}_12` },
+          [db.Sequelize.Op.or]: [
+            { [db.Sequelize.Op.like]: `${platform}_1` },
+            { [db.Sequelize.Op.like]: `${platform}_3` },
+            { [db.Sequelize.Op.like]: `${platform}_6` },
+            { [db.Sequelize.Op.like]: `${platform}_12` },
           ],
         },
       },
@@ -1079,7 +1079,7 @@ const sendWeeklyQuiz = async (platform) => {
         const words = await db.Word.findAll({
           where: {
             id: {
-              [Op.lte]: subscription.lastWordId,
+              [db.Sequelize.Op.lte]: subscription.lastWordId,
             },
             type: subscription.type,
           },
@@ -1320,27 +1320,26 @@ cron.schedule("8 15 * * *", async () => {
   }
 });
 
-cron.schedule("15 0 * * 0", async () => {
+cron.schedule("12 15 * * 0", async () => {
   if (process.env.NODE_ENV === "development") {
     return;
   }
-  try {
-    try {
-      await sendWeeklyQuiz("whatsapp");
 
-      sendSlack(`[주간 퀴즈] Whatsapp 퀴즈 발송 예약 완료`);
-    } catch (error) {
-      if (error.status === 404) {
-        sendSlack("[주간 퀴즈] Whatsapp 요청한 사용자를 찾을 수 없습니다.");
-      } else {
-        sendSlack(
-          "[주간 퀴즈] Whatsapp 서버 오류로 인해 메시지를 발송할 수 없습니다." +
-            error.message
-        );
-      }
-    }
+  try {
+    sendSlack(`[주간 퀴즈] Whatsapp 퀴즈 발송 예약 시작`);
+
+    await sendWeeklyQuiz("whatsapp");
+
+    sendSlack(`[주간 퀴즈] Whatsapp 퀴즈 발송 예약 완료`);
   } catch (error) {
-    sendSlack("[주간 퀴즈] Whatsapp 작업 중 오류 발생");
+    if (error.status === 404) {
+      sendSlack("[주간 퀴즈] Whatsapp 요청한 사용자를 찾을 수 없습니다.");
+    } else {
+      sendSlack(
+        "[주간 퀴즈] Whatsapp 서버 오류로 인해 메시지를 발송할 수 없습니다." +
+          error.message
+      );
+    }
   }
 });
 
