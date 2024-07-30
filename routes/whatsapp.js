@@ -808,6 +808,61 @@ const processCategorySubscriptions = async (category, subscriptions) => {
         );
       }
     });
+  } else if (category === "basic") {
+    subscriptions.forEach(async (subscription) => {
+      const todayWord = await db.Word.findOne({
+        where: {
+          id: {
+            [db.Sequelize.Op.gt]: subscription.lastWordId || 0,
+          },
+          type: {
+            [db.Sequelize.Op.eq]: "basic",
+          },
+        },
+        order: [["id", "ASC"]],
+        limit: 1,
+      });
+
+      if (!todayWord) {
+        sendSlack(`오늘의 단어가 없습니다.`);
+        return;
+      }
+
+      const to = `whatsapp:${subscription.User.phoneNumber}`;
+      try {
+        const response = await client.messages.create({
+          from: process.env.FROM_PHONE_NUMBER,
+          to,
+          contentSid: process.env.TEMPLATE_DAILY_CONVERSATION,
+          messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
+          scheduleType: "fixed",
+          sendAt: getSendAt(),
+          contentVariables: JSON.stringify({
+            1: todayWord.korean?.trim(), // korean
+            2: todayWord.pronunciation?.trim(), // pronunciation
+            3: todayWord.description?.trim(), // description
+            4: todayWord.example_1?.trim(), // example_1
+            5: todayWord.example_2?.trim(), // example_2 (예문 발음기호)
+            6: todayWord.example_3?.trim(), // example_3 (에문 설명)
+          }),
+        });
+        console.log("Scheduled message sent to", subscription.User.name);
+
+        await subscription.update({ lastWordId: todayWord.id });
+
+        // ReceivedWords에 기록 추가
+        await db.ReceivedWords.create({
+          userId: subscription.userId,
+          wordId: todayWord.id,
+          receivedDate: new Date(),
+        });
+      } catch (error) {
+        console.error(
+          `Error sending scheduled message to ${subscription.User.name}: `,
+          error
+        );
+      }
+    });
   } else if (category === "topik_variation") {
     subscriptions.forEach(async (subscription) => {
       const todayQuestion = await db.Question.findOne({
@@ -1027,6 +1082,30 @@ cron.schedule("2 15 * * *", async () => {
     }
   } catch (e) {
     sendSlack("[준비] DB 깨우기 실패");
+  }
+});
+
+cron.schedule("4 15 * * *", async () => {
+  if (process.env.NODE_ENV === "development") {
+    return;
+  }
+  try {
+    try {
+      const count = await sendDailyMessage("basic");
+
+      sendSlack(`[일일 메시지] basic: ${count}명에게 메시지 발송`);
+    } catch (error) {
+      if (error.status === 404) {
+        sendSlack("[일일 메시지] basic: 요청한 사용자를 찾을 수 없습니다.");
+      } else {
+        sendSlack(
+          "[일일 메시지] basic: 서버 오류로 인해 메시지를 발송할 수 없습니다." +
+            error.message
+        );
+      }
+    }
+  } catch (error) {
+    sendSlack("[일일 메시지] basic: 작업 중 오류 발생");
   }
 });
 
