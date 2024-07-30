@@ -4,7 +4,13 @@ const retry = require("async-retry");
 const slack = require("axios").create({
   baseURL: "https://hooks.slack.com/services",
 });
+const twilio = require("twilio");
 const { bot } = require("./telegramBot");
+
+const client = twilio(
+  process.env.TWILIO_ACCOUNT_SID,
+  process.env.TWILIO_AUTH_TOKEN
+);
 
 const sendSlack = async (message) => {
   let text = `${
@@ -46,6 +52,21 @@ async function insertIntoDatabase(data) {
         code,
         codeGeneratedAt,
       });
+
+      await client.messages.create(
+        {
+          from: process.env.FROM_PHONE_NUMBER,
+          to: `whatsapp:${phoneNumber}`,
+          contentSid: process.env.TEMPLATE_WELCOME_TOMMOROW,
+          messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
+        },
+        (error) => {
+          sendSlack(
+            `[Twilio 에러] Twilio API를 통한 메세지 전송 중 에러가 발생했습니다: ${error}`
+          );
+          console.log(error);
+        }
+      );
     }
 
     type.forEach(async (t) => {
@@ -146,7 +167,9 @@ const checkUserCodeForTelegram = async (data) => {
 
     await bot.sendMessage(
       chatId,
-      "Pendaftaran berhasil! Mulai besok, Anda akan menerima kata dalam Bahasa Korea setiap hari pukul 9 pagi. Terima kasih."
+      `*안녕! Annyeong! 👋🏻*\nMulai dari besok, kami akan kirim pesan belajar bahsa Korea setiap hari.\n\n📈 Anda akan bisa belajar dengan cara yang lebih efektif!\n1. Rekam atau ketikkan ungkapan dan contoh kalimat yang dikirim.\n
+2. Pada tanggal 1 bulan depan, kami akan mengirimkan tes bulanan dengan konten yang dikirimkan selama sebulan terakhir.\n\n📢 Silakan periksa instruksinya!\n• Testimony event: Klik 'Hubungi Kami' dibawah dan meninggalkan selfie dengan ulasan. Kami akan mengundi 10 orang dan memberi voucher 1 minggu. \n• Feedback: Komentar dan masukan Anda sangat membantu meningkatkan layanan Annyeong WA. (Klik(Link)\n• Pertanyaan: Akun ini khusus pengiriman. Untuk pertanyaan, silakan klik tombol 'Hubungi Kami' dibawah.\n\nPelajari satu kosakata setiap hari 😊\n\n[Hubungi Kami](https://bit.ly/4ci4awd)`,
+      { parse_mode: "Markdown" }
     );
 
     // 시작 안내 메세지 발송

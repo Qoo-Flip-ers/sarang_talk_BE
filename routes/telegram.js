@@ -56,6 +56,217 @@ async function fetchActiveSubscriptions(category) {
   });
 }
 
+const sendDailyMessage = async (category) => {
+  let count = 0;
+  const categorizedSubscriptions = {};
+
+  // 구독기간이 현재 진행 중인 사용자 목록을 카테고리별로 분류
+  const activeSubscriptions = await fetchActiveSubscriptions(category);
+  activeSubscriptions.forEach((subscription) => {
+    const category = subscription.type || "daily_conversation";
+    if (!categorizedSubscriptions[category]) {
+      categorizedSubscriptions[category] = [];
+    }
+    categorizedSubscriptions[category].push(subscription);
+  });
+
+  // 카테고리별로 함수 실행
+  Object.keys(categorizedSubscriptions).forEach(async (category) => {
+    const subscriptions = categorizedSubscriptions[category];
+    sendSlack(`카테고리: ${category}, 구독자 수: ${subscriptions.length}`);
+    console.log(`카테고리: ${category}, 구독자 수: ${subscriptions.length}`);
+    // 여기에 카테고리별로 실행할 함수를 호출할 수 있습니다.
+    await subscriptions.forEach(async (subscription, index) => {
+      setTimeout(async () => {
+        count += await processCategorySubscriptions(category, [subscription]);
+      }, index * 200); // 0.5초 간격으로 호출
+    });
+  });
+
+  return count;
+};
+
+const processCategorySubscriptions = async (category, subscriptions) => {
+  if (category === "daily_conversation") {
+    subscriptions.forEach(async (subscription) => {
+      console.log("subscription.lastWordId", subscription.lastWordId);
+      const todayWord = await db.Word.findOne({
+        where: {
+          id: {
+            [db.Sequelize.Op.gt]: subscription.lastWordId || 0,
+          },
+          type: {
+            [db.Sequelize.Op.eq]: "daily_conversation",
+          },
+        },
+        order: [["id", "ASC"]],
+        limit: 1,
+      });
+
+      if (!todayWord) {
+        sendSlack(`오늘의 단어가 없습니다.`);
+        return;
+      }
+
+      try {
+        if (subscription.User.chatId) {
+          const text = `*${todayWord.korean?.trim()}*\n\[_${todayWord.pronunciation?.trim()}_\]\n${todayWord.description?.trim()}\n\n*Example*\n${todayWord.example_1?.trim()}\n\[_${todayWord.example_2?.trim()}_\]\n${todayWord.example_3?.trim()}\n\n*안녕! Annyeong! 👋🏻*\nSilakan rekam atau ketik balasan Anda sesuai dengan ungkapan dan contoh kalimat hari ini 😊\n\n_Sent from Annyeong WA_`;
+
+          await redis.lpush(
+            "telegram_message_queue",
+            JSON.stringify({
+              chatId: subscription.User.chatId,
+              text,
+            })
+          );
+
+          // 메시지 전송 후 lastWordId 업데이트
+          await subscription.update({ lastWordId: todayWord.id });
+
+          // ReceivedWords에 기록 추가
+          await db.ReceivedWords.create({
+            userId: subscription.userId,
+            wordId: todayWord.id,
+            receivedDate: new Date(),
+          });
+        } else {
+          sendSlack(
+            `[daily_conversation] ${subscription.User.name}의 chatId가 없습니다.`
+          );
+        }
+      } catch (error) {
+        sendSlack(
+          `[Error] Error sending scheduled message to ${subscription.User.name}: `,
+          error
+        );
+        console.error(
+          `Error sending scheduled message to ${subscription.User.name}: `,
+          error
+        );
+      }
+    });
+  } else if (category === "topik_word") {
+    subscriptions.forEach(async (subscription) => {
+      const todayWord = await db.Word.findOne({
+        where: {
+          id: {
+            [db.Sequelize.Op.gt]: subscription.lastWordId || 0,
+          },
+          type: {
+            [db.Sequelize.Op.eq]: "topik_word",
+          },
+        },
+        order: [["id", "ASC"]],
+        limit: 1,
+      });
+
+      if (!todayWord) {
+        sendSlack(`오늘의 단어가 없습니다.`);
+        return;
+      }
+
+      try {
+        if (subscription.User.chatId) {
+          const text = `*${todayWord.korean?.trim()}*\n\[_${todayWord.pronunciation?.trim()}_\]\n${todayWord.description?.trim()}\n\n*Example*\n${todayWord.example_1?.trim()}\n\[_${todayWord.example_2?.trim()}_\]\n${todayWord.example_3?.trim()}\n\n*안녕! Annyeong! 👋🏻*\nSilakan rekam atau ketik balasan Anda sesuai dengan ungkapan dan contoh kalimat hari ini 😊\n\n_Sent from Annyeong WA_`;
+
+          await redis.lpush(
+            "telegram_message_queue",
+            JSON.stringify({
+              chatId: subscription.User.chatId,
+              text,
+            })
+          );
+
+          // 메시지 전송 후 lastWordId 업데이트
+          await subscription.update({ lastWordId: todayWord.id });
+
+          // ReceivedWords에 기록 추가
+          await db.ReceivedWords.create({
+            userId: subscription.userId,
+            wordId: todayWord.id,
+            receivedDate: new Date(),
+          });
+        } else {
+          sendSlack(
+            `[daily_conversation] ${subscription.User.name}의 chatId가 없습니다.`
+          );
+        }
+      } catch (error) {
+        sendSlack(
+          `[Error] Error sending scheduled message to ${subscription.User.name}: `,
+          error
+        );
+        console.error(
+          `Error sending scheduled message to ${subscription.User.name}: `,
+          error
+        );
+      }
+    });
+  } else if (category === "basic") {
+    subscriptions.forEach(async (subscription) => {
+      const todayWord = await db.Word.findOne({
+        where: {
+          id: {
+            [db.Sequelize.Op.gt]: subscription.lastWordId || 0,
+          },
+          type: {
+            [db.Sequelize.Op.eq]: "basic",
+          },
+        },
+        order: [["id", "ASC"]],
+        limit: 1,
+      });
+
+      if (!todayWord) {
+        sendSlack(`오늘의 단어가 없습니다.`);
+        return;
+      }
+
+      try {
+        if (subscription.User.chatId) {
+          const text = `*${todayWord.korean?.trim()}*\n\[_${todayWord.pronunciation?.trim()}_\]\n${todayWord.description?.trim()}\n\n*Example*\n${todayWord.example_1?.trim()}\n\[_${todayWord.example_2?.trim()}_\]\n${todayWord.example_3?.trim()}\n\n*안녕! Annyeong! 👋🏻*\nSilakan rekam atau ketik balasan Anda sesuai dengan ungkapan dan contoh kalimat hari ini 😊\n\n_Sent from Annyeong WA_`;
+
+          await redis.lpush(
+            "telegram_message_queue",
+            JSON.stringify({
+              chatId: subscription.User.chatId,
+              text,
+            })
+          );
+
+          // 메시지 전송 후 lastWordId 업데이트
+          await subscription.update({ lastWordId: todayWord.id });
+
+          // ReceivedWords에 기록 추가
+          await db.ReceivedWords.create({
+            userId: subscription.userId,
+            wordId: todayWord.id,
+            receivedDate: new Date(),
+          });
+        } else {
+          sendSlack(
+            `[daily_conversation] ${subscription.User.name}의 chatId가 없습니다.`
+          );
+        }
+      } catch (error) {
+        sendSlack(
+          `[Error] Error sending scheduled message to ${subscription.User.name}: `,
+          error
+        );
+        console.error(
+          `Error sending scheduled message to ${subscription.User.name}: `,
+          error
+        );
+      }
+    });
+  }
+
+  const result = subscriptions.map((subscription) => subscription.userId);
+  // uniqueId 개수
+  const uniqueResult = [...new Set(result)];
+  return uniqueResult.length;
+};
+
 // 한국 시간 오전 11시에 예약된 메시지를 전송하는 함수
 const sendScheduledMessages = async () => {
   let count = 0;
@@ -208,6 +419,82 @@ cron.schedule("14 15 * * 0", async () => {
           error.message
       );
     }
+  }
+});
+
+cron.schedule("16 15 * * *", async () => {
+  if (process.env.NODE_ENV === "development") {
+    return;
+  }
+  try {
+    try {
+      const count = await sendDailyMessage("basic");
+
+      sendSlack(`[일일 메시지] basic: ${count}명에게 메시지 발송`);
+    } catch (error) {
+      if (error.status === 404) {
+        sendSlack("[일일 메시지] basic: 요청한 사용자를 찾을 수 없습니다.");
+      } else {
+        sendSlack(
+          "[일일 메시지] basic: 서버 오류로 인해 메시지를 발송할 수 없습니다." +
+            error.message
+        );
+      }
+    }
+  } catch (error) {
+    sendSlack("[일일 메시지] basic: 작업 중 오류 발생");
+  }
+});
+
+cron.schedule("18 15 * * *", async () => {
+  if (process.env.NODE_ENV === "development") {
+    return;
+  }
+  try {
+    try {
+      const count = await sendDailyMessage("topik_word");
+
+      sendSlack(`[일일 메시지] topik_word: ${count}명에게 메시지 발송`);
+    } catch (error) {
+      if (error.status === 404) {
+        sendSlack(
+          "[일일 메시지] topik_word: 요청한 사용자를 찾을 수 없습니다."
+        );
+      } else {
+        sendSlack(
+          "[일일 메시지] topik_word: 서버 오류로 인해 메시지를 발송할 수 없습니다." +
+            error.message
+        );
+      }
+    }
+  } catch (error) {
+    sendSlack("[일일 메시지] topik_word: 작업 중 오류 발생");
+  }
+});
+
+cron.schedule("20 15 * * *", async () => {
+  if (process.env.NODE_ENV === "development") {
+    return;
+  }
+  try {
+    try {
+      const count = await sendDailyMessage("daily_conversation");
+
+      sendSlack(`[일일 메시지] daily_conversation: ${count}명에게 메시지 발송`);
+    } catch (error) {
+      if (error.status === 404) {
+        sendSlack(
+          "[일일 메시지] daily_conversation: 요청한 사용자를 찾을 수 없습니다."
+        );
+      } else {
+        sendSlack(
+          "[일일 메시지] daily_conversation: 서버 오류로 인해 메시지를 발송할 수 없습니다." +
+            error.message
+        );
+      }
+    }
+  } catch (error) {
+    sendSlack("[일일 메시지] daily_conversation: 작업 중 오류 발생");
   }
 });
 
