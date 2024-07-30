@@ -1023,6 +1023,111 @@ async function sendWelcomeMessage() {
   });
 }
 
+const sendWeeklyQuiz = async (platform) => {
+  const now = new Date();
+  // 한국 시간은 UTC+9, 현재 한국 시간 계산
+  const koreaOffset = 9 * 60 * 60 * 1000;
+  const koreaNow = new Date(now.getTime() + koreaOffset);
+
+  // 한국 시간 기준 현재 날짜
+  let year = koreaNow.getFullYear();
+  let month = koreaNow.getMonth();
+  let date = koreaNow.getDate();
+
+  const todayStart = new Date(Date.UTC(year, month, date - 1, 15, 0, 0, 0)); // 한국 시간으로 설정
+  const todayEnd = new Date(Date.UTC(year, month, date, 14, 59, 59, 999)); // 한국 시간으로 설정
+
+  console.log(todayStart, todayEnd);
+
+  // 한국 시간 기준 해당 날짜의 오전 11시 1분을 UTC로 변환
+  const sendAt = new Date(
+    Date.UTC(year, month, date, 2, 1, 0, 0)
+  ).toISOString();
+
+  try {
+    const activeSubscriptions = await db.Subscription.findAll({
+      where: {
+        subscriptionDate: {
+          [db.Sequelize.Op.lte]: todayEnd,
+        },
+        expirationDate: {
+          [db.Sequelize.Op.gte]: todayStart,
+        },
+        quiz: {
+          [Op.ne]: null,
+        },
+        plan: {
+          [Op.or]: [
+            { [Op.like]: `${platform}_1` },
+            { [Op.like]: `${platform}_3` },
+            { [Op.like]: `${platform}_6` },
+            { [Op.like]: `${platform}_12` },
+          ],
+        },
+      },
+      include: [
+        {
+          model: db.User,
+          required: true,
+        },
+      ],
+    });
+
+    for (const subscription of activeSubscriptions) {
+      const to = `whatsapp:${subscription.User.phoneNumber}`;
+      try {
+        const words = await db.Word.findAll({
+          where: {
+            id: {
+              [Op.lte]: subscription.lastWordId,
+            },
+            type: subscription.type,
+          },
+          limit: 7,
+          order: [["id", "DESC"]],
+        });
+
+        const contentVariables = {};
+        words.forEach((word, index) => {
+          contentVariables[index + 1] = word.korean.trim();
+        });
+
+        for (let i = words.length; i < 7; i++) {
+          contentVariables[i + 1] = "kosong"; // 인도네시아어로 '비어있음'
+        }
+
+        const response = await client.messages.create(
+          {
+            from: process.env.FROM_PHONE_NUMBER,
+            to,
+            contentSid: process.env.TEMPLATE_QUIZ,
+            messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
+            scheduleType: platform === "whatsapp" ? "fixed" : undefined,
+            sendAt: platform === "whatsapp" ? sendAt : undefined,
+            contentVariables: JSON.stringify(contentVariables),
+          },
+          (error) => {
+            console.log(error);
+          }
+        );
+
+        console.log(" -> ", response);
+      } catch (error) {
+        sendSlack(
+          `주간 퀴즈 메시지 발송 중 오류 발생: ${subscription.User.name}`
+        );
+        console.error(
+          `Error sending quiz message to ${subscription.User.name}: `,
+          error
+        );
+      }
+    }
+  } catch (error) {
+    sendSlack(`주간 퀴즈 메시지 발송 중 오류 발생: ${error.message}`);
+    console.error("Error fetching subscriptions: ", error);
+  }
+};
+
 const sendSlack = async (message) => {
   let text = `${
     process.env.NODE_ENV === "development" ? "[테스트 환경]" : ""
@@ -1212,6 +1317,30 @@ cron.schedule("8 15 * * *", async () => {
     }
   } catch (error) {
     sendSlack("[일일 메시지] daily_conversation: 작업 중 오류 발생");
+  }
+});
+
+cron.schedule("15 0 * * 0", async () => {
+  if (process.env.NODE_ENV === "development") {
+    return;
+  }
+  try {
+    try {
+      await sendWeeklyQuiz("whatsapp");
+
+      sendSlack(`[주간 퀴즈] Whatsapp 퀴즈 발송 예약 완료`);
+    } catch (error) {
+      if (error.status === 404) {
+        sendSlack("[주간 퀴즈] Whatsapp 요청한 사용자를 찾을 수 없습니다.");
+      } else {
+        sendSlack(
+          "[주간 퀴즈] Whatsapp 서버 오류로 인해 메시지를 발송할 수 없습니다." +
+            error.message
+        );
+      }
+    }
+  } catch (error) {
+    sendSlack("[주간 퀴즈] Whatsapp 작업 중 오류 발생");
   }
 });
 
