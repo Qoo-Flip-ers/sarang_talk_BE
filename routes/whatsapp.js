@@ -624,14 +624,14 @@ const sendDailyMessage = async (category) => {
   });
 
   // 카테고리별로 함수 실행
-  Object.keys(categorizedSubscriptions).forEach((category) => {
+  Object.keys(categorizedSubscriptions).forEach(async (category) => {
     const subscriptions = categorizedSubscriptions[category];
     sendSlack(`카테고리: ${category}, 구독자 수: ${subscriptions.length}`);
     console.log(`카테고리: ${category}, 구독자 수: ${subscriptions.length}`);
     // 여기에 카테고리별로 실행할 함수를 호출할 수 있습니다.
-    subscriptions.forEach((subscription, index) => {
-      setTimeout(() => {
-        count += processCategorySubscriptions(category, [subscription]);
+    await subscriptions.forEach(async (subscription, index) => {
+      setTimeout(async () => {
+        count += await processCategorySubscriptions(category, [subscription]);
       }, index * 500); // 0.5초 간격으로 호출
     });
   });
