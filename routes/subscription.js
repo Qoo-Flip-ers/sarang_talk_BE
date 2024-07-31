@@ -47,22 +47,22 @@ const sendSlack = async (message) => {
  *                 description: 사용자 이름
  *               phoneNumber:
  *                 type: string
- *                 description: 사용자 전화번호 (형식: +국가번호전화번호)
+ *                 description: 사용자 전화번호
  *               email:
  *                 type: string
- *                 description: 사용자 이메일 (형식: user@example.com)
+ *                 description: 사용자 이메일
  *               type:
  *                 type: string
- *                 description: 구독 타입 (예: basic, daily_conversation 등)
+ *                 description: 구독 타입
  *               plan:
  *                 type: string
- *                 description: 구독 플랜 (예: telegram_1, whatsapp_3 등)
+ *                 description: 구독 플랜
  *               quiz:
  *                 type: string
- *                 description: 퀴즈 옵션 (선택 사항)
+ *                 description: 퀴즈 옵션
  *               zoom:
  *                 type: string
- *                 description: 줌 옵션 (선택 사항)
+ *                 description: 줌 옵션
  *     responses:
  *       200:
  *         description: 성공적으로 예약된 사용자 정보
