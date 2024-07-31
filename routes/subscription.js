@@ -26,7 +26,7 @@ const sendSlack = async (message) => {
  * /subscription:
  *   post:
  *     summary: 사용자 생성
- *     description: 새로운 사용자를 생성합니다.
+ *     description: 새로운 사용자를 생성하고 구독을 예약합니다. 사용자는 이름, 전화번호, 이메일, 구독 타입 및 플랜을 제공해야 합니다. 구독 시작일은 현재 날짜로부터 하루 후이며, 플랜에 따라 만료일이 설정됩니다.
  *     tags:
  *       - Subscription
  *     requestBody:
@@ -40,46 +40,45 @@ const sendSlack = async (message) => {
  *               - phoneNumber
  *               - email
  *               - type
+ *               - plan
  *             properties:
  *               name:
  *                 type: string
  *                 description: 사용자 이름
  *               phoneNumber:
  *                 type: string
- *                 description: 사용자 전화번호
+ *                 description: 사용자 전화번호 (형식: +국가번호전화번호)
  *               email:
  *                 type: string
- *                 description: 사용자 이메일
+ *                 description: 사용자 이메일 (형식: user@example.com)
  *               type:
  *                 type: string
- *                 description: 구독 타입
+ *                 description: 구독 타입 (예: basic, daily_conversation 등)
+ *               plan:
+ *                 type: string
+ *                 description: 구독 플랜 (예: telegram_1, whatsapp_3 등)
+ *               quiz:
+ *                 type: string
+ *                 description: 퀴즈 옵션 (선택 사항)
+ *               zoom:
+ *                 type: string
+ *                 description: 줌 옵션 (선택 사항)
  *     responses:
  *       200:
- *         description: 성공적으로 생성된 사용자 정보
+ *         description: 성공적으로 예약된 사용자 정보
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 id:
- *                   type: integer
- *                   description: 구독 ID
- *                 userId:
- *                   type: integer
- *                   description: 사용자 ID
- *                 type:
+ *                 message:
  *                   type: string
- *                   description: 구독 타입
- *                 subscriptionDate:
+ *                   description: 사용자 등록 예약 메시지
+ *                 code:
  *                   type: string
- *                   format: date-time
- *                   description: 구독 시작 날짜
- *                 expirationDate:
- *                   type: string
- *                   format: date-time
- *                   description: 구독 만료 날짜
+ *                   description: 텔레그램 코드 (텔레그램 플랜인 경우)
  *       400:
- *         description: 잘못된 요청
+ *         description: 잘못된 요청 (필수 필드 누락, 형식 오류 등)
  *       500:
  *         description: 서버 오류
  */

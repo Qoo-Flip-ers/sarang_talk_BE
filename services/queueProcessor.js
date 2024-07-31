@@ -53,20 +53,20 @@ async function insertIntoDatabase(data) {
         codeGeneratedAt,
       });
 
-      await client.messages.create(
-        {
-          from: process.env.FROM_PHONE_NUMBER,
-          to: `whatsapp:${phoneNumber}`,
-          contentSid: process.env.TEMPLATE_WELCOME_TOMMOROW,
-          messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
-        },
-        (error) => {
-          sendSlack(
-            `[Twilio 에러] Twilio API를 통한 메세지 전송 중 에러가 발생했습니다: ${error}`
-          );
-          console.log(error);
-        }
-      );
+      // await client.messages.create(
+      //   {
+      //     from: process.env.FROM_PHONE_NUMBER,
+      //     to: `whatsapp:${phoneNumber}`,
+      //     contentSid: process.env.TEMPLATE_WELCOME_TOMMOROW,
+      //     messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
+      //   },
+      //   (error) => {
+      //     sendSlack(
+      //       `[Twilio 에러] Twilio API를 통한 메세지 전송 중 에러가 발생했습니다: ${error}`
+      //     );
+      //     console.log(error);
+      //   }
+      // );
     }
 
     type.forEach(async (t) => {
@@ -89,8 +89,6 @@ async function insertIntoDatabase(data) {
         zoom: newZoom,
       });
     });
-
-    // twilio 시작 안내 메세지 발송 필요
 
     // 시작 안내 메세지 발송
     sendSlack(
