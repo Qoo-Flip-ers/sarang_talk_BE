@@ -1,5 +1,6 @@
 const db = require("../models");
 const TelegramBot = require("node-telegram-bot-api");
+const redis = require("../redis");
 const slack = require("axios").create({
   // baseURL: "https://graph.facebook.com/v19.0/354463551082624",
   // baseURL: "https://graph.facebook.com/v19.0/176451042228268",
