@@ -114,9 +114,11 @@ async function processQueue() {
   isProcessingQueue = true;
 
   try {
-    const data = await redis.rpop("request_subscription");
+    let data;
+    const processLimit = 20; // 초당 처리할 요청 수
+    const interval = 1000 / processLimit; // 1초를 20으로 나눈 간격
 
-    if (data) {
+    while ((data = await redis.rpop("request_subscription"))) {
       const requestData = JSON.parse(data);
       console.log("Processing request:", requestData);
 
@@ -140,6 +142,9 @@ async function processQueue() {
       );
 
       console.log("Request processed successfully");
+
+      // 처리 후 대기
+      await new Promise((resolve) => setTimeout(resolve, interval));
     }
   } catch (err) {
     console.error("Error processing queue:", err);
