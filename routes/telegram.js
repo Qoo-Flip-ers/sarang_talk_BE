@@ -65,10 +65,10 @@ async function fetchActiveSubscriptions(category) {
   return await db.Subscription.findAll({
     where: {
       subscriptionDate: {
-        [db.Sequelize.db.Sequelize.Op.lte]: todayEnd,
+        [db.Sequelize.Op.lte]: todayEnd,
       },
       expirationDate: {
-        [db.Sequelize.db.Sequelize.Op.gte]: todayStart,
+        [db.Sequelize.Op.gte]: todayStart,
       },
       type: category,
     },
