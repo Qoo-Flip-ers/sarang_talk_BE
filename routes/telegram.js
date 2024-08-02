@@ -62,7 +62,7 @@ async function fetchActiveSubscriptions(category) {
     include: [
       {
         model: db.User,
-        attributes: ["id", "name", "phoneNumber"],
+        attributes: ["id", "name", "phoneNumber", "chatId"],
       },
     ],
   });
