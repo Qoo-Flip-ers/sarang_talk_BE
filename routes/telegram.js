@@ -19,6 +19,18 @@ const client = twilio(
   process.env.TWILIO_AUTH_TOKEN
 );
 
+const sendSlack = async (message) => {
+  let text = `${
+    process.env.NODE_ENV === "development" ? "[테스트 환경]" : ""
+  }${message}`;
+  const response = await slack.post(
+    "/T0684TBHDKQ/B07AEG61MR8/HnFpkqFfqpXIBgeTzTklvKJQ",
+    {
+      text,
+    }
+  );
+};
+
 // 구독기간이 현재 진행 중인 사용자 목록을 가져오는 함수
 async function fetchActiveSubscriptions(category) {
   const now = new Date();
