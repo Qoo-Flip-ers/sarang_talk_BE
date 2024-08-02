@@ -19,31 +19,6 @@ const client = twilio(
   process.env.TWILIO_AUTH_TOKEN
 );
 
-/**
- * @swagger
- * /telegram/test:
- *   post:
- *     summary: Test API
- *     description: Test API to fetch active subscriptions
- *     responses:
- *       200:
- *         description: Successful response with active subscriptions data
- *     requestBody:
- *       required: false
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- */
-router.post("/test", async (req, res) => {
-  const activeSubscriptions = await fetchActiveSubscriptions("basic");
-
-  console.log(activeSubscriptions);
-  return res.status(200).json({
-    data: activeSubscriptions,
-  });
-});
-
 // 구독기간이 현재 진행 중인 사용자 목록을 가져오는 함수
 async function fetchActiveSubscriptions(category) {
   const now = new Date();
