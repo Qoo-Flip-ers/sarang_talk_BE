@@ -19,6 +19,22 @@ const client = twilio(
   process.env.TWILIO_AUTH_TOKEN
 );
 
+/**
+ * @swagger
+ * /test:
+ *   post:
+ *     summary: Test API
+ *     description: Test API to fetch active subscriptions
+ *     responses:
+ *       200:
+ *         description: Successful response with active subscriptions data
+ *     requestBody:
+ *       required: false
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ */
 router.post("/test", async (req, res) => {
   const activeSubscriptions = await fetchActiveSubscriptions("basic");
 
