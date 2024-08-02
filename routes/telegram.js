@@ -21,7 +21,7 @@ const client = twilio(
 
 /**
  * @swagger
- * /test:
+ * /telegram/test:
  *   post:
  *     summary: Test API
  *     description: Test API to fetch active subscriptions
