@@ -195,7 +195,7 @@ const processCategorySubscriptions = async (category, subscriptions) => {
           });
         } else {
           sendSlack(
-            `[daily_conversation] ${subscription.User.name}의 chatId가 없습니다.`
+            `[${category}] ${subscription.User.name}의 chatId가 없습니다.`
           );
         }
       } catch (error) {
@@ -252,7 +252,7 @@ const processCategorySubscriptions = async (category, subscriptions) => {
           });
         } else {
           sendSlack(
-            `[daily_conversation] ${subscription.User.name}의 chatId가 없습니다.`
+            `[${category}] ${subscription.User.name}의 chatId가 없습니다.`
           );
         }
       } catch (error) {
@@ -309,7 +309,7 @@ const processCategorySubscriptions = async (category, subscriptions) => {
           });
         } else {
           sendSlack(
-            `[daily_conversation] ${subscription.User.name}의 chatId가 없습니다.`
+            `[${category}] ${subscription.User.name}의 chatId가 없습니다.`
           );
         }
       } catch (error) {
