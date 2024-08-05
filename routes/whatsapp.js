@@ -599,6 +599,13 @@ async function fetchActiveSubscriptions(category) {
         [db.Sequelize.Op.gte]: todayStart,
       },
       type: category,
+      plan: {
+        [db.Sequelize.Op.or]: [
+          { plan: "whatsapp_1" },
+          { plan: "whatsapp_3" },
+          { plan: "whatsapp_12" },
+        ],
+      },
     },
     include: [
       {

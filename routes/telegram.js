@@ -46,6 +46,13 @@ async function fetchActiveSubscriptions(category) {
         [db.Sequelize.db.Sequelize.Op.gte]: todayStart,
       },
       type: category,
+      plan: {
+        [db.Sequelize.Op.or]: [
+          { plan: "telegram_1" },
+          { plan: "telegram_3" },
+          { plan: "telegram_12" },
+        ],
+      },
     },
     include: [
       {
