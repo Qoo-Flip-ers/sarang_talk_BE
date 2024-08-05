@@ -19,6 +19,70 @@ const client = twilio(
   process.env.TWILIO_AUTH_TOKEN
 );
 
+const sendSlack = async (message) => {
+  let text = `${
+    process.env.NODE_ENV === "development" ? "[테스트 환경]" : ""
+  }${message}`;
+  const response = await slack.post(
+    "/T0684TBHDKQ/B07AEG61MR8/HnFpkqFfqpXIBgeTzTklvKJQ",
+    {
+      text,
+    }
+  );
+};
+/**
+ * @swagger
+ * /telegram/send:
+ *   post:
+ *     summary: 메시지 전송
+ *     description: 카테고리에 해당하는 사용자들에게 메시지를 전송합니다.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               category:
+ *                 type: string
+ *                 description: 메시지를 받을 사용자들의 카테고리
+ *     responses:
+ *       200:
+ *         description: 메시지 전송 성공
+ *       500:
+ *         description: 서버 오류
+ */
+router.post("/send", async (req, res) => {
+  const category = req.body.category;
+  let count = 0;
+  const categorizedSubscriptions = {};
+
+  // 구독기간이 현재 진행 중인 사용자 목록을 카테고리별로 분류
+  const activeSubscriptions = await fetchActiveSubscriptions(category);
+  activeSubscriptions.forEach((subscription) => {
+    const category = subscription.type || "daily_conversation";
+    if (!categorizedSubscriptions[category]) {
+      categorizedSubscriptions[category] = [];
+    }
+    categorizedSubscriptions[category].push(subscription);
+  });
+
+  // 카테고리별로 함수 실행
+  Object.keys(categorizedSubscriptions).forEach(async (category) => {
+    const subscriptions = categorizedSubscriptions[category];
+    sendSlack(`카테고리: ${category}, 구독자 수: ${subscriptions.length}`);
+    console.log(`카테고리: ${category}, 구독자 수: ${subscriptions.length}`);
+    // 여기에 카테고리별로 실행할 함수를 호출할 수 있습니다.
+    await subscriptions.forEach(async (subscription, index) => {
+      setTimeout(async () => {
+        count += await processCategorySubscriptions(category, [subscription]);
+      }, index * 200); // 0.5초 간격으로 호출
+    });
+  });
+
+  return count;
+});
+
 // 구독기간이 현재 진행 중인 사용자 목록을 가져오는 함수
 async function fetchActiveSubscriptions(category) {
   const now = new Date();
@@ -40,10 +104,10 @@ async function fetchActiveSubscriptions(category) {
   return await db.Subscription.findAll({
     where: {
       subscriptionDate: {
-        [db.Sequelize.db.Sequelize.Op.lte]: todayEnd,
+        [db.Sequelize.Op.lte]: todayEnd,
       },
       expirationDate: {
-        [db.Sequelize.db.Sequelize.Op.gte]: todayStart,
+        [db.Sequelize.Op.gte]: todayStart,
       },
       type: category,
       plan: {
@@ -57,7 +121,7 @@ async function fetchActiveSubscriptions(category) {
     include: [
       {
         model: db.User,
-        attributes: ["id", "name", "phoneNumber"],
+        attributes: ["id", "name", "phoneNumber", "chatId"],
       },
     ],
   });
@@ -138,7 +202,7 @@ const processCategorySubscriptions = async (category, subscriptions) => {
           });
         } else {
           sendSlack(
-            `[daily_conversation] ${subscription.User.name}의 chatId가 없습니다.`
+            `[${category}] ${subscription.User.name}의 chatId가 없습니다.`
           );
         }
       } catch (error) {
@@ -195,7 +259,7 @@ const processCategorySubscriptions = async (category, subscriptions) => {
           });
         } else {
           sendSlack(
-            `[daily_conversation] ${subscription.User.name}의 chatId가 없습니다.`
+            `[${category}] ${subscription.User.name}의 chatId가 없습니다.`
           );
         }
       } catch (error) {
@@ -252,7 +316,7 @@ const processCategorySubscriptions = async (category, subscriptions) => {
           });
         } else {
           sendSlack(
-            `[daily_conversation] ${subscription.User.name}의 chatId가 없습니다.`
+            `[${category}] ${subscription.User.name}의 chatId가 없습니다.`
           );
         }
       } catch (error) {
