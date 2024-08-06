@@ -600,11 +600,7 @@ async function fetchActiveSubscriptions(category) {
       },
       type: category,
       plan: {
-        [db.Sequelize.Op.or]: [
-          { plan: "whatsapp_1" },
-          { plan: "whatsapp_3" },
-          { plan: "whatsapp_12" },
-        ],
+        [db.Sequelize.Op.in]: ["whatsapp_1", "whatsapp_3", "whatsapp_12"],
       },
     },
     include: [
@@ -1064,11 +1060,11 @@ const sendWeeklyQuiz = async (platform) => {
           [db.Sequelize.Op.ne]: null,
         },
         plan: {
-          [db.Sequelize.Op.or]: [
-            { [db.Sequelize.Op.like]: `${platform}_1` },
-            { [db.Sequelize.Op.like]: `${platform}_3` },
-            { [db.Sequelize.Op.like]: `${platform}_6` },
-            { [db.Sequelize.Op.like]: `${platform}_12` },
+          [db.Sequelize.Op.in]: [
+            `${platform}_1`,
+            `${platform}_3`,
+            `${platform}_6`,
+            `${platform}_12`,
           ],
         },
       },
