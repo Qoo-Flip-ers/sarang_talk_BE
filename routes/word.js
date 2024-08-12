@@ -237,4 +237,23 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
+router.post("/check", async (req, res) => {
+  const korean = req.body.korean;
+
+  try {
+    const word = await db.Word.findOne({
+      where: {
+        korean,
+      },
+    });
+    if (word) {
+      res.json({ result: true });
+    } else {
+      res.json({ result: false });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 module.exports = router;
