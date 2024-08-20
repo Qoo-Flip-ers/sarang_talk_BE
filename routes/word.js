@@ -52,7 +52,6 @@ router.get("/", async (req, res) => {
   }
 });
 
-
 /**
  * @swagger
  * /words/types:
@@ -69,14 +68,19 @@ router.get("/types", async (req, res) => {
   try {
     const typeCounts = await db.Word.findAll({
       attributes: [
-        'type',
-        [db.sequelize.fn('COUNT', db.sequelize.col('id')), 'count']
+        "type",
+        [db.sequelize.fn("COUNT", db.sequelize.col("id")), "count"],
       ],
-      group: ['type']
+      group: ["type"],
+      where: {
+        type: {
+          [db.Sequelize.Op.ne]: null
+        }
+      }
     });
 
     const result = typeCounts.reduce((acc, item) => {
-      acc[item.type] = item.get('count');
+      acc[item.type] = parseInt(item.get("count"));
       return acc;
     }, {});
 
@@ -85,10 +89,6 @@ router.get("/types", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-
-
-
-
 
 /**
  * @swagger
