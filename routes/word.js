@@ -117,13 +117,15 @@ router.get("/types", async (req, res) => {
       where: {
         type: {
           [db.Sequelize.Op.ne]: null,
+          [db.Sequelize.Op.notIn]: ["types"],
         },
       },
       raw: true,
+      nest: true,
     });
 
-    const result = typeCounts.reduce((acc, item) => {
-      acc[item.type] = parseInt(item.count);
+    const result = typeCounts.reduce((acc, { type, count }) => {
+      acc[type] = parseInt(count);
       return acc;
     }, {});
 
