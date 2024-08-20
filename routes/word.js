@@ -117,17 +117,16 @@ router.get("/types", async (req, res) => {
       where: {
         type: {
           [db.Sequelize.Op.ne]: null,
-          [db.Sequelize.Op.notIn]: ["types"],
+          [db.Sequelize.Op.not]: "types", // 'types' 문자열을 제외
         },
       },
       raw: true,
-      nest: true,
     });
 
-    const result = typeCounts.reduce((acc, { type, count }) => {
-      acc[type] = parseInt(count);
-      return acc;
-    }, {});
+    const result = {};
+    typeCounts.forEach(({ type, count }) => {
+      result[type] = parseInt(count); // count를 정수로 변환
+    });
 
     res.json(result);
   } catch (error) {
