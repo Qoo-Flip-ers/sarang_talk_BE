@@ -62,6 +62,36 @@ router.get("/", async (req, res) => {
 
 /**
  * @swagger
+ * /words/types:
+ *   get:
+ *     summary: 타입별 단어 개수 가져오기
+ *     description: 각 타입별 단어의 개수를 반환합니다.
+ *     responses:
+ *       200:
+ *         description: 타입별 단어 개수 반환
+ *       500:
+ *         description: 서버 오류
+ */
+router.get("/types", async (req, res) => {
+  try {
+    const typeCounts = await db.Word.count({
+      attributes: ["type"],
+      group: ["type"],
+    });
+
+    const result = Object.fromEntries(
+      typeCounts.map(({ type, count }) => [type, count])
+    );
+
+    res.json(result);
+  } catch (error) {
+    console.error("타입별 단어 개수 조회 중 오류 발생:", error);
+    res.status(500).json({ error: "서버 내부 오류가 발생했습니다." });
+  }
+});
+
+/**
+ * @swagger
  * /words/{id}:
  *   get:
  *     summary: 특정 단어 가져오기
@@ -91,36 +121,6 @@ router.get("/:id", async (req, res) => {
     }
   } catch (error) {
     res.status(500).json({ error: error.message });
-  }
-});
-
-/**
- * @swagger
- * /words/types:
- *   get:
- *     summary: 타입별 단어 개수 가져오기
- *     description: 각 타입별 단어의 개수를 반환합니다.
- *     responses:
- *       200:
- *         description: 타입별 단어 개수 반환
- *       500:
- *         description: 서버 오류
- */
-router.get("/types", async (req, res) => {
-  try {
-    const typeCounts = await db.Word.count({
-      attributes: ["type"],
-      group: ["type"],
-    });
-
-    const result = Object.fromEntries(
-      typeCounts.map(({ type, count }) => [type, count])
-    );
-
-    res.json(result);
-  } catch (error) {
-    console.error("타입별 단어 개수 조회 중 오류 발생:", error);
-    res.status(500).json({ error: "서버 내부 오류가 발생했습니다." });
   }
 });
 
