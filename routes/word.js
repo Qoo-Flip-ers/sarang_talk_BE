@@ -108,25 +108,14 @@ router.get("/:id", async (req, res) => {
  */
 router.get("/types", async (req, res) => {
   try {
-    const typeCounts = await db.Word.findAll({
-      attributes: [
-        "type",
-        [db.sequelize.fn("COUNT", db.sequelize.col("id")), "count"],
-      ],
+    const typeCounts = await db.Word.count({
+      attributes: ["type"],
       group: ["type"],
-      where: {
-        type: {
-          [db.Sequelize.Op.ne]: null,
-          [db.Sequelize.Op.not]: "types", // 'types' 문자열을 제외
-        },
-      },
-      raw: true,
     });
 
-    const result = {};
-    typeCounts.forEach(({ type, count }) => {
-      result[type] = parseInt(count); // count를 정수로 변환
-    });
+    const result = Object.fromEntries(
+      typeCounts.map(({ type, count }) => [type, count])
+    );
 
     res.json(result);
   } catch (error) {
