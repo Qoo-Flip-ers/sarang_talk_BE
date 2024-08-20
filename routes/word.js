@@ -62,6 +62,40 @@ router.get("/", async (req, res) => {
 
 /**
  * @swagger
+ * /words/{id}:
+ *   get:
+ *     summary: 특정 단어 가져오기
+ *     description: ID를 사용하여 특정 단어를 가져옵니다.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: 단어 ID
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: 단어 반환
+ *       404:
+ *         description: 단어를 찾을 수 없음
+ *       500:
+ *         description: 서버 오류
+ */
+router.get("/:id", async (req, res) => {
+  try {
+    const word = await db.Word.findByPk(req.params.id);
+    if (word) {
+      res.json(word);
+    } else {
+      res.status(404).json({ message: "단어를 찾을 수 없습니다." });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * @swagger
  * /words/types:
  *   get:
  *     summary: 타입별 단어 개수 가져오기
