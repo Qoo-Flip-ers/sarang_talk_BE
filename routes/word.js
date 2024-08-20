@@ -32,11 +32,19 @@ router.get("/", async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
+    let type = undefined;
+
+    if (req.query.type) {
+      type = req.query.type;
+    }
 
     const { count, rows } = await db.Word.findAndCountAll({
       limit: limit,
       offset: offset,
       order: [["createdAt", "DESC"]],
+      where: {
+        type: type,
+      },
     });
 
     const total = Math.ceil(count / limit);
@@ -74,9 +82,9 @@ router.get("/types", async (req, res) => {
       group: ["type"],
       where: {
         type: {
-          [db.Sequelize.Op.ne]: null
-        }
-      }
+          [db.Sequelize.Op.ne]: null,
+        },
+      },
     });
 
     const result = typeCounts.reduce((acc, item) => {
