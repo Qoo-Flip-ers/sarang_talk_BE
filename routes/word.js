@@ -43,7 +43,7 @@ router.get("/", async (req, res) => {
       offset: offset,
       order: [["createdAt", "DESC"]],
       where: {
-        type: type,
+        type: type || { [db.Sequelize.Op.ne]: null },
       },
     });
 
