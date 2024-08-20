@@ -119,16 +119,18 @@ router.get("/types", async (req, res) => {
           [db.Sequelize.Op.ne]: null,
         },
       },
+      raw: true,
     });
 
     const result = typeCounts.reduce((acc, item) => {
-      acc[item.type] = parseInt(item.get("count"));
+      acc[item.type] = parseInt(item.count);
       return acc;
     }, {});
 
     res.json(result);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("타입별 단어 개수 조회 중 오류 발생:", error);
+    res.status(500).json({ error: "서버 내부 오류가 발생했습니다." });
   }
 });
 
