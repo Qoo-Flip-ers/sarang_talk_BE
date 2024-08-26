@@ -328,4 +328,32 @@ router.post("/check", async (req, res) => {
   }
 });
 
+router.get("/empty/en", async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+
+    const { count, rows } = await db.Word.findAndCountAll({
+      where: {
+        en_description: null,
+      },
+      limit: limit,
+      offset: offset,
+      order: [["createdAt", "DESC"]],
+    });
+
+    const totalPages = Math.ceil(count / limit);
+    const result = {
+      totalPages: totalPages,
+      totalCount: count,
+      words: rows,
+    };
+
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 module.exports = router;
