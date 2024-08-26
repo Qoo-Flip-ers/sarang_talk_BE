@@ -333,11 +333,19 @@ router.get("/empty/en", async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
+    let type = undefined;
+
+    if (req.query.type) {
+      type = req.query.type;
+    }
+
+    const whereClause = {
+      en_description: null,
+      type: type || { [db.Sequelize.Op.ne]: null },
+    };
 
     const { count, rows } = await db.Word.findAndCountAll({
-      where: {
-        en_description: null,
-      },
+      where: whereClause,
       limit: limit,
       offset: offset,
       order: [["createdAt", "DESC"]],
