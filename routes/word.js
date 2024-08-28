@@ -32,11 +32,19 @@ router.get("/", async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const offset = (page - 1) * limit;
+    let type = undefined;
+
+    if (req.query.type) {
+      type = req.query.type;
+    }
 
     const { count, rows } = await db.Word.findAndCountAll({
       limit: limit,
       offset: offset,
       order: [["createdAt", "DESC"]],
+      where: {
+        type: type || { [db.Sequelize.Op.ne]: null },
+      },
     });
 
     const total = Math.ceil(count / limit);
@@ -47,6 +55,70 @@ router.get("/", async (req, res) => {
     };
 
     res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * @swagger
+ * /words/types:
+ *   get:
+ *     summary: 타입별 단어 개수 가져오기
+ *     description: 각 타입별 단어의 개수를 반환합니다.
+ *     responses:
+ *       200:
+ *         description: 타입별 단어 개수 반환
+ *       500:
+ *         description: 서버 오류
+ */
+router.get("/types", async (req, res) => {
+  try {
+    const typeCounts = await db.Word.count({
+      attributes: ["type"],
+      group: ["type"],
+    });
+
+    const result = Object.fromEntries(
+      typeCounts.map(({ type, count }) => [type, count])
+    );
+
+    res.json(result);
+  } catch (error) {
+    console.error("타입별 단어 개수 조회 중 오류 발생:", error);
+    res.status(500).json({ error: "서버 내부 오류가 발생했습니다." });
+  }
+});
+
+/**
+ * @swagger
+ * /words/{id}:
+ *   get:
+ *     summary: 특정 단어 가져오기
+ *     description: ID를 사용하여 특정 단어를 가져옵니다.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: 단어 ID
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: 단어 반환
+ *       404:
+ *         description: 단어를 찾을 수 없음
+ *       500:
+ *         description: 서버 오류
+ */
+router.get("/:id", async (req, res) => {
+  try {
+    const word = await db.Word.findByPk(req.params.id);
+    if (word) {
+      res.json(word);
+    } else {
+      res.status(404).json({ message: "단어를 찾을 수 없습니다." });
+    }
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -232,6 +304,61 @@ router.delete("/:id", async (req, res) => {
     } else {
       res.status(404).json({ error: "Word not found" });
     }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.post("/check", async (req, res) => {
+  const korean = req.body.korean;
+
+  try {
+    const word = await db.Word.findOne({
+      where: {
+        korean,
+      },
+    });
+    if (word) {
+      res.json({ result: true });
+    } else {
+      res.json({ result: false });
+    }
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.get("/empty/en", async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const offset = (page - 1) * limit;
+    let type = undefined;
+
+    if (req.query.type) {
+      type = req.query.type;
+    }
+
+    const whereClause = {
+      en_description: null,
+      type: type || { [db.Sequelize.Op.ne]: null },
+    };
+
+    const { count, rows } = await db.Word.findAndCountAll({
+      where: whereClause,
+      limit: limit,
+      offset: offset,
+      order: [["createdAt", "DESC"]],
+    });
+
+    const totalPages = Math.ceil(count / limit);
+    const result = {
+      totalPages: totalPages,
+      totalCount: count,
+      words: rows,
+    };
+
+    res.json(result);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

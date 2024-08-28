@@ -15,6 +15,12 @@ module.exports = (sequelize, DataTypes) => {
       type: { type: DataTypes.STRING, allowNull: true }, // 카테고리 구분
       source: { type: DataTypes.STRING, allowNull: true }, // 출처
       imageUrl: { type: DataTypes.STRING, allowNull: true }, // 이미지 URL
+
+      en_description: { type: DataTypes.STRING, allowNull: true }, // 설명 (인도네시아어)
+      en_pronunciation: { type: DataTypes.STRING, allowNull: true }, // 발음 (인도네시아어)
+      en_example_1: { type: DataTypes.STRING, allowNull: true }, // 예문 1
+      en_example_2: { type: DataTypes.STRING, allowNull: true }, // 예문 2
+      en_example_3: { type: DataTypes.STRING, allowNull: true }, // 예문 3
     },
     {
       sequelize,

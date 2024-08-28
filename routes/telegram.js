@@ -100,7 +100,6 @@ async function fetchActiveSubscriptions(category) {
   const todayEnd = new Date(Date.UTC(year, month, date, 14, 59, 59, 999)); // 한국 시간으로 설정
 
   console.log(todayStart, todayEnd);
-
   return await db.Subscription.findAll({
     where: {
       subscriptionDate: {
@@ -110,6 +109,9 @@ async function fetchActiveSubscriptions(category) {
         [db.Sequelize.Op.gte]: todayStart,
       },
       type: category,
+      plan: {
+        [db.Sequelize.Op.in]: ["telegram_1", "telegram_3", "telegram_12"],
+      },
     },
     include: [
       {
@@ -387,11 +389,11 @@ const sendWeeklyQuiz = async (platform) => {
           [db.Sequelize.Op.ne]: null,
         },
         plan: {
-          [db.Sequelize.Op.or]: [
-            { [db.Sequelize.Op.like]: `${platform}_1` },
-            { [db.Sequelize.Op.like]: `${platform}_3` },
-            { [db.Sequelize.Op.like]: `${platform}_6` },
-            { [db.Sequelize.Op.like]: `${platform}_12` },
+          [db.Sequelize.Op.in]: [
+            `${platform}_1`,
+            `${platform}_3`,
+            `${platform}_6`,
+            `${platform}_12`,
           ],
         },
       },
