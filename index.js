@@ -18,6 +18,7 @@ const telegramRouter = require("./routes/telegram");
 const webhookRouter = require("./routes/webhook");
 const subscriptionRouter = require("./routes/subscription");
 const authRouter = require("./routes/auth");
+const generateRouter = require("./routes/generate");
 
 app.use(express.json());
 app.use(cors());
@@ -30,6 +31,7 @@ app.use("/telegram", telegramRouter);
 app.use("/webhook", webhookRouter);
 app.use("/subscription", subscriptionRouter);
 app.use("/auth", authRouter);
+app.use("/generate", generateRouter);
 
 app.get("/", (req, res) => {
   res.send("Hello World!");
