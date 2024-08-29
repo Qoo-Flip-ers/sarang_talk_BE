@@ -1,13 +1,12 @@
 const express = require("express");
 const router = express.Router();
-const { Configuration, OpenAIApi } = require("openai");
+const { OpenAI } = require("openai");
 require("dotenv").config();
 
 // OpenAI API 설정
-const configuration = new Configuration({
+const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
-const openai = new OpenAIApi(configuration);
 
 /**
  * @swagger
