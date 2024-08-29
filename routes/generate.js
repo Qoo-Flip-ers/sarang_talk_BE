@@ -67,7 +67,7 @@ router.post("/word", async (req, res) => {
 }`;
 
   try {
-    const response = await openai.createChatCompletion({
+    const response = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [{ role: "user", content: prompt }],
     });
