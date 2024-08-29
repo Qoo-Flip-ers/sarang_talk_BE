@@ -72,7 +72,8 @@ router.post("/word", async (req, res) => {
       messages: [{ role: "user", content: prompt }],
     });
 
-    const generatedData = JSON.parse(response.data.choices[0].message.content);
+    console.log(response);
+    const generatedData = JSON.parse(response.choices[0].message.content);
     res.json(generatedData);
   } catch (error) {
     console.error("Error generating response:", error);
