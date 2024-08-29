@@ -72,9 +72,14 @@ router.post("/word", async (req, res) => {
       messages: [{ role: "user", content: prompt }],
     });
 
-    console.log(response);
-    const generatedData = JSON.parse(response.choices[0].message.content);
-    res.json(generatedData);
+    try {
+      const generatedData = response.choices[0].message.content;
+      console.log(generatedData);
+      res.json(generatedData);
+    } catch (parseError) {
+      console.error("JSON 파싱 오류:", parseError);
+      res.status(500).json({ error: "응답 파싱 실패" });
+    }
   } catch (error) {
     console.error("Error generating response:", error);
     res.status(500).json({ error: "Failed to generate response" });
