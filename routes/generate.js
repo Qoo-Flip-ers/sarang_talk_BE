@@ -70,10 +70,18 @@ router.post("/word", async (req, res) => {
     const response = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [{ role: "user", content: prompt }],
+      response_format: { type: "json_object" },
+      temperature: 0.56,
+      max_tokens: 1000,
+      top_p: 1,
+      frequency_penalty: 0,
+      presence_penalty: 0,
+      stop: ["\n"],
     });
 
     try {
       const generatedData = response.choices[0].message.content;
+
       console.log(generatedData);
       res.json(generatedData);
     } catch (parseError) {
