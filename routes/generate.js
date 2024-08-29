@@ -77,9 +77,10 @@ router.post("/word", async (req, res) => {
 
     try {
       const generatedData = response.choices[0].message.content;
+      const formattedData = JSON.parse(generatedData);
 
-      console.log(generatedData);
-      res.json(generatedData);
+      console.log(formattedData);
+      res.json(formattedData);
     } catch (parseError) {
       console.error("JSON 파싱 오류:", parseError);
       res.status(500).json({ error: "응답 파싱 실패" });
