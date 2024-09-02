@@ -223,6 +223,11 @@ router.post("/", async (req, res) => {
       type: req.body.type,
       source: req.body.source,
       imageUrl: req.body.imageUrl,
+      en_description: req.body.en_description,
+      en_pronunciation: req.body.en_pronunciation,
+      en_example_1: req.body.en_example_1,
+      en_example_2: req.body.en_example_2,
+      en_example_3: req.body.en_example_3,
     });
     res.json(newWord);
   } catch (error) {
