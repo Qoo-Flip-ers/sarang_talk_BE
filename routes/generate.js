@@ -91,4 +91,89 @@ router.post("/word", async (req, res) => {
   }
 });
 
+const axios = require("axios");
+const cheerio = require("cheerio");
+const puppeteer = require("puppeteer");
+
+/**
+ * @swagger
+ * /generate/pronunciation:
+ *   get:
+ *     summary: 단어의 발음 오디오 URL을 가져옵니다
+ *     tags: [Generate]
+ *     parameters:
+ *       - in: query
+ *         name: word
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: 발음을 가져올 한국어 단어
+ *     responses:
+ *       200:
+ *         description: 성공적으로 발음 오디오 URL을 가져왔습니다
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 audioUrl:
+ *                   type: string
+ *                   description: 발음 오디오 파일의 URL
+ *       400:
+ *         description: 잘못된 요청 (단어가 제공되지 않음)
+ *       404:
+ *         description: 발음 파일을 찾을 수 없음
+ *       500:
+ *         description: 서버 오류
+ */
+router.get("/pronunciation", async (req, res) => {
+  try {
+    const { word } = req.query;
+
+    if (!word) {
+      return res.status(400).json({ error: "단어가 제공되지 않았습니다." });
+    }
+
+    const url = `https://ko.dict.naver.com/#/search?query=${encodeURIComponent(
+      word
+    )}`;
+
+    const browser = await puppeteer.launch({ headless: "new" });
+    const page = await browser.newPage();
+    await page.setUserAgent(
+      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
+    );
+    await page.goto(url, { waitUntil: "networkidle0", timeout: 60000 });
+
+    // 전체 발음 듣기 버튼을 기다리고 클릭합니다.
+    await page.waitForSelector("button._listen_global_item.btn_listen.all", {
+      timeout: 10000,
+    });
+    await page.click("button._listen_global_item.btn_listen.all");
+
+    // 개별 발음 듣기 버튼이 나타날 때까지 기다립니다.
+    await page.waitForSelector(".btn_listen_global.mp3._btn_play_single", {
+      timeout: 10000,
+    });
+
+    const audioUrl = await page.evaluate(() => {
+      const audioElement = document.querySelector(
+        ".btn_listen_global.mp3._btn_play_single"
+      );
+      return audioElement ? audioElement.getAttribute("data-playobj") : null;
+    });
+
+    await browser.close();
+
+    if (!audioUrl) {
+      return res.status(404).json({ error: "발음 파일을 찾을 수 없습니다." });
+    }
+
+    res.json({ audioUrl });
+  } catch (error) {
+    console.error("발음 데이터 가져오기 오류:", error);
+    res.status(500).json({ error: "발음 데이터를 가져오는 데 실패했습니다." });
+  }
+});
+
 module.exports = router;
