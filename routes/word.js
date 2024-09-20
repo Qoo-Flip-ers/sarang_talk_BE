@@ -228,6 +228,7 @@ router.post("/", async (req, res) => {
       en_example_1: req.body.en_example_1,
       en_example_2: req.body.en_example_2,
       en_example_3: req.body.en_example_3,
+      audioUrl: req.body.audioUrl,
     });
     res.json(newWord);
   } catch (error) {
