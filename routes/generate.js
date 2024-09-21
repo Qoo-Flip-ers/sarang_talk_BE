@@ -184,6 +184,9 @@ router.get("/pronunciation", async (req, res) => {
 
 const { BlobServiceClient } = require("@azure/storage-blob");
 const { v4: uuidv4 } = require("uuid");
+const ffmpeg = require("fluent-ffmpeg");
+const fs = require("fs");
+const path = require("path");
 
 const blobServiceClient = BlobServiceClient.fromConnectionString(
   process.env.AZURE_STORAGE_CONNECTION_STRING
@@ -200,26 +203,45 @@ router.post("/speech", async (req, res) => {
     }
 
     // OpenAI TTS API를 사용하여 음성 생성
-    const mp3 = await openai.audio.speech.create({
+    const opus = await openai.audio.speech.create({
       model: "tts-1-hd",
       voice: "nova",
       input: word,
       speed: 0.9,
-      response_format: "ogg",
+      response_format: "opus",
     });
 
     // 음성 데이터를 버퍼로 변환
-    const buffer = Buffer.from(await mp3.arrayBuffer());
+    const opusBuffer = Buffer.from(await opus.arrayBuffer());
 
-    // 음성이 잘 들리도록 볼륨 조정 (필요한 경우)
-    // 참고: 이 부분은 외부 라이브러리가 필요할 수 있습니다.
-    // const adjustedBuffer = await adjustVolume(buffer, 1.2);
+    // 임시 파일 경로 생성
+    const tempOpusPath = path.join(__dirname, `${uuidv4()}.opus`);
+    const tempOggPath = path.join(__dirname, `${uuidv4()}.ogg`);
+
+    // 임시 Opus 파일 저장
+    await fs.promises.writeFile(tempOpusPath, opusBuffer);
+
+    // Opus를 OGG로 변환
+    await new Promise((resolve, reject) => {
+      ffmpeg(tempOpusPath)
+        .toFormat("ogg")
+        .on("end", resolve)
+        .on("error", reject)
+        .save(tempOggPath);
+    });
+
+    // 변환된 OGG 파일 읽기
+    const oggBuffer = await fs.promises.readFile(tempOggPath);
 
     // Azure Blob Storage에 업로드
     const containerClient = blobServiceClient.getContainerClient(containerName);
-    const blobName = `${uuidv4()}.mp3`;
+    const blobName = `${uuidv4()}.ogg`;
     const blockBlobClient = containerClient.getBlockBlobClient(blobName);
-    await blockBlobClient.upload(buffer, buffer.length);
+    await blockBlobClient.upload(oggBuffer, oggBuffer.length);
+
+    // 임시 파일 삭제
+    await fs.promises.unlink(tempOpusPath);
+    await fs.promises.unlink(tempOggPath);
 
     // 업로드된 파일의 URL 반환
     const url = blockBlobClient.url;
