@@ -201,12 +201,19 @@ router.post("/speech", async (req, res) => {
 
     // OpenAI TTS API를 사용하여 음성 생성
     const mp3 = await openai.audio.speech.create({
-      model: "tts-1",
-      voice: "echo",
+      model: "tts-1-hd",
+      voice: "nova",
       input: word,
-      speed: 1,
+      speed: 0.9,
+      response_format: "mp3",
     });
+
+    // 음성 데이터를 버퍼로 변환
     const buffer = Buffer.from(await mp3.arrayBuffer());
+
+    // 음성이 잘 들리도록 볼륨 조정 (필요한 경우)
+    // 참고: 이 부분은 외부 라이브러리가 필요할 수 있습니다.
+    // const adjustedBuffer = await adjustVolume(buffer, 1.2);
 
     // Azure Blob Storage에 업로드
     const containerClient = blobServiceClient.getContainerClient(containerName);
