@@ -171,6 +171,10 @@ router.get("/pronunciation", async (req, res) => {
       return res.status(404).json({ error: "발음 파일을 찾을 수 없습니다." });
     }
 
+    if (!audioUrl.startsWith("https://dict-dn.pstatic.net")) {
+      return res.status(400).json({ error: "유효하지 않은 오디오 URL입니다." });
+    }
+
     res.json({ audioUrl });
   } catch (error) {
     console.error("발음 데이터 가져오기 오류:", error);
