@@ -87,7 +87,9 @@ router.post("/", async (req, res) => {
     console.log("테스트");
     return;
   }
-  const { name, phoneNumber, email, type, quiz, zoom, plan, test } = req.body;
+  const { name, phoneNumber, email, type, quiz, zoom, plan, test, lang } =
+    req.body;
+
   console.log("new", req.body);
 
   if (!name || !phoneNumber || !email || !type || !plan) {
@@ -191,6 +193,7 @@ router.post("/", async (req, res) => {
       zoom: formattingZoom,
       code,
       codeGeneratedAt,
+      lang: lang ? lang.toUpperCase() : "ID",
     })
   );
 

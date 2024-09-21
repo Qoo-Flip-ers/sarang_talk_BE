@@ -38,6 +38,7 @@ async function insertIntoDatabase(data) {
     zoom,
     code,
     codeGeneratedAt,
+    lang,
   } = data;
 
   try {
@@ -51,6 +52,7 @@ async function insertIntoDatabase(data) {
         status: "active",
         code,
         codeGeneratedAt,
+        language: lang.toUpperCase(),
       });
 
       await client.messages.create(

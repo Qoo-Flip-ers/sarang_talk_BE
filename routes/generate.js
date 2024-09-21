@@ -182,4 +182,44 @@ router.get("/pronunciation", async (req, res) => {
   }
 });
 
+const { BlobServiceClient } = require("@azure/storage-blob");
+const { v4: uuidv4 } = require("uuid");
+
+const blobServiceClient = BlobServiceClient.fromConnectionString(
+  process.env.AZURE_STORAGE_CONNECTION_STRING
+);
+const containerName = "word-speech";
+
+router.post("/speech", async (req, res) => {
+  try {
+    const { word } = req.body;
+
+    // 입력 유효성 검사
+    if (!word || typeof word !== "string") {
+      return res.status(400).json({ error: "유효하지 않은 입력입니다." });
+    }
+
+    // OpenAI TTS API를 사용하여 음성 생성
+    const mp3 = await openai.audio.speech.create({
+      model: "tts-1",
+      voice: "echo",
+      input: word,
+    });
+    const buffer = Buffer.from(await mp3.arrayBuffer());
+
+    // Azure Blob Storage에 업로드
+    const containerClient = blobServiceClient.getContainerClient(containerName);
+    const blobName = `${uuidv4()}.mp3`;
+    const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+    await blockBlobClient.upload(buffer, buffer.length);
+
+    // 업로드된 파일의 URL 반환
+    const url = blockBlobClient.url;
+    res.json({ url });
+  } catch (error) {
+    console.error("음성 생성 오류:", error);
+    res.status(500).json({ error: "음성 생성 중 오류가 발생했습니다." });
+  }
+});
+
 module.exports = router;
