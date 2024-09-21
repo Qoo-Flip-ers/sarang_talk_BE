@@ -205,7 +205,7 @@ router.post("/speech", async (req, res) => {
       voice: "nova",
       input: word,
       speed: 0.9,
-      response_format: "mp3",
+      response_format: "ogg",
     });
 
     // 음성 데이터를 버퍼로 변환
