@@ -204,6 +204,7 @@ router.post("/speech", async (req, res) => {
       model: "tts-1",
       voice: "echo",
       input: word,
+      speed: 1,
     });
     const buffer = Buffer.from(await mp3.arrayBuffer());
 
