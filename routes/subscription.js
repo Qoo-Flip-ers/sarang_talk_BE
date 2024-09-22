@@ -151,10 +151,13 @@ router.post("/", async (req, res) => {
   let startDate = new Date();
   startDate.setDate(startDate.getDate() + 1);
 
-  const comparisonDate = new Date("2024-08-01");
-  if (startDate < comparisonDate) {
-    startDate = comparisonDate;
+  if (lang === "EN") {
+    const canadaStartDate = new Date("2024-10-14T00:00:00-04:00"); // 캐나다 동부 시간 기준
+    if (startDate < canadaStartDate) {
+      startDate = canadaStartDate;
+    }
   }
+
   const month = Number(plan.split("_")[1]);
 
   const endDate = new Date(startDate);
