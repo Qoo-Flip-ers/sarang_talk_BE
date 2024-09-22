@@ -626,20 +626,36 @@ router.post("/welcome", async (req, res) => {
 });
 
 // 구독기간이 현재 진행 중인 사용자 목록을 가져오는 함수
-async function fetchActiveSubscriptions(category) {
+async function fetchActiveSubscriptions(category, lang = "ID") {
   const now = new Date();
 
-  // 한국 시간은 UTC+9, 현재 한국 시간 계산
-  const koreaOffset = 9 * 60 * 60 * 1000;
-  const koreaNow = new Date(now.getTime() + koreaOffset);
+  let todayStart, todayEnd;
 
-  // 한국 시간 기준 현재 날짜
-  let year = koreaNow.getFullYear();
-  let month = koreaNow.getMonth();
-  let date = koreaNow.getDate();
+  if (lang === "EN") {
+    // 캐나다 시간은 UTC-4 (여름 시간 기준), 현재 캐나다 시간 계산
+    const canadaOffset = -4 * 60 * 60 * 1000;
+    const canadaNow = new Date(now.getTime() + canadaOffset);
 
-  const todayStart = new Date(Date.UTC(year, month, date - 1, 15, 0, 0, 0)); // 한국 시간으로 설정
-  const todayEnd = new Date(Date.UTC(year, month, date, 14, 59, 59, 999)); // 한국 시간으로 설정
+    // 캐나다 시간 기준 현재 날짜
+    let year = canadaNow.getFullYear();
+    let month = canadaNow.getMonth();
+    let date = canadaNow.getDate();
+
+    todayStart = new Date(Date.UTC(year, month, date, 4, 0, 0, 0)); // 캐나다 시간 자정
+    todayEnd = new Date(Date.UTC(year, month, date, 27, 59, 59, 999)); // 캐나다 시간 23:59:59
+  } else {
+    // 한국/인도네시아 시간은 UTC+9/UTC+7, 현재 한국 시간 계산 (인도네시아도 같은 날짜 범위 사용)
+    const koreaOffset = 9 * 60 * 60 * 1000;
+    const koreaNow = new Date(now.getTime() + koreaOffset);
+
+    // 한국 시간 기준 현재 날짜
+    let year = koreaNow.getFullYear();
+    let month = koreaNow.getMonth();
+    let date = koreaNow.getDate();
+
+    todayStart = new Date(Date.UTC(year, month, date - 1, 15, 0, 0, 0)); // 한국 시간으로 설정
+    todayEnd = new Date(Date.UTC(year, month, date, 14, 59, 59, 999)); // 한국 시간으로 설정
+  }
 
   console.log(todayStart, todayEnd);
 
@@ -659,18 +675,19 @@ async function fetchActiveSubscriptions(category) {
     include: [
       {
         model: db.User,
-        attributes: ["id", "name", "phoneNumber"],
+        where: { language: lang },
+        attributes: ["id", "name", "phoneNumber", "language"],
       },
     ],
   });
 }
 
-const sendDailyMessage = async (category) => {
+const sendDailyMessage = async (category, lang = "ID") => {
   let count = 0;
   const categorizedSubscriptions = {};
 
   // 구독기간이 현재 진행 중인 사용자 목록을 카테고리별로 분류
-  const activeSubscriptions = await fetchActiveSubscriptions(category);
+  const activeSubscriptions = await fetchActiveSubscriptions(category, lang);
   activeSubscriptions.forEach((subscription) => {
     const category = subscription.type || "daily_conversation";
     if (!categorizedSubscriptions[category]) {
@@ -687,7 +704,11 @@ const sendDailyMessage = async (category) => {
     // 여기에 카테고리별로 실행할 함수를 호출할 수 있습니다.
     await subscriptions.forEach(async (subscription, index) => {
       setTimeout(async () => {
-        count += await processCategorySubscriptions(category, [subscription]);
+        count += await processCategorySubscriptions(
+          category,
+          [subscription],
+          lang
+        );
       }, index * 500); // 0.5초 간격으로 호출
     });
   });
@@ -695,7 +716,11 @@ const sendDailyMessage = async (category) => {
   return count;
 };
 
-const processCategorySubscriptions = async (category, subscriptions) => {
+const processCategorySubscriptions = async (
+  category,
+  subscriptions,
+  lang = "ID"
+) => {
   if (category === "daily_conversation") {
     subscriptions.forEach(async (subscription) => {
       console.log("subscription.lastWordId", subscription.lastWordId);
@@ -707,6 +732,9 @@ const processCategorySubscriptions = async (category, subscriptions) => {
           type: {
             [db.Sequelize.Op.eq]: "daily_conversation",
           },
+          ...(lang === "EN"
+            ? { en_description: { [db.Sequelize.Op.ne]: null } }
+            : { description: { [db.Sequelize.Op.ne]: null } }),
         },
         order: [["id", "ASC"]],
         limit: 1,
@@ -722,79 +750,65 @@ const processCategorySubscriptions = async (category, subscriptions) => {
         const response = await client.messages.create({
           from: process.env.FROM_PHONE_NUMBER,
           to,
-          contentSid: process.env.TEMPLATE_DAILY_CONVERSATION,
+          contentSid:
+            lang === "EN"
+              ? process.env.TEMPLATE_EN_DAILY_CONVERSATION
+              : process.env.TEMPLATE_DAILY_CONVERSATION,
           messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
           scheduleType: "fixed",
-          sendAt: getSendAt(),
+          sendAt: getSendAt(lang),
           contentVariables: JSON.stringify({
-            1: todayWord.korean?.trim(), // korean
-            2: todayWord.pronunciation?.trim(), // pronunciation
-            3: todayWord.description?.trim(), // description
-            4: todayWord.example_1?.trim(), // example_1
-            5: todayWord.example_2?.trim(), // example_2 (예문 발음기호)
-            6: todayWord.example_3?.trim(), // example_3 (에문 설명)
+            1: todayWord.korean?.trim(),
+            2: todayWord.pronunciation?.trim(),
+            3:
+              lang === "EN"
+                ? todayWord.en_description?.trim()
+                : todayWord.description?.trim(),
+            4: todayWord.example_1?.trim(),
+            5: todayWord.example_2?.trim(),
+            6:
+              lang === "EN"
+                ? todayWord.en_example_3?.trim()
+                : todayWord.example_3?.trim(),
           }),
         });
-        console.log("Scheduled message sent to", subscription.User.name);
+        console.log(
+          "예약된 메시지가 다음 사용자에게 전송되었습니다:",
+          subscription.User.name
+        );
 
         // 메시지 전송 후 lastWordId 업데이트
         await subscription.update({ lastWordId: todayWord.id });
 
-        // ReceivedWords에 기록 추가
-        await db.ReceivedWords.create({
-          userId: subscription.userId,
-          wordId: todayWord.id,
-          receivedDate: new Date(),
-        });
-      } catch (error) {
-        console.error(
-          `Error sending scheduled message to ${subscription.User.name}: `,
-          error
-        );
-      }
-    });
-  } else if (category === "kpop_lyrics") {
-    subscriptions.forEach(async (subscription) => {
-      const todayWord = await db.Word.findOne({
-        where: {
-          id: {
-            [db.Sequelize.Op.gt]: subscription.lastWordId || 0,
-          },
-          type: {
-            [db.Sequelize.Op.eq]: "kpop_lyrics",
-          },
-        },
-        order: [["id", "ASC"]],
-        limit: 1,
-      });
+        if (todayWord.imageUrl) {
+          await client.messages.create({
+            from: process.env.FROM_PHONE_NUMBER,
+            to,
+            mediaUrl: [todayWord.imageUrl],
+            messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
+            scheduleType: "fixed",
+            sendAt: getSendAt(lang, "image"),
+          });
+          console.log(
+            "이미지 메시지가 예약되었습니다:",
+            subscription.User.name
+          );
+        }
 
-      if (!todayWord) {
-        sendSlack(`오늘의 단어가 없습니다.`);
-        return;
-      }
-
-      const to = `whatsapp:${subscription.User.phoneNumber}`;
-      try {
-        const response = await client.messages.create({
-          from: process.env.FROM_PHONE_NUMBER,
-          to,
-          contentSid: process.env.TEMPLATE_KPOP_LYRICS,
-          messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
-          scheduleType: "fixed",
-          sendAt: getSendAt(),
-          contentVariables: JSON.stringify({
-            1: todayWord.korean?.trim(), // korean
-            2: todayWord.pronunciation?.trim(), // pronunciation
-            3: todayWord.description?.trim(), // description
-            4: todayWord.source?.trim(), // 출처
-            5: todayWord.example_1?.trim(), // example_1 (예문)
-            6: todayWord.example_2?.trim(), // example_2 (에문 발음기호)
-            7: todayWord.example_3?.trim(), // example_3 (에문 설명)
-          }),
-        });
-        console.log("Scheduled message sent to", subscription.User.name);
-
-        await subscription.update({ lastWordId: todayWord.id });
+        if (todayWord.audioUrl) {
+          await client.messages.create({
+            from: process.env.FROM_PHONE_NUMBER,
+            to,
+            mediaUrl: [todayWord.audioUrl],
+            messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
+            scheduleType: "fixed",
+            sendAt: getSendAt(lang, "audio"),
+          });
+          console.log(
+            "오디오 메시지가 예약되었습니다:",
+            subscription.User.name
+          );
+        }
 
         // ReceivedWords에 기록 추가
         await db.ReceivedWords.create({
@@ -819,6 +833,9 @@ const processCategorySubscriptions = async (category, subscriptions) => {
           type: {
             [db.Sequelize.Op.eq]: "topik_word",
           },
+          ...(lang === "EN"
+            ? { en_description: { [db.Sequelize.Op.ne]: null } }
+            : { description: { [db.Sequelize.Op.ne]: null } }),
         },
         order: [["id", "ASC"]],
         limit: 1,
@@ -834,22 +851,61 @@ const processCategorySubscriptions = async (category, subscriptions) => {
         const response = await client.messages.create({
           from: process.env.FROM_PHONE_NUMBER,
           to,
-          contentSid: process.env.TEMPLATE_TOPIK_WORD,
+          contentSid:
+            lang === "EN"
+              ? process.env.TEMPLATE_EN_TOPIK_WORD
+              : process.env.TEMPLATE_TOPIK_WORD,
           messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
           scheduleType: "fixed",
-          sendAt: getSendAt(),
+          sendAt: getSendAt(lang),
           contentVariables: JSON.stringify({
             1: todayWord.korean?.trim(), // korean
             2: todayWord.pronunciation?.trim(), // pronunciation
-            3: todayWord.description?.trim(), // description
+            3:
+              lang === "EN"
+                ? todayWord.en_description?.trim()
+                : todayWord.description?.trim(), // description
             4: todayWord.example_1?.trim(), // example_1
             5: todayWord.example_2?.trim(), // example_2 (예문 발음기호)
-            6: todayWord.example_3?.trim(), // example_3 (에문 설명)
+            6:
+              lang === "EN"
+                ? todayWord.en_example_3?.trim()
+                : todayWord.example_3?.trim(), // example_3 (에문 설명)
           }),
         });
         console.log("Scheduled message sent to", subscription.User.name);
 
         await subscription.update({ lastWordId: todayWord.id });
+
+        if (todayWord.imageUrl) {
+          await client.messages.create({
+            from: process.env.FROM_PHONE_NUMBER,
+            to,
+            mediaUrl: [todayWord.imageUrl],
+            messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
+            scheduleType: "fixed",
+            sendAt: getSendAt(lang, "image"),
+          });
+          console.log(
+            "이미지 메시지가 예약되었습니다:",
+            subscription.User.name
+          );
+        }
+
+        if (todayWord.audioUrl) {
+          await client.messages.create({
+            from: process.env.FROM_PHONE_NUMBER,
+            to,
+            mediaUrl: [todayWord.audioUrl],
+            messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
+            scheduleType: "fixed",
+            sendAt: getSendAt(lang, "audio"),
+          });
+          console.log(
+            "오디오 메시지가 예약되었습니다:",
+            subscription.User.name
+          );
+        }
 
         // ReceivedWords에 기록 추가
         await db.ReceivedWords.create({
@@ -874,6 +930,9 @@ const processCategorySubscriptions = async (category, subscriptions) => {
           type: {
             [db.Sequelize.Op.eq]: "basic",
           },
+          ...(lang === "EN"
+            ? { en_description: { [db.Sequelize.Op.ne]: null } }
+            : { description: { [db.Sequelize.Op.ne]: null } }),
         },
         order: [["id", "ASC"]],
         limit: 1,
@@ -889,19 +948,65 @@ const processCategorySubscriptions = async (category, subscriptions) => {
         const response = await client.messages.create({
           from: process.env.FROM_PHONE_NUMBER,
           to,
-          contentSid: process.env.TEMPLATE_DAILY_CONVERSATION,
+          contentSid:
+            lang === "EN"
+              ? process.env.TEMPLATE_EN_BASIC
+              : process.env.TEMPLATE_BASIC,
           messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
           scheduleType: "fixed",
-          sendAt: getSendAt(),
+          sendAt: getSendAt(lang),
           contentVariables: JSON.stringify({
             1: todayWord.korean?.trim(), // korean
             2: todayWord.pronunciation?.trim(), // pronunciation
-            3: todayWord.description?.trim(), // description
+            3:
+              lang === "EN"
+                ? todayWord.en_description?.trim()
+                : todayWord.description?.trim(), // description
             4: todayWord.example_1?.trim(), // example_1
             5: todayWord.example_2?.trim(), // example_2 (예문 발음기호)
-            6: todayWord.example_3?.trim(), // example_3 (에문 설명)
+            6:
+              lang === "EN"
+                ? todayWord.en_example_3?.trim()
+                : todayWord.example_3?.trim(), // example_3 (에문 설명)
           }),
         });
+        console.log(
+          "예약된 메시지가 다음 사용자에게 전송되었습니다:",
+          subscription.User.name
+        );
+
+        // 메시지 전송 후 lastWordId 업데이트
+        await subscription.update({ lastWordId: todayWord.id });
+
+        if (todayWord.imageUrl) {
+          await client.messages.create({
+            from: process.env.FROM_PHONE_NUMBER,
+            to,
+            mediaUrl: [todayWord.imageUrl],
+            messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
+            scheduleType: "fixed",
+            sendAt: getSendAt(lang, "image"),
+          });
+          console.log(
+            "이미지 메시지가 예약되었습니다:",
+            subscription.User.name
+          );
+        }
+
+        if (todayWord.audioUrl) {
+          await client.messages.create({
+            from: process.env.FROM_PHONE_NUMBER,
+            to,
+            mediaUrl: [todayWord.audioUrl],
+            messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
+            scheduleType: "fixed",
+            sendAt: getSendAt(lang, "audio"),
+          });
+          console.log(
+            "오디오 메시지가 예약되었습니다:",
+            subscription.User.name
+          );
+        }
         console.log("Scheduled message sent to", subscription.User.name);
 
         await subscription.update({ lastWordId: todayWord.id });
@@ -910,82 +1015,6 @@ const processCategorySubscriptions = async (category, subscriptions) => {
         await db.ReceivedWords.create({
           userId: subscription.userId,
           wordId: todayWord.id,
-          receivedDate: new Date(),
-        });
-      } catch (error) {
-        console.error(
-          `Error sending scheduled message to ${subscription.User.name}: `,
-          error
-        );
-      }
-    });
-  } else if (category === "topik_variation") {
-    subscriptions.forEach(async (subscription) => {
-      const todayQuestion = await db.Question.findOne({
-        where: {
-          id: {
-            [db.Sequelize.Op.gt]: subscription.lastWordId || 0,
-          },
-          type: {
-            [db.Sequelize.Op.eq]: "topik_variation",
-          },
-        },
-        order: [["id", "ASC"]],
-        limit: 1,
-      });
-
-      if (!todayQuestion) {
-        sendSlack(`오늘의 문제가 없습니다.`);
-        return;
-      }
-
-      const to = `whatsapp:${subscription.User.phoneNumber}`;
-      const hasImage = todayQuestion.imageUrl ? true : false;
-
-      const contentVariables = hasImage
-        ? JSON.stringify({
-            1: todayQuestion.imageUrl?.trim(), // 이미지
-            2: todayQuestion.title?.trim(), // 질문
-            3: todayQuestion.example_1?.trim(), // 정답
-            4: todayQuestion.example_2?.trim(), // 해설
-            5: todayQuestion.example_3?.trim(), // 해설
-            6: todayQuestion.example_4?.trim(), // 해설
-            7: todayQuestion.answer?.trim(), // 해설
-            8: todayQuestion.exaplanation?.trim(), // 해설
-          })
-        : JSON.stringify({
-            1: todayQuestion.title?.trim(), // 질문
-            2: todayQuestion.description?.trim(), // 보기
-            3: todayQuestion.example_1?.trim(), // 정답
-            4: todayQuestion.example_2?.trim(), // 해설
-            5: todayQuestion.example_3?.trim(), // 해설
-            6: todayQuestion.example_4?.trim(), // 해설
-            7: todayQuestion.amnswer?.trim(), // 해설
-            8: todayQuestion.exaplanation?.trim(), // 해설
-          });
-
-      const contentSid = hasImage
-        ? process.env.TEMPLATE_TOPIK_VARIATION_MEDIA
-        : process.env.TEMPLATE_TOPIK_VARIATION_TEXT;
-
-      try {
-        const response = await client.messages.create({
-          from: process.env.FROM_PHONE_NUMBER,
-          to,
-          contentSid,
-          messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
-          scheduleType: "fixed",
-          sendAt: getSendAt(),
-          contentVariables,
-        });
-        console.log("Scheduled message sent to", subscription.User.name);
-
-        await subscription.update({ lastWordId: todayQuestion.id });
-
-        // ReceivedWords에 기록 추가
-        await db.ReceivedQuestions.create({
-          userId: subscription.userId,
-          questionId: todayQuestion.id,
           receivedDate: new Date(),
         });
       } catch (error) {
@@ -1196,9 +1225,32 @@ const sendSlack = async (message) => {
   );
 };
 
-const getSendAt = () => {
+const getSendAt = (lang = "ID", type = "template") => {
   // 현재 UTC 시간
   const now = new Date();
+
+  if (lang === "EN") {
+    // 캐나다 동부 시간은 UTC-4 (서머타임 고려), 현재 캐나다 시간 계산
+    const canadaOffset = -4 * 60 * 60 * 1000;
+    const canadaNow = new Date(now.getTime() + canadaOffset);
+
+    // 캐나다 시간 기준 현재 날짜
+    let year = canadaNow.getFullYear();
+    let month = canadaNow.getMonth();
+    let date = canadaNow.getDate();
+
+    // 캐나다 시간 기준 해당 날짜의 오전 9시를 UTC로 변환
+    let sendAt = new Date(Date.UTC(year, month, date, 13, 0, 0, 0));
+
+    if (type === "image") {
+      sendAt.setSeconds(sendAt.getSeconds() + 5);
+    } else if (type === "audio") {
+      sendAt.setSeconds(sendAt.getSeconds() + 10);
+    }
+
+    console.log(`EN: Generated sendAt date: ${sendAt.toISOString()}`);
+    return sendAt.toISOString();
+  }
 
   // 한국 시간은 UTC+9, 현재 한국 시간 계산
   const koreaOffset = 9 * 60 * 60 * 1000;
@@ -1212,11 +1264,18 @@ const getSendAt = () => {
   // 한국 시간 기준 해당 날짜의 오전 11시를 UTC로 변환
   let sendAt = new Date(Date.UTC(year, month, date, 2, 0, 0, 0));
 
-  console.log(`Generated sendAt date: ${sendAt.toISOString()}`);
+  if (type === "image") {
+    sendAt.setSeconds(sendAt.getSeconds() + 5);
+  } else if (type === "audio") {
+    sendAt.setSeconds(sendAt.getSeconds() + 10);
+  }
+
+  console.log(`ID: Generated sendAt date: ${sendAt.toISOString()}`);
   return sendAt.toISOString();
 };
 
-// DB 깨우기 (serverless 때문에)
+// ------------------------ 인도네시아 ------------------------
+// 인도네시아용 DB 깨우기 (serverless 때문에)
 cron.schedule("0 15 * * *", async () => {
   if (process.env.NODE_ENV === "development") {
     return;
@@ -1224,14 +1283,14 @@ cron.schedule("0 15 * * *", async () => {
   try {
     const word = await db.Word.findByPk(1);
     if (word) {
-      sendSlack("[준비] DB 깨우기 시도");
+      sendSlack("[준비] 인도네시아용 DB 깨우기 시도");
     }
   } catch (e) {
-    sendSlack("[준비] DB 깨우기 시도");
+    sendSlack("[준비] 인도네시아용 DB 깨우기 시도");
   }
 });
 
-// DB 깨우기 (serverless 때문에)
+// 인도네시아용 DB 깨우기 (serverless 때문에)
 cron.schedule("2 15 * * *", async () => {
   if (process.env.NODE_ENV === "development") {
     return;
@@ -1239,62 +1298,63 @@ cron.schedule("2 15 * * *", async () => {
   try {
     const word = await db.Word.findByPk(1);
     if (word) {
-      sendSlack("[준비] DB 깨우기 성공");
+      sendSlack("[준비] 인도네시아용 DB 깨우기 성공");
     }
   } catch (e) {
-    sendSlack("[준비] DB 깨우기 실패");
+    sendSlack("[준비] 인도네시아용 DB 깨우기 실패");
   }
 });
 
+// 인도네시아용 메시지 발송
 cron.schedule("4 15 * * *", async () => {
   if (process.env.NODE_ENV === "development") {
     return;
   }
   try {
     try {
-      const count = await sendDailyMessage("basic");
-
-      sendSlack(`[일일 메시지] basic: ${count}명에게 메시지 발송`);
+      const count = await sendDailyMessage("basic", "ID");
+      sendSlack(`[일일 메시지] 인도네시아 basic: ${count}명에게 메시지 발송`);
     } catch (error) {
       if (error.status === 404) {
-        sendSlack("[일일 메시지] basic: 요청한 사용자를 찾을 수 없습니다.");
+        sendSlack(
+          "[일일 메시지] 인도네시아 basic: 요청한 사용자를 찾을 수 없습니다."
+        );
       } else {
         sendSlack(
-          "[일일 메시지] basic: 서버 오류로 인해 메시지를 발송할 수 없습니다." +
+          "[일일 메시지] 인도네시아 basic: 서버 오류로 인해 메시지를 발송할 수 없습니다." +
             error.message
         );
       }
     }
   } catch (error) {
-    sendSlack("[일일 메시지] basic: 작업 중 오류 발생");
+    sendSlack("[일일 메시지] 인도네시아 basic: 작업 중 오류 발생");
   }
 });
 
-// 매일 한국 시간 오전 0시 5분에 작동하는 cron 작업을 설정합니다.
-// 한국 시간은 UTC+9이므로, UTC 시간으로는 오후 3시 5분입니다.
 cron.schedule("5 15 * * *", async () => {
   if (process.env.NODE_ENV === "development") {
     return;
   }
   try {
     try {
-      const count = await sendDailyMessage("kpop_lyrics");
-
-      sendSlack(`[일일 메시지] kpop_lyrics: ${count}명에게 메시지 발송`);
+      const count = await sendDailyMessage("kpop_lyrics", "ID");
+      sendSlack(
+        `[일일 메시지] 인도네시아 kpop_lyrics: ${count}명에게 메시지 발송`
+      );
     } catch (error) {
       if (error.status === 404) {
         sendSlack(
-          "[일일 메시지] kpop_lyrics: 요청한 사용자를 찾을 수 없습니다."
+          "[일일 메시지] 인도네시아 kpop_lyrics: 요청한 사용자를 찾을 수 없습니다."
         );
       } else {
         sendSlack(
-          "[일일 메시지] kpop_lyrics: 서버 오류로 인해 메시지를 발송할 수 없습니다." +
+          "[일일 메시지] 인도네시아 kpop_lyrics: 서버 오류로 인해 메시지를 발송할 수 없습니다." +
             error.message
         );
       }
     }
   } catch (error) {
-    sendSlack("[일일 메시지] kpop_lyrics: 작업 중 오류 발생");
+    sendSlack("[일일 메시지] 인도네시아 kpop_lyrics: 작업 중 오류 발생");
   }
 });
 
@@ -1304,23 +1364,24 @@ cron.schedule("6 15 * * *", async () => {
   }
   try {
     try {
-      const count = await sendDailyMessage("topik_word");
-
-      sendSlack(`[일일 메시지] topik_word: ${count}명에게 메시지 발송`);
+      const count = await sendDailyMessage("topik_word", "ID");
+      sendSlack(
+        `[일일 메시지] 인도네시아 topik_word: ${count}명에게 메시지 발송`
+      );
     } catch (error) {
       if (error.status === 404) {
         sendSlack(
-          "[일일 메시지] topik_word: 요청한 사용자를 찾을 수 없습니다."
+          "[일일 메시지] 인도네시아 topik_word: 요청한 사용자를 찾을 수 없습니다."
         );
       } else {
         sendSlack(
-          "[일일 메시지] topik_word: 서버 오류로 인해 메시지를 발송할 수 없습니다." +
+          "[일일 메시지] 인도네시아 topik_word: 서버 오류로 인해 메시지를 발송할 수 없습니다." +
             error.message
         );
       }
     }
   } catch (error) {
-    sendSlack("[일일 메시지] topik_word: 작업 중 오류 발생");
+    sendSlack("[일일 메시지] 인도네시아 topik_word: 작업 중 오류 발생");
   }
 });
 
@@ -1330,23 +1391,24 @@ cron.schedule("7 15 * * *", async () => {
   }
   try {
     try {
-      const count = await sendDailyMessage("topik_variation");
-
-      sendSlack(`[일일 메시지] topik_variation: ${count}명에게 메시지 발송`);
+      const count = await sendDailyMessage("topik_variation", "ID");
+      sendSlack(
+        `[일일 메시지] 인도네시아 topik_variation: ${count}명에게 메시지 발송`
+      );
     } catch (error) {
       if (error.status === 404) {
         sendSlack(
-          "[일일 메시지] topik_variation: 요청한 사용자를 찾을 수 없습니다."
+          "[일일 메시지] 인도네시아 topik_variation: 요청한 사용자를 찾을 수 없습니다."
         );
       } else {
         sendSlack(
-          "[일일 메시지] topik_variation: 서버 오류로 인해 메시지를 발송할 수 없습니다." +
+          "[일일 메시지] 인도네시아 topik_variation: 서버 오류로 인해 메시지를 발송할 수 없습니다." +
             error.message
         );
       }
     }
   } catch (error) {
-    sendSlack("[일일 메시지] topik_variation: 작업 중 오류 발생");
+    sendSlack("[일일 메시지] 인도네시아 topik_variation: 작업 중 오류 발생");
   }
 });
 
@@ -1356,47 +1418,242 @@ cron.schedule("8 15 * * *", async () => {
   }
   try {
     try {
-      const count = await sendDailyMessage("daily_conversation");
-
-      sendSlack(`[일일 메시지] daily_conversation: ${count}명에게 메시지 발송`);
+      const count = await sendDailyMessage("daily_conversation", "ID");
+      sendSlack(
+        `[일일 메시지] 인도네시아 daily_conversation: ${count}명에게 메시지 발송`
+      );
     } catch (error) {
       if (error.status === 404) {
         sendSlack(
-          "[일일 메시지] daily_conversation: 요청한 사용자를 찾을 수 없습니다."
+          "[일일 메시지] 인도네시아 daily_conversation: 요청한 사용자를 찾을 수 없습니다."
         );
       } else {
         sendSlack(
-          "[일일 메시지] daily_conversation: 서버 오류로 인해 메시지를 발송할 수 없습니다." +
+          "[일일 메시지] 인도네시아 daily_conversation: 서버 오류로 인해 메시지를 발송할 수 없습니다." +
             error.message
         );
       }
     }
   } catch (error) {
-    sendSlack("[일일 메시지] daily_conversation: 작업 중 오류 발생");
+    sendSlack("[일일 메시지] 인도네시아 daily_conversation: 작업 중 오류 발생");
   }
 });
 
+// 인도네시아용 주간 퀴즈
 cron.schedule("12 15 * * 0", async () => {
   if (process.env.NODE_ENV === "development") {
     return;
   }
 
   try {
-    sendSlack(`[주간 퀴즈] Whatsapp 퀴즈 발송 예약 시작`);
+    sendSlack(`[주간 퀴즈] 인도네시아 Whatsapp 퀴즈 발송 예약 시작`);
 
-    await sendWeeklyQuiz("whatsapp");
+    await sendWeeklyQuiz("whatsapp", "ID");
 
-    sendSlack(`[주간 퀴즈] Whatsapp 퀴즈 발송 예약 완료`);
+    sendSlack(`[주간 퀴즈] 인도네시아 Whatsapp 퀴즈 발송 예약 완료`);
   } catch (error) {
     if (error.status === 404) {
-      sendSlack("[주간 퀴즈] Whatsapp 요청한 사용자를 찾을 수 없습니다.");
+      sendSlack(
+        "[주간 퀴즈] 인도네시아 Whatsapp 요청한 사용자를 찾을 수 없습니다."
+      );
     } else {
       sendSlack(
-        "[주간 퀴즈] Whatsapp 서버 오류로 인해 메시지를 발송할 수 없습니다." +
+        "[주간 퀴즈] 인도네시아 Whatsapp 서버 오류로 인해 메시지를 발송할 수 없습니다." +
           error.message
       );
     }
   }
 });
+
+// ------------------------// 인도네시아 ------------------------
+
+// ------------------------ 캐나다 ------------------------
+// 캐나다용 DB 깨우기 (serverless 때문에)
+cron.schedule("0 13 * * *", async () => {
+  if (process.env.NODE_ENV === "development") {
+    return;
+  }
+  try {
+    const word = await db.Word.findByPk(1);
+    if (word) {
+      sendSlack("[준비] 캐나다용 DB 깨우기 시도");
+    }
+  } catch (e) {
+    sendSlack("[준비] 캐나다용 DB 깨우기 시도");
+  }
+});
+
+// 캐나다용 DB 깨우기 (serverless 때문에)
+cron.schedule("2 13 * * *", async () => {
+  if (process.env.NODE_ENV === "development") {
+    return;
+  }
+  try {
+    const word = await db.Word.findByPk(1);
+    if (word) {
+      sendSlack("[준비] 캐나다용 DB 깨우기 성공");
+    }
+  } catch (e) {
+    sendSlack("[준비] 캐나다용 DB 깨우기 실패");
+  }
+});
+
+// 캐나다용 메시지 발송
+cron.schedule("4 13 * * *", async () => {
+  if (process.env.NODE_ENV === "development") {
+    return;
+  }
+  try {
+    try {
+      const count = await sendDailyMessage("basic", "EN");
+      sendSlack(`[일일 메시지] 캐나다 basic: ${count}명에게 메시지 발송`);
+    } catch (error) {
+      if (error.status === 404) {
+        sendSlack(
+          "[일일 메시지] 캐나다 basic: 요청한 사용자를 찾을 수 없습니다."
+        );
+      } else {
+        sendSlack(
+          "[일일 메시지] 캐나다 basic: 서버 오류로 인해 메시지를 발송할 수 없습니다." +
+            error.message
+        );
+      }
+    }
+  } catch (error) {
+    sendSlack("[일일 메시지] 캐나다 basic: 작업 중 오류 발생");
+  }
+});
+
+cron.schedule("5 13 * * *", async () => {
+  if (process.env.NODE_ENV === "development") {
+    return;
+  }
+  try {
+    try {
+      const count = await sendDailyMessage("kpop_lyrics", "EN");
+      sendSlack(`[일일 메시지] 캐나다 kpop_lyrics: ${count}명에게 메시지 발송`);
+    } catch (error) {
+      if (error.status === 404) {
+        sendSlack(
+          "[일일 메시지] 캐나다 kpop_lyrics: 요청한 사용자를 찾을 수 없습니다."
+        );
+      } else {
+        sendSlack(
+          "[일일 메시지] 캐나다 kpop_lyrics: 서버 오류로 인해 메시지를 발송할 수 없습니다." +
+            error.message
+        );
+      }
+    }
+  } catch (error) {
+    sendSlack("[일일 메시지] 캐나다 kpop_lyrics: 작업 중 오류 발생");
+  }
+});
+
+cron.schedule("6 13 * * *", async () => {
+  if (process.env.NODE_ENV === "development") {
+    return;
+  }
+  try {
+    try {
+      const count = await sendDailyMessage("topik_word", "EN");
+      sendSlack(`[일일 메시지] 캐나다 topik_word: ${count}명에게 메시지 발송`);
+    } catch (error) {
+      if (error.status === 404) {
+        sendSlack(
+          "[일일 메시지] 캐나다 topik_word: 요청한 사용자를 찾을 수 없습니다."
+        );
+      } else {
+        sendSlack(
+          "[일일 메시지] 캐나다 topik_word: 서버 오류로 인해 메시지를 발송할 수 없습니다." +
+            error.message
+        );
+      }
+    }
+  } catch (error) {
+    sendSlack("[일일 메시지] 캐나다 topik_word: 작업 중 오류 발생");
+  }
+});
+
+cron.schedule("7 13 * * *", async () => {
+  if (process.env.NODE_ENV === "development") {
+    return;
+  }
+  try {
+    try {
+      const count = await sendDailyMessage("topik_variation", "EN");
+      sendSlack(
+        `[일일 메시지] 캐나다 topik_variation: ${count}명에게 메시지 발송`
+      );
+    } catch (error) {
+      if (error.status === 404) {
+        sendSlack(
+          "[일일 메시지] 캐나다 topik_variation: 요청한 사용자를 찾을 수 없습니다."
+        );
+      } else {
+        sendSlack(
+          "[일일 메시지] 캐나다 topik_variation: 서버 오류로 인해 메시지를 발송할 수 없습니다." +
+            error.message
+        );
+      }
+    }
+  } catch (error) {
+    sendSlack("[일일 메시지] 캐나다 topik_variation: 작업 중 오류 발생");
+  }
+});
+
+cron.schedule("8 13 * * *", async () => {
+  if (process.env.NODE_ENV === "development") {
+    return;
+  }
+  try {
+    try {
+      const count = await sendDailyMessage("daily_conversation", "EN");
+      sendSlack(
+        `[일일 메시지] 캐나다 daily_conversation: ${count}명에게 메시지 발송`
+      );
+    } catch (error) {
+      if (error.status === 404) {
+        sendSlack(
+          "[일일 메시지] 캐나다 daily_conversation: 요청한 사용자를 찾을 수 없습니다."
+        );
+      } else {
+        sendSlack(
+          "[일일 메시지] 캐나다 daily_conversation: 서버 오류로 인해 메시지를 발송할 수 없습니다." +
+            error.message
+        );
+      }
+    }
+  } catch (error) {
+    sendSlack("[일일 메시지] 캐나다 daily_conversation: 작업 중 오류 발생");
+  }
+});
+
+// 캐나다용 주간 퀴즈
+cron.schedule("12 13 * * 0", async () => {
+  if (process.env.NODE_ENV === "development") {
+    return;
+  }
+
+  try {
+    sendSlack(`[주간 퀴즈] 캐나다 Whatsapp 퀴즈 발송 예약 시작`);
+
+    await sendWeeklyQuiz("whatsapp", "EN");
+
+    sendSlack(`[주간 퀴즈] 캐나다 Whatsapp 퀴즈 발송 예약 완료`);
+  } catch (error) {
+    if (error.status === 404) {
+      sendSlack(
+        "[주간 퀴즈] 캐나다 Whatsapp 요청한 사용자를 찾을 수 없습니다."
+      );
+    } else {
+      sendSlack(
+        "[주간 퀴즈] 캐나다 Whatsapp 서버 오류로 인해 메시지를 발송할 수 없습니다." +
+          error.message
+      );
+    }
+  }
+});
+
+// ------------------------ // 캐나다 ------------------------
 
 module.exports = router;
