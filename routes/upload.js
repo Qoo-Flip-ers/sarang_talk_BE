@@ -28,9 +28,16 @@ const upload = multer({
 // 단일 파일 업로드 API
 router.post("/image", upload.single("image"), async (req, res) => {
   try {
+    console.log("파일 업로드 요청이 들어왔습니다.");
     if (!req.file) {
+      console.error("백엔드 서버 업로드 오류: 파일이 업로드되지 않았습니다.");
       return res.status(400).json({ error: "파일이 업로드되지 않았습니다." });
     }
+
+    console.log(
+      "파일이 백엔드 서버에 성공적으로 업로드되었습니다:",
+      req.file.originalname
+    );
 
     const containerClient = blobServiceClient.getContainerClient(containerName);
     const blobName = `${uuidv4()}${path.extname(req.file.originalname)}`;
@@ -38,20 +45,23 @@ router.post("/image", upload.single("image"), async (req, res) => {
 
     // 파일을 스트림으로 읽어 Azure에 업로드
     const stream = fs.createReadStream(req.file.path);
+    console.log("Azure에 파일 업로드를 시작합니다.");
     await blockBlobClient.uploadStream(stream);
+    console.log("Azure에 파일 업로드가 완료되었습니다:", blobName);
 
     // 임시 파일 삭제
     await fs.promises.unlink(req.file.path);
+    console.log("임시 파일이 삭제되었습니다:", req.file.path);
 
     const url = blockBlobClient.url;
     res.json({ message: "파일이 성공적으로 업로드되었습니다.", url });
   } catch (error) {
     if (error instanceof multer.MulterError) {
       // Multer 에러 처리
-      console.error("파일 업로드 Multer 오류:", error);
+      console.error("백엔드 서버 업로드 Multer 오류:", error);
       return res.status(400).json({ error: error.message });
     }
-    console.error("파일 업로드 오류:", error);
+    console.error("Azure 업로드 오류:", error);
     res.status(500).json({ error: "파일 업로드 중 오류가 발생했습니다." });
   }
 });
