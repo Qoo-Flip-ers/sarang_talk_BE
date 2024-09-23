@@ -22,7 +22,7 @@ const upload = multer({
       cb(new multer.MulterError("LIMIT_UNEXPECTED_FILE", file.fieldname));
     }
   },
-  limits: { files: 1 },
+  limits: { files: 1, fileSize: 10 * 1024 * 1024 }, // 파일 크기 제한을 10MB로 설정
 });
 
 // 단일 파일 업로드 API
