@@ -19,6 +19,7 @@ const webhookRouter = require("./routes/webhook");
 const subscriptionRouter = require("./routes/subscription");
 const authRouter = require("./routes/auth");
 const generateRouter = require("./routes/generate");
+const uploadRouter = require("./routes/upload");
 
 app.use(express.json());
 app.use(cors());
@@ -32,6 +33,7 @@ app.use("/webhook", webhookRouter);
 app.use("/subscription", subscriptionRouter);
 app.use("/auth", authRouter);
 app.use("/generate", generateRouter);
+app.use("/upload", uploadRouter);
 
 app.get("/", (req, res) => {
   res.send("Hello World!");
