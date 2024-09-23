@@ -1,4 +1,3 @@
-// Start of Selection
 const express = require("express");
 const router = express.Router();
 const multer = require("multer");
@@ -27,6 +26,7 @@ const upload = multer({
 
 // 단일 파일 업로드 API
 router.post("/image", upload.single("image"), async (req, res) => {
+  console.log("업로드 라우트가 호출되었습니다.");
   try {
     console.log("파일 업로드 요청이 들어왔습니다.");
     if (!req.file) {
@@ -45,6 +45,9 @@ router.post("/image", upload.single("image"), async (req, res) => {
 
     // 파일을 스트림으로 읽어 Azure에 업로드
     const stream = fs.createReadStream(req.file.path);
+    stream.on("error", (streamErr) => {
+      console.error("스트림 읽기 오류:", streamErr);
+    });
     console.log("Azure에 파일 업로드를 시작합니다.");
     await blockBlobClient.uploadStream(stream);
     console.log("Azure에 파일 업로드가 완료되었습니다:", blobName);
@@ -63,6 +66,8 @@ router.post("/image", upload.single("image"), async (req, res) => {
     }
     console.error("Azure 업로드 오류:", error);
     res.status(500).json({ error: "파일 업로드 중 오류가 발생했습니다." });
+  } finally {
+    console.log("업로드 요청 처리 완료.");
   }
 });
 
