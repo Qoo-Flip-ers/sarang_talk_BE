@@ -12,7 +12,17 @@ const blobServiceClient = BlobServiceClient.fromConnectionString(
 const containerName = "images";
 
 // 임시 디렉토리에 파일을 저장하는 multer 설정
-const upload = multer({ dest: "temp/" });
+const upload = multer({
+  dest: "temp/",
+  fileFilter: (req, file, cb) => {
+    if (file.fieldname === "file") {
+      cb(null, true);
+    } else {
+      cb(new multer.MulterError("LIMIT_UNEXPECTED_FILE", file.fieldname));
+    }
+  },
+  limits: { files: 1 },
+});
 
 // 단일 파일 업로드 API
 router.post("/image", upload.single("file"), async (req, res) => {
