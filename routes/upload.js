@@ -1,3 +1,4 @@
+// Start of Selection
 const express = require("express");
 const router = express.Router();
 const multer = require("multer");
@@ -15,7 +16,7 @@ const containerName = "images";
 const upload = multer({
   dest: "temp/",
   fileFilter: (req, file, cb) => {
-    if (file.fieldname === "file") {
+    if (file.fieldname === "image") {
       cb(null, true);
     } else {
       cb(new multer.MulterError("LIMIT_UNEXPECTED_FILE", file.fieldname));
@@ -25,7 +26,7 @@ const upload = multer({
 });
 
 // 단일 파일 업로드 API
-router.post("/image", upload.single("file"), async (req, res) => {
+router.post("/image", upload.single("image"), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ error: "파일이 업로드되지 않았습니다." });
@@ -45,6 +46,11 @@ router.post("/image", upload.single("file"), async (req, res) => {
     const url = blockBlobClient.url;
     res.json({ message: "파일이 성공적으로 업로드되었습니다.", url });
   } catch (error) {
+    if (error instanceof multer.MulterError) {
+      // Multer 에러 처리
+      console.error("파일 업로드 Multer 오류:", error);
+      return res.status(400).json({ error: error.message });
+    }
     console.error("파일 업로드 오류:", error);
     res.status(500).json({ error: "파일 업로드 중 오류가 발생했습니다." });
   }
