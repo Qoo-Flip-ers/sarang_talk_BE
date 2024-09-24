@@ -473,7 +473,8 @@ router.post("/welcome", async (req, res) => {
         count += await processCategorySubscriptions(
           category,
           [subscriptions[i]],
-          lang
+          lang,
+          true
         );
       }
     }
@@ -688,7 +689,8 @@ const sendDailyMessage = async (category, lang = "ID") => {
 const processCategorySubscriptions = async (
   category,
   subscriptions,
-  lang = "ID"
+  lang = "ID",
+  force = false
 ) => {
   if (category === "daily_conversation") {
     subscriptions.forEach(async (subscription) => {
@@ -724,8 +726,7 @@ const processCategorySubscriptions = async (
               ? process.env.TEMPLATE_EN_DAILY_CONVERSATION
               : process.env.TEMPLATE_DAILY_CONVERSATION,
           messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
-          scheduleType: "fixed",
-          sendAt: getSendAt(lang),
+          ...(force ? {} : { scheduleType: "fixed", sendAt: getSendAt(lang) }),
           contentVariables: JSON.stringify({
             1: todayWord.korean?.trim(),
             2: todayWord.pronunciation?.trim(),
@@ -755,8 +756,9 @@ const processCategorySubscriptions = async (
             to,
             mediaUrl: [todayWord.imageUrl],
             messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
-            scheduleType: "fixed",
-            sendAt: getSendAt(lang, "image"),
+            ...(force
+              ? {}
+              : { scheduleType: "fixed", sendAt: getSendAt(lang, "image") }),
           });
           console.log(
             "이미지 메시지가 예약되었습니다:",
@@ -770,8 +772,9 @@ const processCategorySubscriptions = async (
             to,
             mediaUrl: [todayWord.audioUrl],
             messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
-            scheduleType: "fixed",
-            sendAt: getSendAt(lang, "audio"),
+            ...(force
+              ? {}
+              : { scheduleType: "fixed", sendAt: getSendAt(lang, "audio") }),
           });
           console.log(
             "오디오 메시지가 예약되었습니다:",
@@ -825,8 +828,7 @@ const processCategorySubscriptions = async (
               ? process.env.TEMPLATE_EN_TOPIK_WORD
               : process.env.TEMPLATE_TOPIK_WORD,
           messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
-          scheduleType: "fixed",
-          sendAt: getSendAt(lang),
+          ...(force ? {} : { scheduleType: "fixed", sendAt: getSendAt(lang) }),
           contentVariables: JSON.stringify({
             1: todayWord.korean?.trim(), // korean
             2: todayWord.pronunciation?.trim(), // pronunciation
@@ -852,8 +854,9 @@ const processCategorySubscriptions = async (
             to,
             mediaUrl: [todayWord.imageUrl],
             messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
-            scheduleType: "fixed",
-            sendAt: getSendAt(lang, "image"),
+            ...(force
+              ? {}
+              : { scheduleType: "fixed", sendAt: getSendAt(lang, "image") }),
           });
           console.log(
             "이미지 메시지가 예약되었습니다:",
@@ -867,8 +870,9 @@ const processCategorySubscriptions = async (
             to,
             mediaUrl: [todayWord.audioUrl],
             messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
-            scheduleType: "fixed",
-            sendAt: getSendAt(lang, "audio"),
+            ...(force
+              ? {}
+              : { scheduleType: "fixed", sendAt: getSendAt(lang, "audio") }),
           });
           console.log(
             "오디오 메시지가 예약되었습니다:",
@@ -922,8 +926,7 @@ const processCategorySubscriptions = async (
               ? process.env.TEMPLATE_EN_BASIC
               : process.env.TEMPLATE_BASIC,
           messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
-          scheduleType: "fixed",
-          sendAt: getSendAt(lang),
+          ...(force ? {} : { scheduleType: "fixed", sendAt: getSendAt(lang) }),
           contentVariables: JSON.stringify({
             1: todayWord.korean?.trim(), // korean
             2: todayWord.pronunciation?.trim(), // pronunciation
@@ -953,8 +956,9 @@ const processCategorySubscriptions = async (
             to,
             mediaUrl: [todayWord.imageUrl],
             messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
-            scheduleType: "fixed",
-            sendAt: getSendAt(lang, "image"),
+            ...(force
+              ? {}
+              : { scheduleType: "fixed", sendAt: getSendAt(lang, "image") }),
           });
           console.log(
             "이미지 메시지가 예약되었습니다:",
@@ -968,8 +972,9 @@ const processCategorySubscriptions = async (
             to,
             mediaUrl: [todayWord.audioUrl],
             messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
-            scheduleType: "fixed",
-            sendAt: getSendAt(lang, "audio"),
+            ...(force
+              ? {}
+              : { scheduleType: "fixed", sendAt: getSendAt(lang, "audio") }),
           });
           console.log(
             "오디오 메시지가 예약되었습니다:",
