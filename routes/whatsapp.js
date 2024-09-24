@@ -22,7 +22,7 @@ const client = twilio(
  * /whatsapp/send:
  *   post:
  *     summary: 메시지 전송
- *     description: 카테고리에 해당하는 사용자들에게 메시지를 전송합니다.
+ *     description: 카테고리와 언어에 해당하는 사용자들에게 메시지를 전송합니다.
  *     requestBody:
  *       required: true
  *       content:
@@ -33,6 +33,9 @@ const client = twilio(
  *               category:
  *                 type: string
  *                 description: 메시지를 받을 사용자들의 카테고리
+ *               lang:
+ *                 type: string
+ *                 description: 메시지 언어 (예: 'ID' 또는 'EN')
  *     responses:
  *       200:
  *         description: 메시지 전송 성공
@@ -40,12 +43,12 @@ const client = twilio(
  *         description: 서버 오류
  */
 router.post("/send", async (req, res) => {
-  const category = req.body.category;
+  const { category, lang } = req.body;
   let count = 0;
   const categorizedSubscriptions = {};
 
   // 구독기간이 현재 진행 중인 사용자 목록을 카테고리별로 분류
-  const activeSubscriptions = await fetchActiveSubscriptions(category);
+  const activeSubscriptions = await fetchActiveSubscriptions(category, lang);
   activeSubscriptions.forEach((subscription) => {
     const category = subscription.type || "daily_conversation";
     if (!categorizedSubscriptions[category]) {
@@ -57,13 +60,21 @@ router.post("/send", async (req, res) => {
   // 카테고리별로 함수 실행
   Object.keys(categorizedSubscriptions).forEach(async (category) => {
     const subscriptions = categorizedSubscriptions[category];
-    sendSlack(`카테고리: ${category}, 구독자 수: ${subscriptions.length}`);
-    console.log(`카테고리: ${category}, 구독자 수: ${subscriptions.length}`);
+    sendSlack(
+      `카테고리: ${category}, 언어: ${lang}, 구독자 수: ${subscriptions.length}`
+    );
+    console.log(
+      `카테고리: ${category}, 언어: ${lang}, 구독자 수: ${subscriptions.length}`
+    );
     // 여기에 카테고리별로 실행할 함수를 호출할 수 있습니다.
     await subscriptions.forEach(async (subscription, index) => {
       setTimeout(async () => {
-        count += await processCategorySubscriptions(category, [subscription]);
-      }, index * 200); // 0.5초 간격으로 호출
+        count += await processCategorySubscriptions(
+          category,
+          [subscription],
+          lang
+        );
+      }, index * 200); // 0.2초 간격으로 호출
     });
   });
 
