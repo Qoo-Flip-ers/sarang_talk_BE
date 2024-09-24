@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
       code: { type: DataTypes.STRING, allowNull: true },
       chatId: { type: DataTypes.STRING, allowNull: true },
       codeGeneratedAt: { type: DataTypes.DATE, allowNull: true },
-      language: { type: DataTypes.STRING, allowNull: true, default: "ID" },
+      language: { type: DataTypes.STRING, allowNull: false, default: "ID" },
     },
     {
       sequelize,
