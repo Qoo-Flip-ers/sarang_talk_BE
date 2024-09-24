@@ -23,6 +23,9 @@ const client = twilio(
  *   post:
  *     summary: 메시지 전송
  *     description: 카테고리와 언어에 해당하는 사용자들에게 메시지를 전송합니다.
+ *     tags:
+ *       - WhatsApp
+ *     operationId: sendMessage
  *     requestBody:
  *       required: true
  *       content:
@@ -38,9 +41,23 @@ const client = twilio(
  *                 description: 메시지 언어 (예: 'ID' 또는 'EN')
  *     responses:
  *       200:
- *         description: 메시지 전송 성공
+ *         description: 메시지가 성공적으로 발송되었습니다.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "메시지가 성공적으로 발송되었습니다."
+ *                 count:
+ *                   type: number
+ *                   example: 10
+ *                   description: 메시지를 받은 사용자 수
+ *       404:
+ *         description: 요청한 카테고리 또는 언어에 해당하는 사용자를 찾을 수 없습니다.
  *       500:
- *         description: 서버 오류
+ *         description: 서버 내부 오류로 인해 메시지를 발송할 수 없습니다.
  */
 router.post("/send", async (req, res) => {
   const { category, lang } = req.body;
