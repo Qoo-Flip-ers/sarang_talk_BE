@@ -17,87 +17,6 @@ const client = twilio(
   process.env.TWILIO_AUTH_TOKEN
 );
 
-/**
- * @swagger
- * /whatsapp/send:
- *   post:
- *     summary: 메시지 전송
- *     description: 카테고리와 언어에 해당하는 사용자들에게 메시지를 전송합니다.
- *     tags:
- *       - WhatsApp
- *     operationId: sendMessage
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               category:
- *                 type: string
- *                 description: 메시지를 받을 사용자들의 카테고리
- *               lang:
- *                 type: string
- *                 description: 메시지 언어 (예: 'ID' 또는 'EN')
- *     responses:
- *       200:
- *         description: 메시지가 성공적으로 발송되었습니다.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "메시지가 성공적으로 발송되었습니다."
- *                 count:
- *                   type: number
- *                   example: 10
- *                   description: 메시지를 받은 사용자 수
- *       404:
- *         description: 요청한 카테고리 또는 언어에 해당하는 사용자를 찾을 수 없습니다.
- *       500:
- *         description: 서버 내부 오류로 인해 메시지를 발송할 수 없습니다.
- */
-router.post("/send", async (req, res) => {
-  const { category, lang } = req.body;
-  let count = 0;
-  const categorizedSubscriptions = {};
-
-  // 구독기간이 현재 진행 중인 사용자 목록을 카테고리별로 분류
-  const activeSubscriptions = await fetchActiveSubscriptions(category, lang);
-  activeSubscriptions.forEach((subscription) => {
-    const category = subscription.type || "daily_conversation";
-    if (!categorizedSubscriptions[category]) {
-      categorizedSubscriptions[category] = [];
-    }
-    categorizedSubscriptions[category].push(subscription);
-  });
-
-  // 카테고리별로 함수 실행
-  Object.keys(categorizedSubscriptions).forEach(async (category) => {
-    const subscriptions = categorizedSubscriptions[category];
-    sendSlack(
-      `카테고리: ${category}, 언어: ${lang}, 구독자 수: ${subscriptions.length}`
-    );
-    console.log(
-      `카테고리: ${category}, 언어: ${lang}, 구독자 수: ${subscriptions.length}`
-    );
-    // 여기에 카테고리별로 실행할 함수를 호출할 수 있습니다.
-    await subscriptions.forEach(async (subscription, index) => {
-      setTimeout(async () => {
-        count += await processCategorySubscriptions(
-          category,
-          [subscription],
-          lang
-        );
-      }, index * 200); // 0.2초 간격으로 호출
-    });
-  });
-
-  return count;
-});
-
 const sendDailyConversation = async (phoneNumber) => {
   const data = await db.Word.findOne({
     where: { id: 1 },
@@ -513,144 +432,87 @@ router.post("/send-message", async (req, res) => {
 router.post("/welcome", async (req, res) => {
   sendWelcomeMessage();
   return res.json({ message: "WhatsApp 메시지가 성공적으로 발송되었습니다." });
+});
 
-  const messages = [
-    "MMb6846cfd2c181db2f3407e1431a9a469",
-    "MM1de4f433370f8292c19a34b82d2cf721",
-    "MM1b4ee12849cdf7fe39ac45302d270ed5",
-    "MM9aeb0bb74b734b4df19d841e37e3f85d",
-    "MM43f07df479c5a2804a776450907b3d2a",
-    // 5
-    "MM5105cb4a7c82d93806f6028036489c4c",
-    "MMfb2daa6bb3296b3d417b7d7763f7575b",
-    "MMfa8ad297ce8752ef7daade9dfd27947a",
-    "MM48a51b0a86e74c59610c21c0c819420b",
-    "MM9a35fdf40a4dc92940eb1fff823ad1a0",
-    // 10
-    "MMf955a20ecf6b0036ae4a50d4acfee29d",
-    "MM0d30bb1d5c30ee61f08c54d54d9dee90",
-    "MM79989d13cf665114d880a5d85e8a11bf",
-    "MMcf0858a035f1110dfdd1a7c6b9bbabef",
-    "MM6f1705d70ca1c94bd2c9aa677752d724",
+/**
+ * @swagger
+ * /whatsapp/send-lang:
+ *   post:
+ *     summary: 메시지 전송
+ *     description: 카테고리와 언어에 해당하는 사용자들에게 메시지를 전송합니다.
+ *     tags:
+ *       - WhatsApp
+ *     operationId: sendMessage
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               category:
+ *                 type: string
+ *                 description: 메시지를 받을 사용자들의 카테고리
+ *               lang:
+ *                 type: string
+ *                 description: 메시지 언어 (예: 'ID' 또는 'EN')
+ *     responses:
+ *       200:
+ *         description: 메시지가 성공적으로 발송되었습니다.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "메시지가 성공적으로 발송되었습니다."
+ *                 count:
+ *                   type: number
+ *                   example: 10
+ *                   description: 메시지를 받은 사용자 수
+ *       404:
+ *         description: 요청한 카테고리 또는 언어에 해당하는 사용자를 찾을 수 없습니다.
+ *       500:
+ *         description: 서버 내부 오류로 인해 메시지를 발송할 수 없습니다.
+ */
+router.post("/send-lang", async (req, res) => {
+  const { category, lang } = req.body;
+  let count = 0;
+  const categorizedSubscriptions = {};
 
-    "MM45d2f50dea6cb75f7fce3a9655007f44",
-    "MM88faf830517ea1f685dc04a230f995db",
-  ];
-
-  messages.forEach(async (message) => {
-    await client.messages(message).update({ status: "canceled" });
+  // 구독기간이 현재 진행 중인 사용자 목록을 카테고리별로 분류
+  const activeSubscriptions = await fetchActiveSubscriptions(category, lang);
+  activeSubscriptions.forEach((subscription) => {
+    const category = subscription.type || "daily_conversation";
+    if (!categorizedSubscriptions[category]) {
+      categorizedSubscriptions[category] = [];
+    }
+    categorizedSubscriptions[category].push(subscription);
   });
-  // const users = [
-  //   // "+821020252266",
-  //   "+6287784039186",
-  //   "+6282196021955",
-  //   "+6281350486256",
-  //   "+6282124287932",
-  //   "+628895668019",
-  //   "+628114533384",
-  //   "+6285704604552",
-  //   "+6283114217689",
-  //   "+628567002423",
-  //   "+821033308957",
-  //   "+821045709002",
-  // ];
 
-  // const sendTodayEmptyMessage = async (to) => {
-  //   await client.messages.create(
-  //     {
-  //       from: process.env.FROM_PHONE_NUMBER,
-  //       to,
-  //       contentSid: process.env.TEMPLATE_TOPIK_VARIATION,
-  //       messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
-  //       contentVariables: JSON.stringify({
-  //         1: "다음을 순서에 맞게 배열한 것을 고르십시오.", // 질문
-  //         2: "(가) 과일이 싸고 좋아서 많이 샀습니다. (나) 지난 주말에 장을 보러 마트에 갔습니다. (다) 저렴하게 구입한데다 사은품까지 받아 기분이 좋았습니다. (라) 마트 행사 중이라 사은품도 받았습니다.", // 보기
-  //         3: "① (가) - (나) - (라) - (다)", // 정답
-  //         4: "② (나) - (가) - (라) - (다)", // 정답
-  //         5: "③ (가) - (다) - (나) - (라)", // 정답
-  //         6: "④ (나) - (다) - (라) - (가)", // 정답
-  //         7: "② (나) - (가) - (라) - (다)", // 정답
-  //         8: "Jawaban yang benar adalah ② (나) - (가) - (라) - (다). Urutan ini secara akurat mencerminkan urutan temporal peristiwa yang dijelaskan dalam kalimat. Pilihan lain tidak cocok karena salah mencerminkan urutan kronologis kejadian. ① (가) - (나) - (라) - (다): Urutan ini menyiratkan bahwa pembicara membeli buah terlebih dahulu dan kemudian pergi ke supermarket, yang tidak sesuai dengan konteksnya. ③ (가) - (다) - (나) - (라): Urutan ini menyiratkan bahwa pembicara pergi ke supermarket setelah menerima hadiah gratis, namun ini tidak sesuai dengan konteksnya. ④ (나) - (다) - (라) - (가): Urutan ini menyiratkan bahwa pembicara menerima hadiah gratis sebelum membeli buah tersebut, yang tidak sesuai dengan konteksnya.", // 해설
-  //       }),
-  //       // contentVariables: JSON.stringify({
-  //       //   1: "힘내다", // korean
-  //       //   2: "himnaeda", // korean
-  //       //   3: "Bersemangat", // pronunciation
-  //       //   4: "시험 잘 보세요. 힘내세요!", // description
-  //       //   5: "siheom jal boseyo. himnaeseyo!", // example_1
-  //       //   6: "Semoga sukses ujianmu. Semangat!", // example_2
-  //       // }),
-  //       // scheduleType: "fixed",
-  //       // sendAt: new Date(Date.UTC(2024, 6, 1, 2, 0, 0, 0)).toISOString(), // UTC 기준으로 한국 시간 오전 11시로 설정
-  //     },
-  //     (error) => {
-  //       console.log(error);
-  //     }
-  //   );
-  // };
+  // 카테고리별로 함수 실행
+  Object.keys(categorizedSubscriptions).forEach(async (category) => {
+    const subscriptions = categorizedSubscriptions[category];
+    sendSlack(
+      `카테고리: ${category}, 언어: ${lang}, 구독자 수: ${subscriptions.length}`
+    );
+    console.log(
+      `카테고리: ${category}, 언어: ${lang}, 구독자 수: ${subscriptions.length}`
+    );
+    // 여기에 카테고리별로 실행할 함수를 호출할 수 있습니다.
+    await subscriptions.forEach(async (subscription, index) => {
+      setTimeout(async () => {
+        count += await processCategorySubscriptions(
+          category,
+          [subscription],
+          lang
+        );
+      }, index * 200); // 0.2초 간격으로 호출
+    });
+  });
 
-  // users.forEach(async (user) => {
-  //   sendTodayEmptyMessage(`whatsapp:${user}`);
-  // });
-  return;
-
-  // const response = await client.messages.create(
-  //   {
-  //     from: process.env.FROM_PHONE_NUMBER,
-  //     to: "whatsapp:+6281319705099",
-  //     contentSid: process.env.TEMPLATE_DAILY_CONVERSATION,
-  //     messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
-  //     contentVariables: JSON.stringify({
-  //       1: "답답하다", // korean
-  //       2: "dapdapada", // pronunciation
-  //       3: "Perasaan tertekan, jengkel, frustasi", // description
-  //       4: "이 상황이 정말 답답해요.", // example_1
-  //       5: "i sanghwangi jeongmal dapdapaeyo", // example_2 (예문 발음기호)
-  //       6: "Situasi ini sangat membuat frustrasi", // example_3 (에문 설명)
-  //     }),
-  //     // scheduleType: "fixed",
-  //     // sendAt: new Date(Date.UTC(2024, 6, 1, 2, 0, 0, 0)).toISOString(), // UTC 기준으로 한국 시간 오전 11시로 설정
-  //   },
-  //   (error) => {
-  //     console.log(error);
-  //   }
-  // );
-  // const response2 = await client.messages.create(
-  //   {
-  //     from: process.env.FROM_PHONE_NUMBER,
-  //     to: "whatsapp:+6281324602755",
-  //     contentSid: process.env.TEMPLATE_WELCOME,
-  //     messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
-  //     // scheduleType: "fixed",
-  //     // sendAt: new Date(Date.UTC(2024, 6, 1, 2, 0, 0, 0)).toISOString(), // UTC 기준으로 한국 시간 오전 11시로 설정
-  //   },
-  //   (error) => {
-  //     console.log(error);
-  //   }
-  // );
-  // return;
-  //   {
-  //     from: process.env.FROM_PHONE_NUMBER,
-  //     to: "whatsapp:+821020252266",
-  //     contentSid: process.env.TEMPLATE_TOPIK_VARIATION_TEXT,
-  //     messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
-  //     // scheduleType: "fixed",
-  //     // sendAt: new Date(new Date().setHours(7, 20, 0, 0)).toISOString(),
-  //     contentVariables: JSON.stringify({
-  //       1: "다음 밑줄 친 부분과 의미가 비슷한 것을 고르십시오", // 질문
-  //       2: "태어난 지 얼마 안 되어 서울로 왔으니 서울이 고향인 셈이다.", // 보기
-  //       3: "① 고향일 뿐이다", // 정답
-  //       4: "② 고향이면 좋겠다", // 정답
-  //       5: "③ 고향일 리가 없다", // 정답
-  //       6: "④ 고향이나 마찬가지이다", // 정답
-  //       7: "④ 고향이나 마찬가지이다", // 정답
-  //       8: "Jawaban yang benar adalah ④ 고향이나 마찬가지이다 (Sama dengan kampung halamanku) Dalam konteksnya, ungkapan ini berarti bahwa meskipun “Seoul” bukan tempat kelahiran pembicara, namun ia sudah lama tinggal di sana dan menganggapnya sebagai kampung halamannya.", // 해설
-  //     }),
-  //   },
-  //   (error) => {
-  //     console.log(error);
-  //   }
-  // );
+  return count;
 });
 
 // 구독기간이 현재 진행 중인 사용자 목록을 가져오는 함수
