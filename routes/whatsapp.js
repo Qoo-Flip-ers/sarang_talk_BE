@@ -457,7 +457,7 @@ router.post("/welcome", async (req, res) => {
  *                 type: string
  *                 description: 메시지 언어 (예: 'ID' 또는 'EN')
  *     responses:
- *       200:
+ *       '200':
  *         description: 메시지가 성공적으로 발송되었습니다.
  *         content:
  *           application/json:
@@ -471,48 +471,68 @@ router.post("/welcome", async (req, res) => {
  *                   type: number
  *                   example: 10
  *                   description: 메시지를 받은 사용자 수
- *       404:
+ *       '404':
  *         description: 요청한 카테고리 또는 언어에 해당하는 사용자를 찾을 수 없습니다.
- *       500:
+ *       '500':
  *         description: 서버 내부 오류로 인해 메시지를 발송할 수 없습니다.
  */
 router.post("/send-lang", async (req, res) => {
-  const { category, lang } = req.body;
-  let count = 0;
-  const categorizedSubscriptions = {};
+  try {
+    const { category, lang } = req.body;
+    let count = 0;
+    const categorizedSubscriptions = {};
 
-  // 구독기간이 현재 진행 중인 사용자 목록을 카테고리별로 분류
-  const activeSubscriptions = await fetchActiveSubscriptions(category, lang);
-  activeSubscriptions.forEach((subscription) => {
-    const category = subscription.type || "daily_conversation";
-    if (!categorizedSubscriptions[category]) {
-      categorizedSubscriptions[category] = [];
-    }
-    categorizedSubscriptions[category].push(subscription);
-  });
+    // 구독기간이 현재 진행 중인 사용자 목록을 카테고리별로 분류
+    const activeSubscriptions = await fetchActiveSubscriptions(category, lang);
+    activeSubscriptions.forEach((subscription) => {
+      const category = subscription.type || "daily_conversation";
+      if (!categorizedSubscriptions[category]) {
+        categorizedSubscriptions[category] = [];
+      }
+      categorizedSubscriptions[category].push(subscription);
+    });
 
-  // 카테고리별로 함수 실행
-  Object.keys(categorizedSubscriptions).forEach(async (category) => {
-    const subscriptions = categorizedSubscriptions[category];
-    sendSlack(
-      `카테고리: ${category}, 언어: ${lang}, 구독자 수: ${subscriptions.length}`
-    );
-    console.log(
-      `카테고리: ${category}, 언어: ${lang}, 구독자 수: ${subscriptions.length}`
-    );
-    // 여기에 카테고리별로 실행할 함수를 호출할 수 있습니다.
-    await subscriptions.forEach(async (subscription, index) => {
-      setTimeout(async () => {
+    // 카테고리별로 함수 실행
+    for (const category of Object.keys(categorizedSubscriptions)) {
+      const subscriptions = categorizedSubscriptions[category];
+      sendSlack(
+        `카테고리: ${category}, 언어: ${lang}, 구독자 수: ${subscriptions.length}`
+      );
+      console.log(
+        `카테고리: ${category}, 언어: ${lang}, 구독자 수: ${subscriptions.length}`
+      );
+
+      for (let i = 0; i < subscriptions.length; i++) {
+        await new Promise((resolve) => setTimeout(resolve, 200)); // 0.2초 간격으로 호출
         count += await processCategorySubscriptions(
           category,
-          [subscription],
+          [subscriptions[i]],
           lang
         );
-      }, index * 200); // 0.2초 간격으로 호출
-    });
-  });
+      }
+    }
 
-  return count;
+    res.status(200).json({
+      message: "메시지가 성공적으로 발송되었습니다.",
+      count: count,
+    });
+  } catch (error) {
+    console.error(error);
+    if (error.status === 404) {
+      res
+        .status(404)
+        .json({
+          message:
+            "요청한 카테고리 또는 언어에 해당하는 사용자를 찾을 수 없습니다.",
+        });
+    } else {
+      res
+        .status(500)
+        .json({
+          message: "서버 내부 오류로 인해 메시지를 발송할 수 없습니다.",
+        });
+    }
+  }
 });
 
 // 구독기간이 현재 진행 중인 사용자 목록을 가져오는 함수
