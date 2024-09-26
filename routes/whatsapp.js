@@ -215,7 +215,8 @@ router.post("/topik_word", async (req, res) => {
  * /whatsapp/daily:
  *   post:
  *     summary: 일일 대화 메시지 발송
- *     description: 등록된 사용자의 전화번호로 일일 대화 관련 WhatsApp 메시지를 발송합니다.
+ *     description: 특정 사용자에게 일일 대화 메시지를 발송합니다.
+ *     tags: [WhatsApp]
  *     requestBody:
  *       required: true
  *       content:
@@ -226,11 +227,13 @@ router.post("/topik_word", async (req, res) => {
  *               phoneNumber:
  *                 type: string
  *                 description: 사용자의 전화번호
+ *                 example: "+821020252266"
  *               lang:
  *                 type: string
- *                 description: 언어 코드 (예: 'EN' 또는 'ID')
+ *                 description: 메시지 언어 (EN 또는 ID)
+ *                 example: "EN"
  *     responses:
- *       '200':
+ *       200:
  *         description: 메시지가 성공적으로 발송되었습니다.
  *         content:
  *           application/json:
@@ -246,15 +249,13 @@ router.post("/topik_word", async (req, res) => {
  *                     status:
  *                       type: string
  *                       example: "sent"
- *       '404':
- *         description: 요청한 사용자를 찾을 수 없습니다.
- *       '500':
+ *       404:
+ *         description: 오늘의 단어가 없습니다.
+ *       500:
  *         description: 서버 내부 오류로 인해 메시지를 발송할 수 없습니다.
  */
-router.get("/daily", async (req, res) => {
-  // const { phoneNumber, lang } = req.body;
-  const phoneNumber = "+821020252266";
-  const lang = "EN";
+router.post("/daily", async (req, res) => {
+  const { phoneNumber = "+821020252266", lang = "EN" } = req.body;
 
   const todayWord = await db.Word.findOne({
     where: {
