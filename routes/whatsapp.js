@@ -90,7 +90,7 @@ const sendDailyConversation = async (phoneNumber) => {
 
 /**
  * @swagger
- * /whatsapp/daily-conversation:
+ * /whatsapp/daily:
  *   post:
  *     summary: 일일 대화 메시지 발송
  *     description: 등록된 사용자의 전화번호로 일일 대화 관련 WhatsApp 메시지를 발송합니다.
@@ -131,7 +131,7 @@ const sendDailyConversation = async (phoneNumber) => {
  *       '500':
  *         description: 서버 내부 오류로 인해 메시지를 발송할 수 없습니다.
  */
-router.post("/daily-conversation", async (req, res) => {
+router.post("/daily", async (req, res) => {
   const { phoneNumber, lang } = req.body;
 
   const todayWord = await db.Word.findOne({
