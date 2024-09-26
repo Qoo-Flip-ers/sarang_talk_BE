@@ -177,7 +177,7 @@ router.post("/", async (req, res) => {
     }
   }
 
-  const month = Number(plan.split("_")[1]);
+  const month = duration;
 
   const endDate = new Date(startDate);
   endDate.setMonth(startDate.getMonth() + month);
