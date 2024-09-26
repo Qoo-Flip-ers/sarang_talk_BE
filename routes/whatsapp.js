@@ -285,10 +285,7 @@ router.post("/daily", async (req, res) => {
       from: process.env.FROM_PHONE_NUMBER,
       // messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
       to,
-      contentSid:
-        lang === "EN"
-          ? process.env.TEMPLATE_EN_DAILY_CONVERSATION
-          : process.env.TEMPLATE_DAILY_CONVERSATION,
+      contentSid: process.env.TEMPLATE_EN_WITH_MEDIA,
       contentVariables: JSON.stringify({
         1: todayWord.korean?.trim(),
         2: todayWord.pronunciation?.trim(),
@@ -302,28 +299,9 @@ router.post("/daily", async (req, res) => {
           lang === "EN"
             ? todayWord.en_example_3?.trim()
             : todayWord.example_3?.trim(),
+        7: "video/d31417cc-dd9e-4297-be87-7f2158d3aaf6.mp4",
       }),
     });
-
-    console.log("예약된 메시지가 다음 사용자에게 전송되었습니다:", phoneNumber);
-    console.log("이미지 메시지가 5초 후에 전송되었습니다");
-    setTimeout(() => {
-      client.messages.create({
-        from: process.env.FROM_PHONE_NUMBER,
-        to,
-        body: "안녕하세요, 무엇을 도와드릴까요?", // 메시지 내용
-      });
-    }, 5000);
-
-    setTimeout(() => {
-      client.messages.create({
-        from: process.env.FROM_PHONE_NUMBER,
-        to,
-        mediaUrl: [
-          "https://annyeongwa.blob.core.windows.net/word-speech/8a3ba6fb-fda9-4e5b-b760-9653c4bdf42c.mp3",
-        ],
-      });
-    }, 10000);
 
     // if (todayWord.audioUrl) {
     //   setTimeout(async () => {
