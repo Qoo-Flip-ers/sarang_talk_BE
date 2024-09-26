@@ -275,8 +275,8 @@ router.post("/combine-gif-audio", async (req, res) => {
 
     // 임시 파일로 저장
     await Promise.all([
-      fs.writeFile(tempGifPath, Buffer.from(gifResponse.data)),
-      fs.writeFile(tempAudioPath, Buffer.from(audioResponse.data)),
+      fs.promises.writeFile(tempGifPath, Buffer.from(gifResponse.data)),
+      fs.promises.writeFile(tempAudioPath, Buffer.from(audioResponse.data)),
     ]);
 
     // FFmpeg를 사용하여 GIF와 오디오 합성
@@ -304,9 +304,9 @@ router.post("/combine-gif-audio", async (req, res) => {
 
     // 임시 파일들 삭제
     await Promise.all([
-      fs.unlink(tempGifPath),
-      fs.unlink(tempAudioPath),
-      fs.unlink(tempOutputPath),
+      fs.promises.unlink(tempGifPath),
+      fs.promises.unlink(tempAudioPath),
+      fs.promises.unlink(tempOutputPath),
     ]);
 
     // 업로드된 파일의 URL 반환
