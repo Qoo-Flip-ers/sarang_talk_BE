@@ -306,25 +306,28 @@ router.post("/daily", async (req, res) => {
     });
 
     console.log("예약된 메시지가 다음 사용자에게 전송되었습니다:", phoneNumber);
-
     if (todayWord.imageUrl) {
-      await client.messages.create({
-        from: process.env.FROM_PHONE_NUMBER,
-        to,
-        mediaUrl: [todayWord.imageUrl],
-        messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
-      });
-      console.log("이미지 메시지가 전송되었습니다");
+      setTimeout(async () => {
+        await client.messages.create({
+          from: process.env.FROM_PHONE_NUMBER,
+          to,
+          mediaUrl: [todayWord.imageUrl],
+          messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
+        });
+        console.log("이미지 메시지가 5초 후에 전송되었습니다");
+      }, 5000);
     }
 
     if (todayWord.audioUrl) {
-      await client.messages.create({
-        from: process.env.FROM_PHONE_NUMBER,
-        to,
-        mediaUrl: [todayWord.audioUrl],
-        messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
-      });
-      console.log("오디오 메시지가 전송되었습니다");
+      setTimeout(async () => {
+        await client.messages.create({
+          from: process.env.FROM_PHONE_NUMBER,
+          to,
+          mediaUrl: [todayWord.audioUrl],
+          messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
+        });
+        console.log("오디오 메시지가 10초 후에 전송되었습니다");
+      }, 10000);
     }
 
     res.status(200).json({
