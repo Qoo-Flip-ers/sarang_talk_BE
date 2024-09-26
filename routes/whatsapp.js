@@ -308,16 +308,19 @@ router.post("/daily", async (req, res) => {
     console.log("예약된 메시지가 다음 사용자에게 전송되었습니다:", phoneNumber);
     await client.messages.create({
       from: process.env.FROM_PHONE_NUMBER,
-      // messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
+      messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
       // contentSid: process.env.TEMPLATE_EN_WITH_MEDIA,
       to,
-      mediaUrl: [
-        "https://annyeongwa.blob.core.windows.net/word-speech/1b3668d5-d646-4407-8a52-683a5c5a88f7.ogg",
-      ],
+      body: "안녕하세요! 도움이 필요하시면 여기에 답장해주세요.",
     });
     console.log("이미지 메시지가 5초 후에 전송되었습니다");
-    if (todayWord.imageUrl) {
-    }
+    setTimeout(() => {
+      client.messages.create({
+        from: process.env.FROM_PHONE_NUMBER,
+        to,
+        body: "안녕하세요, 무엇을 도와드릴까요?", // 메시지 내용
+      });
+    }, 5000);
 
     // if (todayWord.audioUrl) {
     //   setTimeout(async () => {
