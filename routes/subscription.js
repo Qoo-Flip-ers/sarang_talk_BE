@@ -87,12 +87,29 @@ router.post("/", async (req, res) => {
     console.log("테스트");
     return;
   }
-  const { name, phoneNumber, email, type, quiz, zoom, plan, test, lang } =
-    req.body;
 
-  console.log("new", req.body);
+  const {
+    name,
+    phoneNumber,
+    email,
+    lang,
+    plan,
+    platform,
+    duration,
+    zoom_mentoring,
+    test,
+  } = req.body;
 
-  if (!name || !phoneNumber || !email || !type || !plan) {
+  console.log("새로운 요청:", req.body);
+  // 새로운 형식을 기존 형식으로 변환
+  const type = plan[0] || "";
+  const zoom = zoom_mentoring[0] === "yes" ? "zoom" : "";
+  const convertedPlan = `${platform[0]}_${duration[0]}`;
+  const convertedLang = lang[0] || "";
+  const convertedTest = test[0] === "true" ? true : false;
+
+  // 기존 유효성 검사 로직
+  if (!name || !phoneNumber || !email || !type || !convertedPlan) {
     console.log("[error] 모든 필드를 입력해주세요.");
     return res.status(400).json({ error: "모든 필드를 입력해주세요." });
   }
@@ -120,7 +137,7 @@ router.post("/", async (req, res) => {
   ];
 
   const formattingType = type.split(",").map((t) => t.trim());
-  const formattingQuiz = quiz ? quiz.split(",").map((t) => t.trim()) : [];
+
   const formattingZoom = zoom ? zoom.split(",").map((t) => t.trim()) : [];
 
   if (
@@ -141,7 +158,8 @@ router.post("/", async (req, res) => {
     "whatsapp_3",
     "whatsapp_12",
   ];
-  if (plan.length === 0 || !validPlans.includes(plan)) {
+
+  if (!validPlans.includes(convertedPlan)) {
     console.log("[error] 유효하지 않은 플랜이 포함되어 있습니다.");
     return res
       .status(400)
@@ -166,12 +184,12 @@ router.post("/", async (req, res) => {
   let code;
   let codeGeneratedAt;
 
-  if (plan.includes("telegram")) {
+  if (convertedPlan.includes("telegram")) {
     code = uuidv4();
     codeGeneratedAt = new Date();
   }
 
-  if (test) {
+  if (convertedTest) {
     sendSlack(`[테스트] 테스트 값이 들어왔습니다. ${test} , ${typeof test}`);
     console.log("테스트모드");
     return res.status(200).json({
@@ -192,11 +210,10 @@ router.post("/", async (req, res) => {
       email,
       startDate,
       endDate,
-      quiz: formattingQuiz,
       zoom: formattingZoom,
       code,
       codeGeneratedAt,
-      lang: lang ? lang.toUpperCase() : "ID",
+      lang: convertedLang.toUpperCase(),
     })
   );
 
