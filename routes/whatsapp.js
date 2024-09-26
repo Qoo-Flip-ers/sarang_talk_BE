@@ -94,8 +94,6 @@ const sendDailyConversation = async (phoneNumber) => {
  *   post:
  *     summary: 일일 대화 메시지 발송
  *     description: 등록된 사용자의 전화번호로 일일 대화 관련 WhatsApp 메시지를 발송합니다.
- *     tags:
- *       - WhatsApp
  *     requestBody:
  *       required: true
  *       content:
