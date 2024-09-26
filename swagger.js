@@ -6,7 +6,7 @@ const options = {
     openapi: "3.0.0",
     info: {
       title: "Express API with Swagger",
-      version: "1.0.0",
+      version: "1.0.1",
       description:
         "A simple CRUD API application with Express and documented with Swagger",
     },
