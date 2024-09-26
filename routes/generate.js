@@ -279,17 +279,38 @@ router.post("/combine-gif-audio", async (req, res) => {
       fs.promises.writeFile(tempAudioPath, Buffer.from(audioResponse.data)),
     ]);
 
+    // GIF와 오디오 길이 확인
+    const [gifDuration, audioDuration] = await Promise.all([
+      getGifDuration(tempGifPath),
+      getAudioDuration(tempAudioPath),
+    ]);
+
+    // 더 긴 길이 계산
+    const maxDuration = Math.max(gifDuration, audioDuration);
+
+    // 오디오 시작 시간 계산 (전체 길이에서 오디오 길이를 뺀 시간)
+    const audioStartTime = Math.max(0, maxDuration - audioDuration);
+
     // FFmpeg를 사용하여 GIF와 오디오 합성
     await new Promise((resolve, reject) => {
       ffmpeg()
         .input(tempGifPath)
+        .inputOptions([
+          `-stream_loop ${Math.ceil(maxDuration / gifDuration) - 1}`,
+        ])
         .input(tempAudioPath)
         .outputOptions([
           "-c:v libx264",
           "-c:a aac",
           "-strict experimental",
           "-pix_fmt yuv420p",
-          "-shortest",
+          `-t ${maxDuration}`,
+          "-filter_complex",
+          `[1:a]adelay=${Math.floor(audioStartTime * 1000)}|${Math.floor(
+            audioStartTime * 1000
+          )}[delayedaudio];[0:v][delayedaudio]concat=n=1:v=1:a=1[v][a]`,
+          "-map [v]",
+          "-map [a]",
         ])
         .on("end", resolve)
         .on("error", reject)
@@ -319,5 +340,25 @@ router.post("/combine-gif-audio", async (req, res) => {
       .json({ error: "GIF와 오디오 합성 중 오류가 발생했습니다." });
   }
 });
+
+// GIF 길이 확인 함수
+async function getGifDuration(filePath) {
+  return new Promise((resolve, reject) => {
+    ffmpeg.ffprobe(filePath, (err, metadata) => {
+      if (err) reject(err);
+      else resolve(metadata.format.duration);
+    });
+  });
+}
+
+// 오디오 길이 확인 함수
+async function getAudioDuration(filePath) {
+  return new Promise((resolve, reject) => {
+    ffmpeg.ffprobe(filePath, (err, metadata) => {
+      if (err) reject(err);
+      else resolve(metadata.format.duration);
+    });
+  });
+}
 
 module.exports = router;
