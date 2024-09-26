@@ -201,32 +201,46 @@ router.post("/speech", async (req, res) => {
       return res.status(400).json({ error: "유효하지 않은 입력입니다." });
     }
 
-    // OpenAI TTS API를 사용하여 음성 생성
-    const mp3 = await openai.audio.speech.create({
+    // OpenAI TTS API를 사용하여 음성 생성 (opus 형식으로)
+    const opus = await openai.audio.speech.create({
       model: "tts-1-hd",
       voice: "nova",
       input: word,
       speed: 0.9,
-      response_format: "mp3",
+      response_format: "opus",
     });
 
     // 음성 데이터를 버퍼로 변환
-    const mp3Buffer = Buffer.from(await mp3.arrayBuffer());
+    const opusBuffer = Buffer.from(await opus.arrayBuffer());
 
     // 임시 파일 경로 생성
-    const tempMp3Path = path.join(__dirname, `${uuidv4()}.mp3`);
+    const tempOpusPath = path.join(__dirname, `${uuidv4()}.opus`);
+    const tempOggPath = path.join(__dirname, `${uuidv4()}.ogg`);
 
-    // 임시 MP3 파일 저장
-    await fs.promises.writeFile(tempMp3Path, mp3Buffer);
+    // 임시 Opus 파일 저장
+    await fs.promises.writeFile(tempOpusPath, opusBuffer);
+
+    // Opus를 Ogg로 변환
+    await new Promise((resolve, reject) => {
+      ffmpeg(tempOpusPath)
+        .outputOptions("-c:a libopus")
+        .toFormat("ogg")
+        .on("end", resolve)
+        .on("error", reject)
+        .save(tempOggPath);
+    });
 
     // Azure Blob Storage에 업로드
     const containerClient = blobServiceClient.getContainerClient(containerName);
-    const blobName = `${uuidv4()}.mp3`;
+    const blobName = `${uuidv4()}.ogg`;
     const blockBlobClient = containerClient.getBlockBlobClient(blobName);
-    await blockBlobClient.uploadFile(tempMp3Path);
+    await blockBlobClient.uploadFile(tempOggPath);
 
-    // 임시 파일 삭제
-    await fs.promises.unlink(tempMp3Path);
+    // 임시 파일들 삭제
+    await Promise.all([
+      fs.promises.unlink(tempOpusPath),
+      fs.promises.unlink(tempOggPath),
+    ]);
 
     // 업로드된 파일의 URL 반환
     const url = blockBlobClient.url;
