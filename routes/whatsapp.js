@@ -309,7 +309,7 @@ router.post("/daily", async (req, res) => {
     if (todayWord.imageUrl) {
       setTimeout(async () => {
         await client.messages.create({
-          from: process.env.FROM_PHONE_NUMBER,
+          // from: process.env.FROM_PHONE_NUMBER,
           messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
           to,
           mediaUrl:
@@ -322,7 +322,7 @@ router.post("/daily", async (req, res) => {
     if (todayWord.audioUrl) {
       setTimeout(async () => {
         await client.messages.create({
-          from: process.env.FROM_PHONE_NUMBER,
+          // from: process.env.FROM_PHONE_NUMBER,
           messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
           to,
           mediaUrl: [
