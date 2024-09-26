@@ -324,7 +324,7 @@ router.post("/daily", async (req, res) => {
           lang === "EN"
             ? todayWord.en_example_3?.trim()
             : todayWord.example_3?.trim(),
-        7: "word-speech/1b3668d5-d646-4407-8a52-683a5c5a88f7.ogg",
+        7: "word-speech/3ac855b5-2e14-4ee3-8b71-e2d3d254fa68.ogg",
       }),
     });
     console.log("이미지 메시지가 5초 후에 전송되었습니다");
