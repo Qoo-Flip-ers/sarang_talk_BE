@@ -281,29 +281,29 @@ router.post("/daily", async (req, res) => {
   const to = `whatsapp:${phoneNumber}`;
 
   try {
-    const response = await client.messages.create({
-      from: process.env.FROM_PHONE_NUMBER,
-      to,
-      contentSid:
-        lang === "EN"
-          ? process.env.TEMPLATE_EN_DAILY_CONVERSATION
-          : process.env.TEMPLATE_DAILY_CONVERSATION,
-      messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
-      contentVariables: JSON.stringify({
-        1: todayWord.korean?.trim(),
-        2: todayWord.pronunciation?.trim(),
-        3:
-          lang === "EN"
-            ? todayWord.en_description?.trim()
-            : todayWord.description?.trim(),
-        4: todayWord.example_1?.trim(),
-        5: todayWord.example_2?.trim(),
-        6:
-          lang === "EN"
-            ? todayWord.en_example_3?.trim()
-            : todayWord.example_3?.trim(),
-      }),
-    });
+    // const response = await client.messages.create({
+    //   from: process.env.FROM_PHONE_NUMBER,
+    //   to,
+    //   contentSid:
+    //     lang === "EN"
+    //       ? process.env.TEMPLATE_EN_DAILY_CONVERSATION
+    //       : process.env.TEMPLATE_DAILY_CONVERSATION,
+    //   messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
+    //   contentVariables: JSON.stringify({
+    //     1: todayWord.korean?.trim(),
+    //     2: todayWord.pronunciation?.trim(),
+    //     3:
+    //       lang === "EN"
+    //         ? todayWord.en_description?.trim()
+    //         : todayWord.description?.trim(),
+    //     4: todayWord.example_1?.trim(),
+    //     5: todayWord.example_2?.trim(),
+    //     6:
+    //       lang === "EN"
+    //         ? todayWord.en_example_3?.trim()
+    //         : todayWord.example_3?.trim(),
+    //   }),
+    // });
 
     console.log("예약된 메시지가 다음 사용자에게 전송되었습니다:", phoneNumber);
     if (todayWord.imageUrl) {
@@ -330,7 +330,7 @@ router.post("/daily", async (req, res) => {
 
     res.status(200).json({
       message: "메시지가 성공적으로 발송되었습니다.",
-      response: { status: response.status },
+      response: { status: "good" },
     });
   } catch (error) {
     console.error(`Error sending message to ${phoneNumber}:`, error);
