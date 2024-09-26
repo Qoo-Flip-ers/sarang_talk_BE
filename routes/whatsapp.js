@@ -251,8 +251,10 @@ router.post("/topik_word", async (req, res) => {
  *       '500':
  *         description: 서버 내부 오류로 인해 메시지를 발송할 수 없습니다.
  */
-router.post("/daily", async (req, res) => {
-  const { phoneNumber, lang } = req.body;
+router.get("/daily", async (req, res) => {
+  // const { phoneNumber, lang } = req.body;
+  const phoneNumber = "+821020252266";
+  const lang = "EN";
 
   const todayWord = await db.Word.findOne({
     where: {
