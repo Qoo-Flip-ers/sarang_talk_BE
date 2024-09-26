@@ -309,8 +309,8 @@ router.post("/daily", async (req, res) => {
     if (todayWord.imageUrl) {
       setTimeout(async () => {
         await client.messages.create({
-          // from: process.env.FROM_PHONE_NUMBER,
-          messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
+          from: process.env.FROM_PHONE_NUMBER,
+          // messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
           to,
           body: "https://annyeongwa.blob.core.windows.net/images/Frame_6929.png",
         });
@@ -322,7 +322,7 @@ router.post("/daily", async (req, res) => {
       setTimeout(async () => {
         await client.messages.create({
           // from: process.env.FROM_PHONE_NUMBER,
-          messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
+          // messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
           to,
           body: [
             "https://annyeongwa.blob.core.windows.net/images/Frame_6929.png",
