@@ -288,7 +288,6 @@ router.post("/daily", async (req, res) => {
     //     lang === "EN"
     //       ? process.env.TEMPLATE_EN_DAILY_CONVERSATION
     //       : process.env.TEMPLATE_DAILY_CONVERSATION,
-    //   messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
     //   contentVariables: JSON.stringify({
     //     1: todayWord.korean?.trim(),
     //     2: todayWord.pronunciation?.trim(),
@@ -309,7 +308,8 @@ router.post("/daily", async (req, res) => {
     if (todayWord.imageUrl) {
       setTimeout(async () => {
         await client.messages.create({
-          from: process.env.FROM_PHONE_NUMBER,
+          // from: process.env.FROM_PHONE_NUMBER,
+          messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
           to,
           mediaUrl: [todayWord.imageUrl],
         });
@@ -320,7 +320,8 @@ router.post("/daily", async (req, res) => {
     if (todayWord.audioUrl) {
       setTimeout(async () => {
         await client.messages.create({
-          from: process.env.FROM_PHONE_NUMBER,
+          // from: process.env.FROM_PHONE_NUMBER,
+          messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
           to,
           mediaUrl: [todayWord.audioUrl],
         });
