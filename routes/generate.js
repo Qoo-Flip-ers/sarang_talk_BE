@@ -196,53 +196,37 @@ const containerName = "word-speech";
 router.post("/speech", async (req, res) => {
   try {
     const { word } = req.body;
-
     // 입력 유효성 검사
     if (!word || typeof word !== "string") {
       return res.status(400).json({ error: "유효하지 않은 입력입니다." });
     }
 
     // OpenAI TTS API를 사용하여 음성 생성
-    const opus = await openai.audio.speech.create({
+    const mp3 = await openai.audio.speech.create({
       model: "tts-1-hd",
       voice: "nova",
       input: word,
       speed: 0.9,
-      response_format: "opus",
+      response_format: "mp3",
     });
 
     // 음성 데이터를 버퍼로 변환
-    const opusBuffer = Buffer.from(await opus.arrayBuffer());
+    const mp3Buffer = Buffer.from(await mp3.arrayBuffer());
 
     // 임시 파일 경로 생성
-    const tempOpusPath = path.join(__dirname, `${uuidv4()}.opus`);
-    const tempOggPath = path.join(__dirname, `${uuidv4()}.ogg`);
+    const tempMp3Path = path.join(__dirname, `${uuidv4()}.mp3`);
 
-    // 임시 Opus 파일 저장
-    await fs.promises.writeFile(tempOpusPath, opusBuffer);
-
-    // Opus를 OGG로 변환 (Opus 코덱 사용)
-    await new Promise((resolve, reject) => {
-      ffmpeg(tempOpusPath)
-        .audioCodec("libopus")
-        .toFormat("ogg")
-        .on("end", resolve)
-        .on("error", reject)
-        .save(tempOggPath);
-    });
-
-    // 변환된 OGG 파일 읽기
-    const oggBuffer = await fs.promises.readFile(tempOggPath);
+    // 임시 MP3 파일 저장
+    await fs.promises.writeFile(tempMp3Path, mp3Buffer);
 
     // Azure Blob Storage에 업로드
     const containerClient = blobServiceClient.getContainerClient(containerName);
-    const blobName = `${uuidv4()}.ogg`;
+    const blobName = `${uuidv4()}.mp3`;
     const blockBlobClient = containerClient.getBlockBlobClient(blobName);
-    await blockBlobClient.upload(oggBuffer, oggBuffer.length);
+    await blockBlobClient.uploadFile(tempMp3Path);
 
     // 임시 파일 삭제
-    await fs.promises.unlink(tempOpusPath);
-    await fs.promises.unlink(tempOggPath);
+    await fs.promises.unlink(tempMp3Path);
 
     // 업로드된 파일의 URL 반환
     const url = blockBlobClient.url;
