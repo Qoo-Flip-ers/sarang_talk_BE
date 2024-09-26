@@ -281,14 +281,36 @@ router.post("/daily", async (req, res) => {
   const to = `whatsapp:${phoneNumber}`;
 
   try {
-    const response = await client.messages.create({
+    // const response = await client.messages.create({
+    //   from: process.env.FROM_PHONE_NUMBER,
+    //   messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
+    //   to,
+    //   contentSid:
+    //     lang === "EN"
+    //       ? process.env.TEMPLATE_EN_DAILY_CONVERSATION
+    //       : process.env.TEMPLATE_DAILY_CONVERSATION,
+    //   contentVariables: JSON.stringify({
+    //     1: todayWord.korean?.trim(),
+    //     2: todayWord.pronunciation?.trim(),
+    //     3:
+    //       lang === "EN"
+    //         ? todayWord.en_description?.trim()
+    //         : todayWord.description?.trim(),
+    //     4: todayWord.example_1?.trim(),
+    //     5: todayWord.example_2?.trim(),
+    //     6:
+    //       lang === "EN"
+    //         ? todayWord.en_example_3?.trim()
+    //         : todayWord.example_3?.trim(),
+    //   }),
+    // });
+
+    console.log("예약된 메시지가 다음 사용자에게 전송되었습니다:", phoneNumber);
+    await client.messages.create({
       from: process.env.FROM_PHONE_NUMBER,
       messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
+      contentSid: process.env.TEMPLATE_EN_WITH_MEDIA,
       to,
-      contentSid:
-        lang === "EN"
-          ? process.env.TEMPLATE_EN_DAILY_CONVERSATION
-          : process.env.TEMPLATE_DAILY_CONVERSATION,
       contentVariables: JSON.stringify({
         1: todayWord.korean?.trim(),
         2: todayWord.pronunciation?.trim(),
@@ -302,35 +324,26 @@ router.post("/daily", async (req, res) => {
           lang === "EN"
             ? todayWord.en_example_3?.trim()
             : todayWord.example_3?.trim(),
+        7: todayWord.imageUrl,
       }),
     });
-
-    console.log("예약된 메시지가 다음 사용자에게 전송되었습니다:", phoneNumber);
+    console.log("이미지 메시지가 5초 후에 전송되었습니다");
     if (todayWord.imageUrl) {
-      setTimeout(async () => {
-        await client.messages.create({
-          from: process.env.FROM_PHONE_NUMBER,
-          // messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
-          to,
-          body: "https://annyeongwa.blob.core.windows.net/images/Frame_6929.png",
-        });
-        console.log("이미지 메시지가 5초 후에 전송되었습니다");
-      }, 5000);
     }
 
-    if (todayWord.audioUrl) {
-      setTimeout(async () => {
-        await client.messages.create({
-          // from: process.env.FROM_PHONE_NUMBER,
-          // messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
-          to,
-          body: [
-            "https://annyeongwa.blob.core.windows.net/images/Frame_6929.png",
-          ],
-        });
-        console.log("오디오 메시지가 10초 후에 전송되었습니다");
-      }, 10000);
-    }
+    // if (todayWord.audioUrl) {
+    //   setTimeout(async () => {
+    //     await client.messages.create({
+    //       // from: process.env.FROM_PHONE_NUMBER,
+    //       // messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
+    //       to,
+    //       body: [
+    //         "https://annyeongwa.blob.core.windows.net/images/Frame_6929.png",
+    //       ],
+    //     });
+    //     console.log("오디오 메시지가 10초 후에 전송되었습니다");
+    //   }, 10000);
+    // }
 
     res.status(200).json({
       message: "메시지가 성공적으로 발송되었습니다.",
