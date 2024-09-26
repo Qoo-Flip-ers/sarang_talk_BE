@@ -102,7 +102,7 @@ router.post("/", async (req, res) => {
 
   console.log("새로운 요청:", req.body);
   // 새로운 형식을 기존 형식으로 변환
-  const type = plan[0] || "";
+  const type = plan[0] === "beginners" ? "basic" : plan[0] || "";
   const zoom = zoom_mentoring[0] === "yes" ? "zoom" : "";
   const convertedPlan = `${platform[0]}_${duration[0]}`;
   const convertedLang = lang[0] || "";
@@ -130,6 +130,7 @@ router.post("/", async (req, res) => {
   }
   const validTypes = [
     "basic",
+    "beginners",
     "daily_conversation",
     "kpop_lyrics",
     "topik_word",
