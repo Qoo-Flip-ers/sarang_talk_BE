@@ -237,4 +237,73 @@ router.post("/speech", async (req, res) => {
   }
 });
 
+router.post("/combine-gif-audio", async (req, res) => {
+  try {
+    const { gifUrl, audioUrl } = req.body;
+
+    // 입력 유효성 검사
+    if (!gifUrl || !audioUrl) {
+      return res
+        .status(400)
+        .json({ error: "GIF URL과 오디오 URL이 필요합니다." });
+    }
+
+    // 임시 파일 경로 생성
+    const tempGifPath = path.join(__dirname, `${uuidv4()}.gif`);
+    const tempAudioPath = path.join(__dirname, `${uuidv4()}.ogg`);
+    const tempOutputPath = path.join(__dirname, `${uuidv4()}.mp4`);
+
+    // GIF와 오디오 파일 다운로드
+    const [gifResponse, audioResponse] = await Promise.all([
+      axios.get(gifUrl, { responseType: "arraybuffer" }),
+      axios.get(audioUrl, { responseType: "arraybuffer" }),
+    ]);
+
+    // 임시 파일로 저장
+    await Promise.all([
+      fs.writeFile(tempGifPath, Buffer.from(gifResponse.data)),
+      fs.writeFile(tempAudioPath, Buffer.from(audioResponse.data)),
+    ]);
+
+    // FFmpeg를 사용하여 GIF와 오디오 합성
+    await new Promise((resolve, reject) => {
+      ffmpeg()
+        .input(tempGifPath)
+        .input(tempAudioPath)
+        .outputOptions([
+          "-c:v libx264",
+          "-c:a aac",
+          "-strict experimental",
+          "-pix_fmt yuv420p",
+          "-shortest",
+        ])
+        .on("end", resolve)
+        .on("error", reject)
+        .save(tempOutputPath);
+    });
+
+    // Azure Blob Storage에 업로드
+    const containerClient = blobServiceClient.getContainerClient("video");
+    const blobName = `${uuidv4()}.mp4`;
+    const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+    await blockBlobClient.uploadFile(tempOutputPath);
+
+    // 임시 파일들 삭제
+    await Promise.all([
+      fs.unlink(tempGifPath),
+      fs.unlink(tempAudioPath),
+      fs.unlink(tempOutputPath),
+    ]);
+
+    // 업로드된 파일의 URL 반환
+    const url = blockBlobClient.url;
+    res.json({ url });
+  } catch (error) {
+    console.error("GIF와 오디오 합성 오류:", error);
+    res
+      .status(500)
+      .json({ error: "GIF와 오디오 합성 중 오류가 발생했습니다." });
+  }
+});
+
 module.exports = router;
