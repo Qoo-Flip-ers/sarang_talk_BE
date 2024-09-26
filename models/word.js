@@ -22,6 +22,7 @@ module.exports = (sequelize, DataTypes) => {
       en_example_2: { type: DataTypes.STRING, allowNull: true }, // 예문 2
       en_example_3: { type: DataTypes.STRING, allowNull: true }, // 예문 3
       audioUrl: { type: DataTypes.STRING(500), allowNull: true },
+      videoUrl: { type: DataTypes.STRING(500), allowNull: true }, // 비디오 URL 추가
     },
     {
       sequelize,

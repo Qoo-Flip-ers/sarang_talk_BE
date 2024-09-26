@@ -779,7 +779,11 @@ const processCategorySubscriptions = async (
           to,
           contentSid:
             lang === "EN"
-              ? process.env.TEMPLATE_EN_DAILY_CONVERSATION
+              ? todayWord.videoUrl
+                ? process.env.TEMPLATE_EN_WITH_VIDEO
+                : process.env.TEMPLATE_EN_DAILY_CONVERSATION
+              : todayWord.videoUrl
+              ? process.env.TEMPLATE_WITH_VIDEO
               : process.env.TEMPLATE_DAILY_CONVERSATION,
           messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
           ...(force ? {} : { scheduleType: "fixed", sendAt: getSendAt(lang) }),
@@ -796,6 +800,7 @@ const processCategorySubscriptions = async (
               lang === "EN"
                 ? todayWord.en_example_3?.trim()
                 : todayWord.example_3?.trim(),
+            7: todayWord.videoUrl || undefined,
           }),
         });
         console.log(
@@ -806,34 +811,9 @@ const processCategorySubscriptions = async (
         // 메시지 전송 후 lastWordId 업데이트
         await subscription.update({ lastWordId: todayWord.id });
 
-        if (todayWord.imageUrl) {
-          await client.messages.create({
-            from: process.env.FROM_PHONE_NUMBER,
-            to,
-            mediaUrl: [todayWord.imageUrl],
-            messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
-            ...(force
-              ? {}
-              : { scheduleType: "fixed", sendAt: getSendAt(lang, "image") }),
-          });
+        if (todayWord.videoUrl) {
           console.log(
-            "이미지 메시지가 예약되었습니다:",
-            subscription.User.name
-          );
-        }
-
-        if (todayWord.audioUrl) {
-          await client.messages.create({
-            from: process.env.FROM_PHONE_NUMBER,
-            to,
-            mediaUrl: [todayWord.audioUrl],
-            messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
-            ...(force
-              ? {}
-              : { scheduleType: "fixed", sendAt: getSendAt(lang, "audio") }),
-          });
-          console.log(
-            "오디오 메시지가 예약되었습니다:",
+            "비디오가 포함된 메시지가 전송되었습니다:",
             subscription.User.name
           );
         }
@@ -881,7 +861,11 @@ const processCategorySubscriptions = async (
           to,
           contentSid:
             lang === "EN"
-              ? process.env.TEMPLATE_EN_TOPIK_WORD
+              ? todayWord.videoUrl
+                ? process.env.TEMPLATE_EN_WITH_VIDEO
+                : process.env.TEMPLATE_EN_TOPIK_WORD
+              : todayWord.videoUrl
+              ? process.env.TEMPLATE_WITH_VIDEO
               : process.env.TEMPLATE_TOPIK_WORD,
           messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
           ...(force ? {} : { scheduleType: "fixed", sendAt: getSendAt(lang) }),
@@ -898,40 +882,16 @@ const processCategorySubscriptions = async (
               lang === "EN"
                 ? todayWord.en_example_3?.trim()
                 : todayWord.example_3?.trim(), // example_3 (에문 설명)
+            7: todayWord.videoUrl || undefined,
           }),
         });
         console.log("Scheduled message sent to", subscription.User.name);
 
         await subscription.update({ lastWordId: todayWord.id });
 
-        if (todayWord.imageUrl) {
-          await client.messages.create({
-            from: process.env.FROM_PHONE_NUMBER,
-            to,
-            mediaUrl: [todayWord.imageUrl],
-            messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
-            ...(force
-              ? {}
-              : { scheduleType: "fixed", sendAt: getSendAt(lang, "image") }),
-          });
+        if (todayWord.videoUrl) {
           console.log(
-            "이미지 메시지가 예약되었습니다:",
-            subscription.User.name
-          );
-        }
-
-        if (todayWord.audioUrl) {
-          await client.messages.create({
-            from: process.env.FROM_PHONE_NUMBER,
-            to,
-            mediaUrl: [todayWord.audioUrl],
-            messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
-            ...(force
-              ? {}
-              : { scheduleType: "fixed", sendAt: getSendAt(lang, "audio") }),
-          });
-          console.log(
-            "오디오 메시지가 예약되었습니다:",
+            "비디오가 포함된 메시지가 전송되었습니다:",
             subscription.User.name
           );
         }
@@ -979,7 +939,11 @@ const processCategorySubscriptions = async (
           to,
           contentSid:
             lang === "EN"
-              ? process.env.TEMPLATE_EN_BASIC
+              ? todayWord.videoUrl
+                ? process.env.TEMPLATE_EN_WITH_VIDEO
+                : process.env.TEMPLATE_EN_BASIC
+              : todayWord.videoUrl
+              ? process.env.TEMPLATE_WITH_VIDEO
               : process.env.TEMPLATE_BASIC,
           messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
           ...(force ? {} : { scheduleType: "fixed", sendAt: getSendAt(lang) }),
@@ -996,6 +960,7 @@ const processCategorySubscriptions = async (
               lang === "EN"
                 ? todayWord.en_example_3?.trim()
                 : todayWord.example_3?.trim(), // example_3 (에문 설명)
+            7: todayWord.videoUrl || undefined,
           }),
         });
         console.log(
@@ -1006,37 +971,13 @@ const processCategorySubscriptions = async (
         // 메시지 전송 후 lastWordId 업데이트
         await subscription.update({ lastWordId: todayWord.id });
 
-        if (todayWord.imageUrl) {
-          await client.messages.create({
-            from: process.env.FROM_PHONE_NUMBER,
-            to,
-            mediaUrl: [todayWord.imageUrl],
-            messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
-            ...(force
-              ? {}
-              : { scheduleType: "fixed", sendAt: getSendAt(lang, "image") }),
-          });
+        if (todayWord.videoUrl) {
           console.log(
-            "이미지 메시지가 예약되었습니다:",
+            "비디오가 포함된 메시지가 전송되었습니다:",
             subscription.User.name
           );
         }
 
-        if (todayWord.audioUrl) {
-          await client.messages.create({
-            from: process.env.FROM_PHONE_NUMBER,
-            to,
-            mediaUrl: [todayWord.audioUrl],
-            messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
-            ...(force
-              ? {}
-              : { scheduleType: "fixed", sendAt: getSendAt(lang, "audio") }),
-          });
-          console.log(
-            "오디오 메시지가 예약되었습니다:",
-            subscription.User.name
-          );
-        }
         console.log("Scheduled message sent to", subscription.User.name);
 
         await subscription.update({ lastWordId: todayWord.id });
