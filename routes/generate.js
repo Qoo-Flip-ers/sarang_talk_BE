@@ -221,9 +221,10 @@ router.post("/speech", async (req, res) => {
     // 임시 Opus 파일 저장
     await fs.promises.writeFile(tempOpusPath, opusBuffer);
 
-    // Opus를 OGG로 변환
+    // Opus를 OGG로 변환 (Opus 코덱 사용)
     await new Promise((resolve, reject) => {
       ffmpeg(tempOpusPath)
+        .audioCodec("libopus")
         .toFormat("ogg")
         .on("end", resolve)
         .on("error", reject)
