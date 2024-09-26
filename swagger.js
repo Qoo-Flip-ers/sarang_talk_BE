@@ -22,14 +22,24 @@ const options = {
 const swaggerSpec = swaggerJsdoc(options);
 
 function swaggerDocs(app, port) {
-  app.use("/api-docs-whatsapp", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+  app.use(
+    "/api-docs-whatsapp",
+    swaggerUi.serve,
+    swaggerUi.setup(swaggerSpec, {
+      swaggerOptions: { defaultModelsExpandDepth: -1 },
+    })
+  );
   app.get("/api-docs-whatsapp.json", (req, res) => {
     res.setHeader("Content-Type", "application/json");
+    res.setHeader(
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate, private"
+    );
     res.send(swaggerSpec);
   });
 
   console.log(
-    `Swagger docs available at http://localhost:${port}/api-docs-whatsapp`
+    `Swagger 문서는 http://localhost:${port}/api-docs-whatsapp 에서 확인할 수 있습니다`
   );
 }
 
