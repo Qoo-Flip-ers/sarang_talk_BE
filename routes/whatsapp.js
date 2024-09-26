@@ -285,7 +285,7 @@ router.post("/daily", async (req, res) => {
       from: process.env.FROM_PHONE_NUMBER,
       messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
       to,
-      contentSid: process.env.TEMPLATE_EN_WITH_MEDIA,
+      contentSid: process.env.TEMPLATE_EN_WITH_VIDEO,
       contentVariables: JSON.stringify({
         1: todayWord.korean?.trim(),
         2: todayWord.pronunciation?.trim(),
