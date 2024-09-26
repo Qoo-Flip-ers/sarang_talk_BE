@@ -324,7 +324,10 @@ router.post("/daily", async (req, res) => {
           lang === "EN"
             ? todayWord.en_example_3?.trim()
             : todayWord.example_3?.trim(),
-        7: todayWord.imageUrl,
+        7: todayWord.imageUrl.replace(
+          "https://annyeongwa.blob.core.windows.net/",
+          ""
+        ),
       }),
     });
     console.log("이미지 메시지가 5초 후에 전송되었습니다");
