@@ -283,7 +283,7 @@ router.post("/daily", async (req, res) => {
   try {
     const response = await client.messages.create({
       from: process.env.FROM_PHONE_NUMBER,
-      // messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
+      messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
       to,
       contentSid: process.env.TEMPLATE_EN_WITH_MEDIA,
       contentVariables: JSON.stringify({
