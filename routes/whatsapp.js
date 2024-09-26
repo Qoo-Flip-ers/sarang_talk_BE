@@ -308,24 +308,12 @@ router.post("/daily", async (req, res) => {
     console.log("예약된 메시지가 다음 사용자에게 전송되었습니다:", phoneNumber);
     await client.messages.create({
       from: process.env.FROM_PHONE_NUMBER,
-      messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
-      contentSid: process.env.TEMPLATE_EN_WITH_MEDIA,
+      // messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
+      // contentSid: process.env.TEMPLATE_EN_WITH_MEDIA,
       to,
-      contentVariables: JSON.stringify({
-        1: todayWord.korean?.trim(),
-        2: todayWord.pronunciation?.trim(),
-        3:
-          lang === "EN"
-            ? todayWord.en_description?.trim()
-            : todayWord.description?.trim(),
-        4: todayWord.example_1?.trim(),
-        5: todayWord.example_2?.trim(),
-        6:
-          lang === "EN"
-            ? todayWord.en_example_3?.trim()
-            : todayWord.example_3?.trim(),
-        7: "word-speech/3ac855b5-2e14-4ee3-8b71-e2d3d254fa68.ogg",
-      }),
+      mediaUrl: [
+        "https://annyeongwa.blob.core.windows.net/word-speech/1b3668d5-d646-4407-8a52-683a5c5a88f7.ogg",
+      ],
     });
     console.log("이미지 메시지가 5초 후에 전송되었습니다");
     if (todayWord.imageUrl) {
