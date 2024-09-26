@@ -90,6 +90,128 @@ const sendDailyConversation = async (phoneNumber) => {
 
 /**
  * @swagger
+ * /whatsapp/kpop_lyrics:
+ *   post:
+ *     summary: 일일 대화 메시지 발송
+ *     description: 등록된 사용자의 전화번호로 일일 대화 관련 WhatsApp 메시지를 발송합니다.
+ *     tags:
+ *       - WhatsApp
+ *     operationId: sendDailyConversationMessage
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               userId:
+ *                 type: string
+ *                 description: 사용자의 고유 식별자
+ *     responses:
+ *       200:
+ *         description: 메시지가 성공적으로 발송되었습니다.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "메시지가 성공적으로 발송되었습니다."
+ *                 response:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       status:
+ *                         type: string
+ *                         example: "sent"
+ *       404:
+ *         description: 요청한 사용자를 찾을 수 없습니다.
+ *       500:
+ *         description: 서버 내부 오류로 인해 메시지를 발송할 수 없습니다.
+ */
+router.post("/kpop_lyrics", async (req, res) => {
+  try {
+    const result = await sendDailyMessage("kpop_lyrics");
+    res.status(200).json({
+      message: "메시지가 성공적으로 발송되었습니다.",
+      response: result,
+    });
+  } catch (error) {
+    if (error.status === 404) {
+      res.status(404).json({ message: "요청한 사용자를 찾을 수 없습니다." });
+    } else {
+      res
+        .status(500)
+        .json({ message: "서버 오류로 인해 메시지를 발송할 수 없습니다." });
+    }
+  }
+});
+
+/**
+ * @swagger
+ * /whatsapp/topik_word:
+ *   post:
+ *     summary: 일일 대화 메시지 발송
+ *     description: 등록된 사용자의 전화번호로 일일 대화 관련 WhatsApp 메시지를 발송합니다.
+ *     tags:
+ *       - WhatsApp
+ *     operationId: sendDailyConversationMessage
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               userId:
+ *                 type: string
+ *                 description: 사용자의 고유 식별자
+ *     responses:
+ *       200:
+ *         description: 메시지가 성공적으로 발송되었습니다.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "메시지가 성공적으로 발송되었습니다."
+ *                 response:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       status:
+ *                         type: string
+ *                         example: "sent"
+ *       404:
+ *         description: 요청한 사용자를 찾을 수 없습니다.
+ *       500:
+ *         description: 서버 내부 오류로 인해 메시지를 발송할 수 없습니다.
+ */
+router.post("/topik_word", async (req, res) => {
+  try {
+    const result = await sendDailyMessage("topik_word");
+    res.status(200).json({
+      message: "메시지가 성공적으로 발송되었습니다.",
+      response: result,
+    });
+  } catch (error) {
+    if (error.status === 404) {
+      res.status(404).json({ message: "요청한 사용자를 찾을 수 없습니다." });
+    } else {
+      res
+        .status(500)
+        .json({ message: "서버 오류로 인해 메시지를 발송할 수 없습니다." });
+    }
+  }
+});
+
+/**
+ * @swagger
  * /whatsapp/daily:
  *   post:
  *     summary: 일일 대화 메시지 발송
@@ -209,128 +331,6 @@ router.post("/daily", async (req, res) => {
   } catch (error) {
     console.error(`Error sending message to ${phoneNumber}:`, error);
     res.status(500).json({ message: "메시지 발송 중 오류가 발생했습니다." });
-  }
-});
-
-/**
- * @swagger
- * /whatsapp/kpop_lyrics:
- *   post:
- *     summary: 일일 대화 메시지 발송
- *     description: 등록된 사용자의 전화번호로 일일 대화 관련 WhatsApp 메시지를 발송합니다.
- *     tags:
- *       - WhatsApp
- *     operationId: sendDailyConversationMessage
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               userId:
- *                 type: string
- *                 description: 사용자의 고유 식별자
- *     responses:
- *       200:
- *         description: 메시지가 성공적으로 발송되었습니다.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "메시지가 성공적으로 발송되었습니다."
- *                 response:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       status:
- *                         type: string
- *                         example: "sent"
- *       404:
- *         description: 요청한 사용자를 찾을 수 없습니다.
- *       500:
- *         description: 서버 내부 오류로 인해 메시지를 발송할 수 없습니다.
- */
-router.post("/kpop_lyrics", async (req, res) => {
-  try {
-    const result = await sendDailyMessage("kpop_lyrics");
-    res.status(200).json({
-      message: "메시지가 성공적으로 발송되었습니다.",
-      response: result,
-    });
-  } catch (error) {
-    if (error.status === 404) {
-      res.status(404).json({ message: "요청한 사용자를 찾을 수 없습니다." });
-    } else {
-      res
-        .status(500)
-        .json({ message: "서버 오류로 인해 메시지를 발송할 수 없습니다." });
-    }
-  }
-});
-
-/**
- * @swagger
- * /whatsapp/topik_word:
- *   post:
- *     summary: 일일 대화 메시지 발송
- *     description: 등록된 사용자의 전화번호로 일일 대화 관련 WhatsApp 메시지를 발송합니다.
- *     tags:
- *       - WhatsApp
- *     operationId: sendDailyConversationMessage
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               userId:
- *                 type: string
- *                 description: 사용자의 고유 식별자
- *     responses:
- *       200:
- *         description: 메시지가 성공적으로 발송되었습니다.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "메시지가 성공적으로 발송되었습니다."
- *                 response:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       status:
- *                         type: string
- *                         example: "sent"
- *       404:
- *         description: 요청한 사용자를 찾을 수 없습니다.
- *       500:
- *         description: 서버 내부 오류로 인해 메시지를 발송할 수 없습니다.
- */
-router.post("/topik_word", async (req, res) => {
-  try {
-    const result = await sendDailyMessage("topik_word");
-    res.status(200).json({
-      message: "메시지가 성공적으로 발송되었습니다.",
-      response: result,
-    });
-  } catch (error) {
-    if (error.status === 404) {
-      res.status(404).json({ message: "요청한 사용자를 찾을 수 없습니다." });
-    } else {
-      res
-        .status(500)
-        .json({ message: "서버 오류로 인해 메시지를 발송할 수 없습니다." });
-    }
   }
 });
 
