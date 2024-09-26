@@ -59,7 +59,10 @@ async function insertIntoDatabase(data) {
         {
           from: process.env.FROM_PHONE_NUMBER,
           to: `whatsapp:${phoneNumber}`,
-          contentSid: process.env.TEMPLATE_WELCOME_TOMMOROW,
+          contentSid:
+            lang === "EN"
+              ? process.env.TEMPLATE_EN_WELCOME
+              : process.env.TEMPLATE_WELCOME_TOMMOROW,
           messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
         },
         (error) => {
