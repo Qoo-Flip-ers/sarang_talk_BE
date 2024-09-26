@@ -104,9 +104,12 @@ const sendDailyConversation = async (phoneNumber) => {
  *           schema:
  *             type: object
  *             properties:
- *               userId:
+ *               phoneNumber:
  *                 type: string
- *                 description: 사용자의 고유 식별자
+ *                 description: 사용자의 전화번호
+ *               lang:
+ *                 type: string
+ *                 description: 언어 코드 (예: 'EN' 또는 'ID')
  *     responses:
  *       200:
  *         description: 메시지가 성공적으로 발송되었습니다.
@@ -119,33 +122,90 @@ const sendDailyConversation = async (phoneNumber) => {
  *                   type: string
  *                   example: "메시지가 성공적으로 발송되었습니다."
  *                 response:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       status:
- *                         type: string
- *                         example: "sent"
+ *                   type: object
+ *                   properties:
+ *                     status:
+ *                       type: string
+ *                       example: "sent"
  *       404:
  *         description: 요청한 사용자를 찾을 수 없습니다.
  *       500:
  *         description: 서버 내부 오류로 인해 메시지를 발송할 수 없습니다.
  */
 router.post("/daily-conversation", async (req, res) => {
+  const { phoneNumber, lang } = req.body;
+
+  const todayWord = await db.Word.findOne({
+    where: {
+      id: {
+        [db.Sequelize.Op.gt]: 0,
+      },
+      type: {
+        [db.Sequelize.Op.eq]: "daily_conversation",
+      },
+      ...(lang === "EN"
+        ? { en_description: { [db.Sequelize.Op.ne]: null } }
+        : { description: { [db.Sequelize.Op.ne]: null } }),
+    },
+    order: [["id", "ASC"]],
+    limit: 1,
+  });
+
+  if (!todayWord) {
+    sendSlack(`오늘의 단어가 없습니다.`);
+    return;
+  }
+
+  const to = `whatsapp:${phoneNumber}`;
+
   try {
-    const result = await sendDailyMessage("daily_conversation");
-    res.status(200).json({
-      message: "메시지가 성공적으로 발송되었습니다.",
-      response: result,
+    const response = await client.messages.create({
+      from: process.env.FROM_PHONE_NUMBER,
+      to,
+      contentSid:
+        lang === "EN"
+          ? process.env.TEMPLATE_EN_DAILY_CONVERSATION
+          : process.env.TEMPLATE_DAILY_CONVERSATION,
+      messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
+      contentVariables: JSON.stringify({
+        1: todayWord.korean?.trim(),
+        2: todayWord.pronunciation?.trim(),
+        3:
+          lang === "EN"
+            ? todayWord.en_description?.trim()
+            : todayWord.description?.trim(),
+        4: todayWord.example_1?.trim(),
+        5: todayWord.example_2?.trim(),
+        6:
+          lang === "EN"
+            ? todayWord.en_example_3?.trim()
+            : todayWord.example_3?.trim(),
+      }),
     });
-  } catch (error) {
-    if (error.status === 404) {
-      res.status(404).json({ message: "요청한 사용자를 찾을 수 없습니다." });
-    } else {
-      res
-        .status(500)
-        .json({ message: "서버 오류로 인해 메시지를 발송할 수 없습니다." });
+
+    console.log("예약된 메시지가 다음 사용자에게 전송되었습니다:");
+
+    if (todayWord.imageUrl) {
+      await client.messages.create({
+        from: process.env.FROM_PHONE_NUMBER,
+        to,
+        mediaUrl: [todayWord.imageUrl],
+        messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
+      });
+      console.log("이미지 메시지가 예약되었습니다");
     }
+
+    if (todayWord.audioUrl) {
+      await client.messages.create({
+        from: process.env.FROM_PHONE_NUMBER,
+        to,
+        mediaUrl: [todayWord.audioUrl],
+        messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
+      });
+      console.log("오디오 메시지가 예약되었습니다");
+    }
+  } catch (error) {
+    console.error(`Error sending scheduled message to  `);
   }
 });
 
