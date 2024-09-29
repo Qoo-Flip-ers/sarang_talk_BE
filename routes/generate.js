@@ -128,35 +128,54 @@ const puppeteer = require("puppeteer");
  */
 router.get("/pronunciation", async (req, res) => {
   try {
+    console.log("발음 요청 시작");
     const { word } = req.query;
 
     if (!word) {
+      console.log("단어가 제공되지 않음");
       return res.status(400).json({ error: "단어가 제공되지 않았습니다." });
     }
 
+    console.log(`요청된 단어: ${word}`);
     const url = `https://ko.dict.naver.com/#/search?query=${encodeURIComponent(
       word
     )}`;
+    console.log(`네이버 사전 URL: ${url}`);
+
     const browser = await puppeteer.launch({
       headless: true,
       args: ["--no-sandbox", "--disable-setuid-sandbox"],
     });
+    console.log("브라우저 실행됨");
+
     const page = await browser.newPage();
     await page.setUserAgent(
       "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
     );
+    console.log("새 페이지 생성 및 User-Agent 설정");
+
     await page.goto(url, { waitUntil: "networkidle0", timeout: 60000 });
+    console.log("페이지 로드 완료");
 
-    // 전체 발음 듣기 버튼을 기다리고 클릭합니다.
-    await page.waitForSelector("button._listen_global_item.btn_listen.all", {
-      timeout: 10000,
-    });
-    await page.click("button._listen_global_item.btn_listen.all");
+    try {
+      await page.waitForSelector("button._listen_global_item.btn_listen.all", {
+        timeout: 10000,
+      });
+      console.log("전체 발음 듣기 버튼 발견");
+      await page.click("button._listen_global_item.btn_listen.all");
+      console.log("전체 발음 듣기 버튼 클릭");
+    } catch (error) {
+      console.error("전체 발음 듣기 버튼 클릭 실패:", error);
+    }
 
-    // 개별 발음 듣기 버튼이 나타날 때까지 기다립니다.
-    await page.waitForSelector(".btn_listen_global.mp3._btn_play_single", {
-      timeout: 10000,
-    });
+    try {
+      await page.waitForSelector(".btn_listen_global.mp3._btn_play_single", {
+        timeout: 10000,
+      });
+      console.log("개별 발음 듣기 버튼 발견");
+    } catch (error) {
+      console.error("개별 발음 듣기 버튼을 찾지 못함:", error);
+    }
 
     const audioUrl = await page.evaluate(() => {
       const audioElement = document.querySelector(
@@ -164,46 +183,59 @@ router.get("/pronunciation", async (req, res) => {
       );
       return audioElement ? audioElement.getAttribute("data-playobj") : null;
     });
+    console.log(`발견된 오디오 URL: ${audioUrl}`);
 
     await browser.close();
+    console.log("브라우저 종료");
 
     if (!audioUrl) {
+      console.log("발음 파일을 찾을 수 없음");
       return res.status(404).json({ error: "발음 파일을 찾을 수 없습니다." });
     }
 
     if (!audioUrl.startsWith("https://dict-dn.pstatic.net")) {
+      console.log("유효하지 않은 오디오 URL");
       return res.status(400).json({ error: "유효하지 않은 오디오 URL입니다." });
     }
 
-    // 오디오 파일을 Ogg 형식으로 변환하여 Azure 스토리지에 업로드
+    console.log("오디오 파일 다운로드 시작");
     const response = await axios.get(audioUrl, { responseType: "arraybuffer" });
     const audioBuffer = Buffer.from(response.data);
+    console.log("오디오 파일 다운로드 완료");
 
     const tempOggPath = path.join(__dirname, `${uuidv4()}.ogg`);
+    console.log(`임시 Ogg 파일 경로: ${tempOggPath}`);
 
-    // Ogg 파일로 변환
+    console.log("Ogg 파일로 변환 시작");
     await new Promise((resolve, reject) => {
       ffmpeg()
-        .input(Buffer.from(audioBuffer)) // 버퍼를 직접 입력으로 사용
-        .inputFormat("mp3") // 입력 형식을 명시적으로 지정
+        .input(audioBuffer)
+        .inputFormat("mp3")
         .audioCodec("libvorbis")
         .toFormat("ogg")
-        .on("end", resolve)
-        .on("error", reject)
+        .on("end", () => {
+          console.log("Ogg 파일 변환 완료");
+          resolve();
+        })
+        .on("error", (err) => {
+          console.error("Ogg 파일 변환 실패:", err);
+          reject(err);
+        })
         .save(tempOggPath);
     });
 
-    // Azure Blob Storage에 업로드
+    console.log("Azure Blob Storage 업로드 시작");
     const containerClient = blobServiceClient.getContainerClient(containerName);
     const blobName = `${uuidv4()}.ogg`;
     const blockBlobClient = containerClient.getBlockBlobClient(blobName);
     await blockBlobClient.uploadFile(tempOggPath);
+    console.log("Azure Blob Storage 업로드 완료");
 
-    // 임시 파일 삭제
+    console.log("임시 파일 삭제");
     await fs.promises.unlink(tempOggPath);
 
-    // 업로드된 파일의 URL 반환
     const uploadedUrl = blockBlobClient.url;
+    console.log(`업로드된 URL: ${uploadedUrl}`);
     res.json({ audioUrl: uploadedUrl });
   } catch (error) {
     console.error("발음 데이터 가져오기 오류:", error);
