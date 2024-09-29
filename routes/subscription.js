@@ -23,61 +23,48 @@ const sendSlack = async (message) => {
     console.error("Slack 메시지 전송 중 오류 발생:", error);
   }
 };
-
 /**
  * @swagger
  * /subscription:
  *   post:
- *     summary: 사용자 생성
- *     description: 새로운 사용자를 생성하고 구독을 예약합니다. 사용자는 이름, 전화번호, 이메일, 언어, 플랜, 플랫폼, 기간, 줌 멘토링 여부, 테스트 여부를 제공해야 합니다.
- *     tags:
- *       - Subscription
+ *     summary: 사용자 등록
+ *     description: 새로운 사용자를 등록합니다.
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - name
- *               - phoneNumber
- *               - email
- *               - lang
- *               - plan
- *               - platform
- *               - duration
- *               - zoom_mentoring
- *               - test
  *             properties:
  *               name:
  *                 type: string
  *                 description: 사용자 이름
  *               phoneNumber:
  *                 type: string
- *                 description: 사용자 전화번호 (국가 코드 포함)
+ *                 description: 전화번호 (형식: +국가번호번호)
  *               email:
  *                 type: string
- *                 description: 사용자 이메일
+ *                 description: 이메일 주소
  *               lang:
  *                 type: array
  *                 items:
  *                   type: string
- *                 description: 사용자 언어 (예: ["KO", "EN"])
+ *                 description: 언어 (예: ["EN", "KR"])
  *               plan:
  *                 type: array
  *                 items:
  *                   type: string
- *                 description: 구독 플랜 (예: ["beginners", "basic"])
+ *                 description: 구독 계획 (예: ["beginners", "daily_conversation"])
  *               platform:
  *                 type: array
  *                 items:
  *                   type: string
- *                 description: 사용 플랫폼 (예: ["telegram", "whatsapp"])
+ *                 description: 플랫폼 (예: ["whatsapp", "telegram"])
  *               duration:
  *                 type: array
  *                 items:
- *                   type: string
- *                 description: 구독 기간 (예: ["1", "3", "12"])
+ *                   type: integer
+ *                 description: 구독 기간 (개월 수)
  *               zoom_mentoring:
  *                 type: array
  *                 items:
@@ -87,10 +74,10 @@ const sendSlack = async (message) => {
  *                 type: array
  *                 items:
  *                   type: string
- *                 description: 테스트 여부 (예: ["true", "false"])
+ *                 description: 테스트 모드 여부 (예: ["true", "false"])
  *     responses:
  *       200:
- *         description: 성공적으로 예약된 사용자 정보
+ *         description: 사용자 등록이 성공적으로 예약되었습니다.
  *         content:
  *           application/json:
  *             schema:
@@ -98,11 +85,20 @@ const sendSlack = async (message) => {
  *               properties:
  *                 message:
  *                   type: string
- *                   description: 사용자 등록 예약 메시지
+ *                   description: 성공 메시지
+ *                 code:
+ *                   type: string
+ *                   description: 생성된 코드 (텔레그램 플랜에 해당하는 경우)
  *       400:
- *         description: 잘못된 요청 (필수 필드 누락, 형식 오류 등)
- *       500:
- *         description: 서버 오류
+ *         description: 잘못된 요청
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: 오류 메시지
  */
 router.post("/", async (req, res) => {
   if (process.env.NODE_ENV === "development") {
