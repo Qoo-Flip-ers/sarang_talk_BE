@@ -124,7 +124,7 @@ router.post("/", async (req, res) => {
   const zoom = zoom_mentoring[0] === "yes" ? "zoom" : "";
   const convertedPlan = `${platform[0]}_${duration[0]}`;
   const convertedLang = lang[0] || "";
-  const convertedTest = test[0] === "true" ? true : false;
+  const convertedTest = test && test[0] === "true" ? true : false;
 
   // 기존 유효성 검사 로직
   if (!name || !phoneNumber || !email || !type || !convertedPlan) {
@@ -225,7 +225,7 @@ router.post("/", async (req, res) => {
       name,
       phoneNumber,
       type: formattingType,
-      plan,
+      plan: convertedPlan,
       email,
       startDate,
       endDate,
