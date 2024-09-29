@@ -26,7 +26,7 @@ function swaggerDocs(app, port) {
     "/api-docs-whatsapp",
     swaggerUi.serve,
     swaggerUi.setup(swaggerSpec, {
-      swaggerOptions: { defaultModelsExpandDepth: -1 },
+      swaggerOptions: { defaultModelsExpandDepth: 1 }, // 업데이트 반영
     })
   );
   app.get("/api-docs-whatsapp.json", (req, res) => {
