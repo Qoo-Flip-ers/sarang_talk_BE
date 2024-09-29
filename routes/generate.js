@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { OpenAI } = require("openai");
 require("dotenv").config();
+const { Readable } = require("stream");
 
 // OpenAI API 설정
 const openai = new OpenAI({
@@ -126,6 +127,7 @@ const puppeteer = require("puppeteer");
  *       500:
  *         description: 서버 오류
  */
+// Start of Selection
 router.get("/pronunciation", async (req, res) => {
   try {
     console.log("발음 요청 시작");
@@ -207,9 +209,13 @@ router.get("/pronunciation", async (req, res) => {
     console.log(`임시 Ogg 파일 경로: ${tempOggPath}`);
 
     console.log("Ogg 파일로 변환 시작");
+
+    const inputStream = new Readable();
+    inputStream.push(audioBuffer);
+    inputStream.push(null);
+
     await new Promise((resolve, reject) => {
-      ffmpeg()
-        .input(audioBuffer)
+      ffmpeg(inputStream)
         .inputFormat("mp3")
         .audioCodec("libvorbis")
         .toFormat("ogg")
