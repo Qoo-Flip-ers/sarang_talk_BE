@@ -45,7 +45,9 @@ db.sequelize.sync().then(() => {
 
 const server = app.listen(port, () => {
   console.log(`서버가 ${port}번 포트에서 실행 중입니다.`);
-  swaggerDocs(app, port);
+  setTimeout(() => {
+    swaggerDocs(app, port);
+  }, 1000);
 
   if (process.send) {
     process.send("ready");
