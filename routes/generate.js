@@ -205,40 +205,22 @@ router.get("/pronunciation", async (req, res) => {
     const audioBuffer = Buffer.from(response.data);
     console.log("오디오 파일 다운로드 완료");
 
-    const tempOggPath = path.join(__dirname, `${uuidv4()}.ogg`);
-    console.log(`임시 Ogg 파일 경로: ${tempOggPath}`);
+    const tempMp3Path = path.join(__dirname, `${uuidv4()}.mp3`);
+    console.log(`임시 MP3 파일 경로: ${tempMp3Path}`);
 
-    console.log("Ogg 파일로 변환 시작");
-
-    const inputStream = new Readable();
-    inputStream.push(audioBuffer);
-    inputStream.push(null);
-
-    await new Promise((resolve, reject) => {
-      ffmpeg(inputStream)
-        .inputFormat("mp3")
-        .audioCodec("libvorbis")
-        .toFormat("ogg")
-        .on("end", () => {
-          console.log("Ogg 파일 변환 완료");
-          resolve();
-        })
-        .on("error", (err) => {
-          console.error("Ogg 파일 변환 실패:", err);
-          reject(err);
-        })
-        .save(tempOggPath);
-    });
+    console.log("MP3 파일 저장 시작");
+    await fs.promises.writeFile(tempMp3Path, audioBuffer);
+    console.log("MP3 파일 저장 완료");
 
     console.log("Azure Blob Storage 업로드 시작");
     const containerClient = blobServiceClient.getContainerClient(containerName);
-    const blobName = `${uuidv4()}.ogg`;
+    const blobName = `${uuidv4()}.mp3`;
     const blockBlobClient = containerClient.getBlockBlobClient(blobName);
-    await blockBlobClient.uploadFile(tempOggPath);
+    await blockBlobClient.uploadFile(tempMp3Path);
     console.log("Azure Blob Storage 업로드 완료");
 
     console.log("임시 파일 삭제");
-    await fs.promises.unlink(tempOggPath);
+    await fs.promises.unlink(tempMp3Path);
 
     const uploadedUrl = blockBlobClient.url;
     console.log(`업로드된 URL: ${uploadedUrl}`);
@@ -329,9 +311,20 @@ router.post("/combine-gif-audio", async (req, res) => {
         .json({ error: "GIF URL과 오디오 URL이 필요합니다." });
     }
 
+    // 오디오 파일 확장자 추출 및 유효성 검사
+    let audioExtension = path.extname(new URL(audioUrl).pathname).toLowerCase();
+    if (![".mp3", ".ogg"].includes(audioExtension)) {
+      return res
+        .status(400)
+        .json({
+          error:
+            "지원되지 않는 오디오 형식입니다. mp3 또는 ogg 파일을 사용해주세요.",
+        });
+    }
+
     // 임시 파일 경로 생성
     const tempGifPath = path.join(__dirname, `${uuidv4()}.gif`);
-    const tempAudioPath = path.join(__dirname, `${uuidv4()}.ogg`);
+    const tempAudioPath = path.join(__dirname, `${uuidv4()}${audioExtension}`);
     const tempOutputPath = path.join(__dirname, `${uuidv4()}.mp4`);
 
     // GIF와 오디오 파일 다운로드
