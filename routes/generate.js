@@ -175,7 +175,35 @@ router.get("/pronunciation", async (req, res) => {
       return res.status(400).json({ error: "유효하지 않은 오디오 URL입니다." });
     }
 
-    res.json({ audioUrl });
+    // 오디오 파일을 Ogg 형식으로 변환하여 Azure 스토리지에 업로드
+    const response = await axios.get(audioUrl, { responseType: "arraybuffer" });
+    const audioBuffer = Buffer.from(response.data);
+
+    const tempOggPath = path.join(__dirname, `${uuidv4()}.ogg`);
+
+    // Ogg 파일로 변환
+    await new Promise((resolve, reject) => {
+      ffmpeg()
+        .input(audioBuffer)
+        .audioCodec("libvorbis")
+        .toFormat("ogg")
+        .on("end", resolve)
+        .on("error", reject)
+        .save(tempOggPath);
+    });
+
+    // Azure Blob Storage에 업로드
+    const containerClient = blobServiceClient.getContainerClient(containerName);
+    const blobName = `${uuidv4()}.ogg`;
+    const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+    await blockBlobClient.uploadFile(tempOggPath);
+
+    // 임시 파일 삭제
+    await fs.promises.unlink(tempOggPath);
+
+    // 업로드된 파일의 URL 반환
+    const uploadedUrl = blockBlobClient.url;
+    res.json({ audioUrl: uploadedUrl });
   } catch (error) {
     console.error("발음 데이터 가져오기 오류:", error);
     res.status(500).json({ error: "발음 데이터를 가져오는 데 실패했습니다." });
