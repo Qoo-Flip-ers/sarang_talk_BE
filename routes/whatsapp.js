@@ -3,14 +3,6 @@ const router = express.Router();
 const db = require("../models");
 const twilio = require("twilio");
 const cron = require("node-cron");
-const slack = require("axios").create({
-  // baseURL: "https://graph.facebook.com/v19.0/354463551082624",
-  // baseURL: "https://graph.facebook.com/v19.0/176451042228268",
-  baseURL: "https://hooks.slack.com/services",
-});
-
-const SLACK_URL =
-  "https://hooks.slack.com/services/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";
 
 const client = twilio(
   process.env.TWILIO_ACCOUNT_SID,
@@ -274,7 +266,7 @@ router.post("/daily", async (req, res) => {
   });
 
   if (!todayWord) {
-    sendSlack(`오늘의 단어가 없습니다.`);
+    // sendSlack(`오늘의 단어가 없습니다.`);
     return res.status(404).json({ message: "오늘의 단어가 없습니다." });
   }
 
@@ -517,9 +509,9 @@ router.post("/welcome", async (req, res) => {
     // 카테고리별로 함수 실행
     for (const category of Object.keys(categorizedSubscriptions)) {
       const subscriptions = categorizedSubscriptions[category];
-      sendSlack(
-        `카테고리: ${category}, 언어: ${lang}, 구독자 수: ${subscriptions.length}`
-      );
+      // sendSlack(
+      //   `카테고리: ${category}, 언어: ${lang}, 구독자 수: ${subscriptions.length}`
+      // );
       console.log(
         `카테고리: ${category}, 언어: ${lang}, 구독자 수: ${subscriptions.length}`
       );
@@ -615,9 +607,9 @@ router.post("/send-lang", async (req, res) => {
     // 카테고리별로 함수 실행
     for (const category of Object.keys(categorizedSubscriptions)) {
       const subscriptions = categorizedSubscriptions[category];
-      sendSlack(
-        `카테고리: ${category}, 언어: ${lang}, 구독자 수: ${subscriptions.length}`
-      );
+      // sendSlack(
+      //   `카테고리: ${category}, 언어: ${lang}, 구독자 수: ${subscriptions.length}`
+      // );
       console.log(
         `카테고리: ${category}, 언어: ${lang}, 구독자 수: ${subscriptions.length}`
       );
@@ -725,7 +717,7 @@ const sendDailyMessage = async (category, lang = "ID") => {
   // 카테고리별로 함수 실행
   Object.keys(categorizedSubscriptions).forEach(async (category) => {
     const subscriptions = categorizedSubscriptions[category];
-    sendSlack(`카테고리: ${category}, 구독자 수: ${subscriptions.length}`);
+    // sendSlack(`카테고리: ${category}, 구독자 수: ${subscriptions.length}`);
     console.log(`카테고리: ${category}, 구독자 수: ${subscriptions.length}`);
     // 여기에 카테고리별로 실행할 함수를 호출할 수 있습니다.
     await subscriptions.forEach(async (subscription, index) => {
@@ -768,7 +760,7 @@ const processCategorySubscriptions = async (
       });
 
       if (!todayWord) {
-        sendSlack(`오늘의 단어가 없습니다.`);
+        // sendSlack(`오늘의 단어가 없습니다.`);
         return;
       }
 
@@ -850,7 +842,7 @@ const processCategorySubscriptions = async (
       });
 
       if (!todayWord) {
-        sendSlack(`오늘의 단어가 없습니다.`);
+        // sendSlack(`오늘의 단어가 없습니다.`);
         return;
       }
 
@@ -928,7 +920,7 @@ const processCategorySubscriptions = async (
       });
 
       if (!todayWord) {
-        sendSlack(`오늘의 단어가 없습니다.`);
+        // sendSlack(`오늘의 단어가 없습니다.`);
         return;
       }
 
@@ -1040,16 +1032,16 @@ async function fetchSubscriptionsStartingToday() {
 async function sendWelcomeMessage() {
   const activeSubscriptions = await fetchSubscriptionsStartingToday();
   if (activeSubscriptions.length === 0) {
-    sendSlack("오늘 구독 시작하는 사용자가 없습니다.");
+    // sendSlack("오늘 구독 시작하는 사용자가 없습니다.");
     console.log("오늘 구독 시작하는 사용자가 없습니다.");
     return;
   } else {
     console.log(
       `오늘 구독 시작하는 사용자가 ${activeSubscriptions.length}명(구독 기준) 있습니다. `
     );
-    sendSlack(
-      `오늘 구독 시작하는 사용자가 ${activeSubscriptions.length}명(구독 기준) 있습니다. `
-    );
+    // sendSlack(
+    //   `오늘 구독 시작하는 사용자가 ${activeSubscriptions.length}명(구독 기준) 있습니다. `
+    // );
   }
 
   activeSubscriptions.forEach(async (subscription) => {
@@ -1169,9 +1161,9 @@ const sendWeeklyQuiz = async (platform) => {
 
         console.log(" -> ", response);
       } catch (error) {
-        sendSlack(
-          `주간 퀴즈 메시지 발송 중 오류 발생: ${subscription.User.name}`
-        );
+        // sendSlack(
+        //   `주간 퀴즈 메시지 발송 중 오류 발생: ${subscription.User.name}`
+        // );
         console.error(
           `Error sending quiz message to ${subscription.User.name}: `,
           error
@@ -1179,24 +1171,8 @@ const sendWeeklyQuiz = async (platform) => {
       }
     }
   } catch (error) {
-    sendSlack(`주간 퀴즈 메시지 발송 중 오류 발생: ${error.message}`);
+    // sendSlack(`주간 퀴즈 메시지 발송 중 오류 발생: ${error.message}`);
     console.error("Error fetching subscriptions: ", error);
-  }
-};
-
-const sendSlack = async (message) => {
-  try {
-    let text = `${
-      process.env.NODE_ENV === "development" ? "[테스트 환경]" : ""
-    }${message}`;
-    const response = await slack.post(
-      "/T0684TBHDKQ/B07AEG61MR8/GWc1HKf6Bk2U4gIsvfjV2M8I",
-      {
-        text,
-      }
-    );
-  } catch (error) {
-    console.error("Slack 메시지 전송 중 오류 발생:", error);
   }
 };
 
@@ -1258,10 +1234,10 @@ cron.schedule("0 15 * * *", async () => {
   try {
     const word = await db.Word.findByPk(1);
     if (word) {
-      sendSlack("[준비] 인도네시아용 DB 깨우기 시도");
+      // sendSlack("[준비] 인도네시아용 DB 깨우기 시도");
     }
   } catch (e) {
-    sendSlack("[준비] 인도네시아용 DB 깨우기 시도");
+    // sendSlack("[준비] 인도네시아용 DB 깨우기 시도");
   }
 });
 
@@ -1273,10 +1249,10 @@ cron.schedule("2 15 * * *", async () => {
   try {
     const word = await db.Word.findByPk(1);
     if (word) {
-      sendSlack("[준비] 인도네시아용 DB 깨우기 성공");
+      // sendSlack("[준비] 인도네시아용 DB 깨우기 성공");
     }
   } catch (e) {
-    sendSlack("[준비] 인도네시아용 DB 깨우기 실패");
+    // sendSlack("[준비] 인도네시아용 DB 깨우기 실패");
   }
 });
 
@@ -1288,21 +1264,21 @@ cron.schedule("4 15 * * *", async () => {
   try {
     try {
       const count = await sendDailyMessage("basic", "ID");
-      sendSlack(`[일일 메시지] 인도네시아 basic: ${count}명에게 메시지 발송`);
+      // sendSlack(`[일일 메시지] 인도네시아 basic: ${count}명에게 메시지 발송`);
     } catch (error) {
       if (error.status === 404) {
-        sendSlack(
-          "[일일 메시지] 인도네시아 basic: 요청한 사용자를 찾을 수 없습니다."
-        );
+        // sendSlack(
+        //   "[일일 메시지] 인도네시아 basic: 요청한 사용자를 찾을 수 없습니다."
+        // );
       } else {
-        sendSlack(
-          "[일일 메시지] 인도네시아 basic: 서버 오류로 인해 메시지를 발송할 수 없습니다." +
-            error.message
-        );
+        // sendSlack(
+        //   "[일일 메시지] 인도네시아 basic: 서버 오류로 인해 메시지를 발송할 수 없습니다." +
+        //     error.message
+        // );
       }
     }
   } catch (error) {
-    sendSlack("[일일 메시지] 인도네시아 basic: 작업 중 오류 발생");
+    // sendSlack("[일일 메시지] 인도네시아 basic: 작업 중 오류 발생");
   }
 });
 
@@ -1313,23 +1289,23 @@ cron.schedule("5 15 * * *", async () => {
   try {
     try {
       const count = await sendDailyMessage("kpop_lyrics", "ID");
-      sendSlack(
-        `[일일 메시지] 인도네시아 kpop_lyrics: ${count}명에게 메시지 발송`
-      );
+      // sendSlack(
+      //   `[일일 메시지] 인도네시아 kpop_lyrics: ${count}명에게 메시지 발송`
+      // );
     } catch (error) {
       if (error.status === 404) {
-        sendSlack(
-          "[일일 메시지] 인도네시아 kpop_lyrics: 요청한 사용자를 찾을 수 없습니다."
-        );
+        // sendSlack(
+        //   "[일일 메시지] 인도네시아 kpop_lyrics: 요청한 사용자를 찾을 수 없습니다."
+        // );
       } else {
-        sendSlack(
-          "[일일 메시지] 인도네시아 kpop_lyrics: 서버 오류로 인해 메시지를 발송할 수 없습니다." +
-            error.message
-        );
+        // sendSlack(
+        //   "[일일 메시지] 인도네시아 kpop_lyrics: 서버 오류로 인해 메시지를 발송할 수 없습니다." +
+        //     error.message
+        // );
       }
     }
   } catch (error) {
-    sendSlack("[일일 메시지] 인도네시아 kpop_lyrics: 작업 중 오류 발생");
+    // sendSlack("[일일 메시지] 인도네시아 kpop_lyrics: 작업 중 오류 발생");
   }
 });
 
@@ -1340,23 +1316,23 @@ cron.schedule("6 15 * * *", async () => {
   try {
     try {
       const count = await sendDailyMessage("topik_word", "ID");
-      sendSlack(
-        `[일일 메시지] 인도네시아 topik_word: ${count}명에게 메시지 발송`
-      );
+      // sendSlack(
+      //   `[일일 메시지] 인도네시아 topik_word: ${count}명에게 메시지 발송`
+      // );
     } catch (error) {
       if (error.status === 404) {
-        sendSlack(
-          "[일일 메시지] 인도네시아 topik_word: 요청한 사용자를 찾을 수 없습니다."
-        );
+        // sendSlack(
+        //   "[일일 메시지] 인도네시아 topik_word: 요청한 사용자를 찾을 수 없습니다."
+        // );
       } else {
-        sendSlack(
-          "[일일 메시지] 인도네시아 topik_word: 서버 오류로 인해 메시지를 발송할 수 없습니다." +
-            error.message
-        );
+        // sendSlack(
+        //   "[일일 메시지] 인도네시아 topik_word: 서버 오류로 인해 메시지를 발송할 수 없습니다." +
+        //     error.message
+        // );
       }
     }
   } catch (error) {
-    sendSlack("[일일 메시지] 인도네시아 topik_word: 작업 중 오류 발생");
+    // sendSlack("[일일 메시지] 인도네시아 topik_word: 작업 중 오류 발생");
   }
 });
 
@@ -1367,23 +1343,23 @@ cron.schedule("7 15 * * *", async () => {
   try {
     try {
       const count = await sendDailyMessage("topik_variation", "ID");
-      sendSlack(
-        `[일일 메시지] 인도네시아 topik_variation: ${count}명에게 메시지 발송`
-      );
+      // sendSlack(
+      //   `[일일 메시지] 인도네시아 topik_variation: ${count}명에게 메시지 발송`
+      // );
     } catch (error) {
       if (error.status === 404) {
-        sendSlack(
-          "[일일 메시지] 인도네시아 topik_variation: 요청한 사용자를 찾을 수 없습니다."
-        );
+        // sendSlack(
+        //   "[일일 메시지] 인도네시아 topik_variation: 요청한 사용자를 찾을 수 없습니다."
+        // );
       } else {
-        sendSlack(
-          "[일일 메시지] 인도네시아 topik_variation: 서버 오류로 인해 메시지를 발송할 수 없습니다." +
-            error.message
-        );
+        // sendSlack(
+        //   "[일일 메시지] 인도네시아 topik_variation: 서버 오류로 인해 메시지를 발송할 수 없습니다." +
+        //     error.message
+        // );
       }
     }
   } catch (error) {
-    sendSlack("[일일 메시지] 인도네시아 topik_variation: 작업 중 오류 발생");
+    // sendSlack("[일일 메시지] 인도네시아 topik_variation: 작업 중 오류 발생");
   }
 });
 
@@ -1394,23 +1370,23 @@ cron.schedule("8 15 * * *", async () => {
   try {
     try {
       const count = await sendDailyMessage("daily_conversation", "ID");
-      sendSlack(
-        `[일일 메시지] 인도네시아 daily_conversation: ${count}명에게 메시지 발송`
-      );
+      // sendSlack(
+      //   `[일일 메시지] 인도네시아 daily_conversation: ${count}명에게 메시지 발송`
+      // );
     } catch (error) {
       if (error.status === 404) {
-        sendSlack(
-          "[일일 메시지] 인도네시아 daily_conversation: 요청한 사용자를 찾을 수 없습니다."
-        );
+        // sendSlack(
+        //   "[일일 메시지] 인도네시아 daily_conversation: 요청한 사용자를 찾을 수 없습니다."
+        // );
       } else {
-        sendSlack(
-          "[일일 메시지] 인도네시아 daily_conversation: 서버 오류로 인해 메시지를 발송할 수 없습니다." +
-            error.message
-        );
+        // sendSlack(
+        //   "[일일 메시지] 인도네시아 daily_conversation: 서버 오류로 인해 메시지를 발송할 수 없습니다." +
+        //     error.message
+        // );
       }
     }
   } catch (error) {
-    sendSlack("[일일 메시지] 인도네시아 daily_conversation: 작업 중 오류 발생");
+    // sendSlack("[일일 메시지] 인도네시아 daily_conversation: 작업 중 오류 발생");
   }
 });
 
@@ -1421,21 +1397,21 @@ cron.schedule("12 15 * * 0", async () => {
   }
 
   try {
-    sendSlack(`[주간 퀴즈] 인도네시아 Whatsapp 퀴즈 발송 예약 시작`);
+    // sendSlack(`[주간 퀴즈] 인도네시아 Whatsapp 퀴즈 발송 예약 시작`);
 
     await sendWeeklyQuiz("whatsapp", "ID");
 
-    sendSlack(`[주간 퀴즈] 인도네시아 Whatsapp 퀴즈 발송 예약 완료`);
+    // sendSlack(`[주간 퀴즈] 인도네시아 Whatsapp 퀴즈 발송 예약 완료`);
   } catch (error) {
     if (error.status === 404) {
-      sendSlack(
-        "[주간 퀴즈] 인도네시아 Whatsapp 요청한 사용자를 찾을 수 없습니다."
-      );
+      // sendSlack(
+      //   "[주간 퀴즈] 인도네시아 Whatsapp 요청한 사용자를 찾을 수 없습니다."
+      // );
     } else {
-      sendSlack(
-        "[주간 퀴즈] 인도네시아 Whatsapp 서버 오류로 인해 메시지를 발송할 수 없습니다." +
-          error.message
-      );
+      // sendSlack(
+      //   "[주간 퀴즈] 인도네시아 Whatsapp 서버 오류로 인해 메시지를 발송할 수 없습니다." +
+      //     error.message
+      // );
     }
   }
 });
@@ -1451,10 +1427,10 @@ cron.schedule("0 13 * * *", async () => {
   try {
     const word = await db.Word.findByPk(1);
     if (word) {
-      sendSlack("[준비] 캐나다용 DB 깨우기 시도");
+      // sendSlack("[준비] 캐나다용 DB 깨우기 시도");
     }
   } catch (e) {
-    sendSlack("[준비] 캐나다용 DB 깨우기 시도");
+    // sendSlack("[준비] 캐나다용 DB 깨우기 시도");
   }
 });
 
@@ -1466,10 +1442,10 @@ cron.schedule("2 13 * * *", async () => {
   try {
     const word = await db.Word.findByPk(1);
     if (word) {
-      sendSlack("[준비] 캐나다용 DB 깨우기 성공");
+      // sendSlack("[준비] 캐나다용 DB 깨우기 성공");
     }
   } catch (e) {
-    sendSlack("[준비] 캐나다용 DB 깨우기 실패");
+    // sendSlack("[준비] 캐나다용 DB 깨우기 실패");
   }
 });
 
@@ -1481,21 +1457,21 @@ cron.schedule("4 13 * * *", async () => {
   try {
     try {
       const count = await sendDailyMessage("basic", "EN");
-      sendSlack(`[일일 메시지] 캐나다 basic: ${count}명에게 메시지 발송`);
+      // sendSlack(`[일일 메시지] 캐나다 basic: ${count}명에게 메시지 발송`);
     } catch (error) {
       if (error.status === 404) {
-        sendSlack(
-          "[일일 메시지] 캐나다 basic: 요청한 사용자를 찾을 수 없습니다."
-        );
+        // sendSlack(
+        //   "[일일 메시지] 캐나다 basic: 요청한 사용자를 찾을 수 없습니다."
+        // );
       } else {
-        sendSlack(
-          "[일일 메시지] 캐나다 basic: 서버 오류로 인해 메시지를 발송할 수 없습니다." +
-            error.message
-        );
+        // sendSlack(
+        //   "[일일 메시지] 캐나다 basic: 서버 오류로 인해 메시지를 발송할 수 없습니다." +
+        //     error.message
+        // );
       }
     }
   } catch (error) {
-    sendSlack("[일일 메시지] 캐나다 basic: 작업 중 오류 발생");
+    // sendSlack("[일일 메시지] 캐나다 basic: 작업 중 오류 발생");
   }
 });
 
@@ -1506,21 +1482,21 @@ cron.schedule("5 13 * * *", async () => {
   try {
     try {
       const count = await sendDailyMessage("kpop_lyrics", "EN");
-      sendSlack(`[일일 메시지] 캐나다 kpop_lyrics: ${count}명에게 메시지 발송`);
+      // sendSlack(`[일일 메시지] 캐나다 kpop_lyrics: ${count}명에게 메시지 발송`);
     } catch (error) {
       if (error.status === 404) {
-        sendSlack(
-          "[일일 메시지] 캐나다 kpop_lyrics: 요청한 사용자를 찾을 수 없습니다."
-        );
+        // sendSlack(
+        //   "[일일 메시지] 캐나다 kpop_lyrics: 요청한 사용자를 찾을 수 없습니다."
+        // );
       } else {
-        sendSlack(
-          "[일일 메시지] 캐나다 kpop_lyrics: 서버 오류로 인해 메시지를 발송할 수 없습니다." +
-            error.message
-        );
+        // sendSlack(
+        //   "[일일 메시지] 캐나다 kpop_lyrics: 서버 오류로 인해 메시지를 발송할 수 없습니다." +
+        //     error.message
+        // );
       }
     }
   } catch (error) {
-    sendSlack("[일일 메시지] 캐나다 kpop_lyrics: 작업 중 오류 발생");
+    // sendSlack("[일일 메시지] 캐나다 kpop_lyrics: 작업 중 오류 발생");
   }
 });
 
@@ -1531,21 +1507,21 @@ cron.schedule("6 13 * * *", async () => {
   try {
     try {
       const count = await sendDailyMessage("topik_word", "EN");
-      sendSlack(`[일일 메시지] 캐나다 topik_word: ${count}명에게 메시지 발송`);
+      // sendSlack(`[일일 메시지] 캐나다 topik_word: ${count}명에게 메시지 발송`);
     } catch (error) {
       if (error.status === 404) {
-        sendSlack(
-          "[일일 메시지] 캐나다 topik_word: 요청한 사용자를 찾을 수 없습니다."
-        );
+        // sendSlack(
+        //   "[일일 메시지] 캐나다 topik_word: 요청한 사용자를 찾을 수 없습니다."
+        // );
       } else {
-        sendSlack(
-          "[일일 메시지] 캐나다 topik_word: 서버 오류로 인해 메시지를 발송할 수 없습니다." +
-            error.message
-        );
+        // sendSlack(
+        //   "[일일 메시지] 캐나다 topik_word: 서버 오류로 인해 메시지를 발송할 수 없습니다." +
+        //     error.message
+        // );
       }
     }
   } catch (error) {
-    sendSlack("[일일 메시지] 캐나다 topik_word: 작업 중 오류 발생");
+    // sendSlack("[일일 메시지] 캐나다 topik_word: 작업 중 오류 발생");
   }
 });
 
@@ -1556,23 +1532,23 @@ cron.schedule("7 13 * * *", async () => {
   try {
     try {
       const count = await sendDailyMessage("topik_variation", "EN");
-      sendSlack(
-        `[일일 메시지] 캐나다 topik_variation: ${count}명에게 메시지 발송`
-      );
+      // sendSlack(
+      //   `[일일 메시지] 캐나다 topik_variation: ${count}명에게 메시지 발송`
+      // );
     } catch (error) {
       if (error.status === 404) {
-        sendSlack(
-          "[일일 메시지] 캐나다 topik_variation: 요청한 사용자를 찾을 수 없습니다."
-        );
+        // sendSlack(
+        //   "[일일 메시지] 캐나다 topik_variation: 요청한 사용자를 찾을 수 없습니다."
+        // );
       } else {
-        sendSlack(
-          "[일일 메시지] 캐나다 topik_variation: 서버 오류로 인해 메시지를 발송할 수 없습니다." +
-            error.message
-        );
+        // sendSlack(
+        //   "[일일 메시지] 캐나다 topik_variation: 서버 오류로 인해 메시지를 발송할 수 없습니다." +
+        //     error.message
+        // );
       }
     }
   } catch (error) {
-    sendSlack("[일일 메시지] 캐나다 topik_variation: 작업 중 오류 발생");
+    // sendSlack("[일일 메시지] 캐나다 topik_variation: 작업 중 오류 발생");
   }
 });
 
@@ -1583,23 +1559,23 @@ cron.schedule("8 13 * * *", async () => {
   try {
     try {
       const count = await sendDailyMessage("daily_conversation", "EN");
-      sendSlack(
-        `[일일 메시지] 캐나다 daily_conversation: ${count}명에게 메시지 발송`
-      );
+      // sendSlack(
+      //   `[일일 메시지] 캐나다 daily_conversation: ${count}명에게 메시지 발송`
+      // );
     } catch (error) {
       if (error.status === 404) {
-        sendSlack(
-          "[일일 메시지] 캐나다 daily_conversation: 요청한 사용자를 찾을 수 없습니다."
-        );
+        // sendSlack(
+        //   "[일일 메시지] 캐나다 daily_conversation: 요청한 사용자를 찾을 수 없습니다."
+        // );
       } else {
-        sendSlack(
-          "[일일 메시지] 캐나다 daily_conversation: 서버 오류로 인해 메시지를 발송할 수 없습니다." +
-            error.message
-        );
+        // sendSlack(
+        //   "[일일 메시지] 캐나다 daily_conversation: 서버 오류로 인해 메시지를 발송할 수 없습니다." +
+        //     error.message
+        // );
       }
     }
   } catch (error) {
-    sendSlack("[일일 메시지] 캐나다 daily_conversation: 작업 중 오류 발생");
+    // sendSlack("[일일 메시지] 캐나다 daily_conversation: 작업 중 오류 발생");
   }
 });
 
@@ -1610,21 +1586,21 @@ cron.schedule("12 13 * * 0", async () => {
   }
 
   try {
-    sendSlack(`[주간 퀴즈] 캐나다 Whatsapp 퀴즈 발송 예약 시작`);
+    // sendSlack(`[주간 퀴즈] 캐나다 Whatsapp 퀴즈 발송 예약 시작`);
 
     await sendWeeklyQuiz("whatsapp", "EN");
 
-    sendSlack(`[주간 퀴즈] 캐나다 Whatsapp 퀴즈 발송 예약 완료`);
+    // sendSlack(`[주간 퀴즈] 캐나다 Whatsapp 퀴즈 발송 예약 완료`);
   } catch (error) {
     if (error.status === 404) {
-      sendSlack(
-        "[주간 퀴즈] 캐나다 Whatsapp 요청한 사용자를 찾을 수 없습니다."
-      );
+      // sendSlack(
+      //   "[주간 퀴즈] 캐나다 Whatsapp 요청한 사용자를 찾을 수 없습니다."
+      // );
     } else {
-      sendSlack(
-        "[주간 퀴즈] 캐나다 Whatsapp 서버 오류로 인해 메시지를 발송할 수 없습니다." +
-          error.message
-      );
+      // sendSlack(
+      //   "[주간 퀴즈] 캐나다 Whatsapp 서버 오류로 인해 메시지를 발송할 수 없습니다." +
+      //     error.message
+      // );
     }
   }
 });

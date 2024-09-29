@@ -3,26 +3,8 @@ const router = express.Router();
 const db = require("../models");
 const checkToken = require("../middlewares/checkToken");
 const redis = require("../redis");
-const slack = require("axios").create({
-  baseURL: "https://hooks.slack.com/services",
-});
 const { v4: uuidv4 } = require("uuid");
 
-const sendSlack = async (message) => {
-  try {
-    let text = `${
-      process.env.NODE_ENV === "development" ? "[테스트 환경]" : ""
-    }${message}`;
-    const response = await slack.post(
-      "/T0684TBHDKQ/B07AEG61MR8/GWc1HKf6Bk2U4gIsvfjV2M8I",
-      {
-        text,
-      }
-    );
-  } catch (error) {
-    console.error("Slack 메시지 전송 중 오류 발생:", error);
-  }
-};
 /**
  * @swagger
  * /subscription:
@@ -209,7 +191,7 @@ router.post("/", async (req, res) => {
   }
 
   if (convertedTest) {
-    sendSlack(`[테스트] 테스트 값이 들어왔습니다. ${test} , ${typeof test}`);
+    // sendSlack(`[테스트] 테스트 값이 들어왔습니다. ${test} , ${typeof test}`);
     console.log("테스트모드");
     return res.status(200).json({
       message:
@@ -236,20 +218,20 @@ router.post("/", async (req, res) => {
     })
   );
 
-  sendSlack(
-    `[예약완료] 새로운 사용자 등록: ${name} (${phoneNumber}) ${type} 이 예약되었습니다. ${
-      code ? `(코드: ${code})` : ""
-    }`
-  );
+  // sendSlack(
+  //   `[예약완료] 새로운 사용자 등록: ${name} (${phoneNumber}) ${type} 이 예약되었습니다. ${
+  //     code ? `(코드: ${code})` : ""
+  //   }`
+  // );
 
   try {
     const user = await db.User.findOne({
       where: { id: 1 },
     });
 
-    sendSlack("[DB 깨우기] 사용자 예약을 위한 DB 깨우기 시도");
+    // sendSlack("[DB 깨우기] 사용자 예약을 위한 DB 깨우기 시도");
   } catch (e) {
-    sendSlack("[DB 깨우기] 사용자 예약을 위한 DB 깨우기 시도");
+    // sendSlack("[DB 깨우기] 사용자 예약을 위한 DB 깨우기 시도");
   }
 
   res.status(200).json({
@@ -257,35 +239,6 @@ router.post("/", async (req, res) => {
       "사용자 등록이 예약되었습니다. 1분 이내로 안내 메세지가 발송됩니다.",
     code: plan.includes("telegram") ? code : null,
   });
-  // try {
-  //   let user = await db.User.findOne({ where: { phoneNumber, email } });
-
-  //   if (!user) {
-  //     user = await db.User.create({
-  //       name,
-  //       phoneNumber,
-  //       email,
-  //       status: "active",
-  //     });
-  //   }
-
-  //   const newSubscription = await db.Subscription.create({
-  //     userId: user.id,
-  //     type,
-  //     subscriptionDate: startDate,
-  //     expirationDate: endDate,
-  //   });
-
-  //   // 시작 안내 메세지 발송
-  //   res.json(newSubscription);
-  // } catch (error) {
-  //   sendSlack(
-  //     `[유저 등록 에러] 새로운 사용자 등록 중에 에러가 발생했습니다: ${user.name} (${user.phoneNumber}) ${type}`
-  //   );
-
-  //   console.error("Error creating user or subscription: ", error);
-  //   res.status(500).json({ error: "서버 오류가 발생했습니다." });
-  // }
 });
 
 module.exports = router;

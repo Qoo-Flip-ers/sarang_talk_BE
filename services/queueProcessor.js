@@ -1,32 +1,12 @@
 const db = require("../models");
 const redis = require("../redis");
 const retry = require("async-retry");
-const slack = require("axios").create({
-  baseURL: "https://hooks.slack.com/services",
-});
 const twilio = require("twilio");
 const { bot } = require("./telegramBot");
-
 const client = twilio(
   process.env.TWILIO_ACCOUNT_SID,
   process.env.TWILIO_AUTH_TOKEN
 );
-
-const sendSlack = async (message) => {
-  try {
-    let text = `${
-      process.env.NODE_ENV === "development" ? "[테스트 환경]" : ""
-    }${message}`;
-    const response = await slack.post(
-      "/T0684TBHDKQ/B07AEG61MR8/GWc1HKf6Bk2U4gIsvfjV2M8I",
-      {
-        text,
-      }
-    );
-  } catch (error) {
-    console.error("Slack 메시지 전송 중 오류 발생:", error);
-  }
-};
 
 // 서버리스 DB에 데이터 삽입 함수 (Sequelize 사용)
 async function insertIntoDatabase(data) {
@@ -70,9 +50,9 @@ async function insertIntoDatabase(data) {
           messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
         },
         (error) => {
-          sendSlack(
-            `[Twilio 에러] Twilio API를 통한 메세지 전송 중 에러가 발생했습니다: ${error}`
-          );
+          // sendSlack(
+          //   `[Twilio 에러] Twilio API를 통한 메세지 전송 중 에러가 발생했습니다: ${error}`
+          // );
           console.log(error);
         }
       );
@@ -100,13 +80,13 @@ async function insertIntoDatabase(data) {
     });
 
     // 시작 안내 메세지 발송
-    sendSlack(
-      `[등록완료] 새로운 사용자 등록이 완료되었습니다: ${user.name} (${user.phoneNumber}) ${type}`
-    );
+    // sendSlack(
+    //   `[등록완료] 새로운 사용자 등록이 완료되었습니다: ${user.name} (${user.phoneNumber}) ${type}`
+    // );
   } catch (error) {
-    sendSlack(
-      `[등록에러] 새로운 사용자 등록 중에 에러가 발생했습니다: ${user.name} (${user.phoneNumber}) ${type}`
-    );
+    // sendSlack(
+    //   `[등록에러] 새로운 사용자 등록 중에 에러가 발생했습니다: ${user.name} (${user.phoneNumber}) ${type}`
+    // );
   }
 }
 
@@ -145,7 +125,7 @@ async function processQueue() {
           minTimeout: 70000,
           onRetry: (err, attempt) => {
             console.error(`Attempt ${attempt} failed:`, err);
-            sendSlack(`[DB 에러] DB 잠자는 중. ${err.message}`);
+            // sendSlack(`[DB 에러] DB 잠자는 중. ${err.message}`);
           },
         }
       );
@@ -169,7 +149,7 @@ const checkUserCodeForTelegram = async (data) => {
     let user = await db.User.findOne({ where: { code } });
 
     if (!user) {
-      sendSlack(`[텔레그램 봇] 코드가 일치하지 않습니다. 코드: ${code}`);
+      // sendSlack(`[텔레그램 봇] 코드가 일치하지 않습니다. 코드: ${code}`);
       // await bot.sendMessage(chatId, "Code does not match.");
       return;
     }
@@ -185,13 +165,13 @@ const checkUserCodeForTelegram = async (data) => {
     );
 
     // 시작 안내 메세지 발송
-    sendSlack(
-      `[등록완료] 텔레그렘에 새로운 사용자 등록이 완료되었습니다: ${user.name} (${user.phoneNumber})`
-    );
+    // sendSlack(
+    //   `[등록완료] 텔레그렘에 새로운 사용자 등록이 완료되었습니다: ${user.name} (${user.phoneNumber})`
+    // );
   } catch (error) {
-    sendSlack(
-      `[등록에러] 텔레그렘 새로운 사용자 등록 중에 에러가 발생했습니다: ${user.name} (${user.phoneNumber})`
-    );
+    // sendSlack(
+    //   `[등록에러] 텔레그렘 새로운 사용자 등록 중에 에러가 발생했습니다: ${user.name} (${user.phoneNumber})`
+    // );
   }
 };
 
@@ -226,9 +206,9 @@ const processQueueForTelegramBot = async () => {
           minTimeout: 70000,
           onRetry: (err, attempt) => {
             console.error(`Attempt ${attempt} failed:`, err);
-            sendSlack(
-              `[DB 에러] DB 잠자는 중. telegram cron job 시도중. ${err.message}`
-            );
+            // sendSlack(
+            //   `[DB 에러] DB 잠자는 중. telegram cron job 시도중. ${err.message}`
+            // );
           },
         }
       );
