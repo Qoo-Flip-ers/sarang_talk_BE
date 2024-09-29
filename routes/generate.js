@@ -184,7 +184,8 @@ router.get("/pronunciation", async (req, res) => {
     // Ogg 파일로 변환
     await new Promise((resolve, reject) => {
       ffmpeg()
-        .input(audioBuffer)
+        .input(Buffer.from(audioBuffer)) // 버퍼를 직접 입력으로 사용
+        .inputFormat("mp3") // 입력 형식을 명시적으로 지정
         .audioCodec("libvorbis")
         .toFormat("ogg")
         .on("end", resolve)
