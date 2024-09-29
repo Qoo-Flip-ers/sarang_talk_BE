@@ -33,7 +33,7 @@ function swaggerDocs(app, port) {
     res.setHeader("Content-Type", "application/json");
     res.setHeader(
       "Cache-Control",
-      "no-store, no-cache, must-revalidate, private"
+      "no-store, no-cache, must-revalidate, max-age=0"
     );
     res.send(swaggerSpec);
   });
