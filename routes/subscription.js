@@ -24,13 +24,12 @@ const sendSlack = async (message) => {
   }
 };
 
-// 사용자 생성
 /**
  * @swagger
  * /subscription:
  *   post:
  *     summary: 사용자 생성
- *     description: 새로운 사용자를 생성하고 구독을 예약합니다. 사용자는 이름, 전화번호, 이메일, 구독 타입 및 플랜을 제공해야 합니다. 구독 시작일은 현재 날짜로부터 하루 후이며, 플랜에 따라 만료일이 설정됩니다.
+ *     description: 새로운 사용자를 생성하고 구독을 예약합니다. 사용자는 이름, 전화번호, 이메일, 언어, 플랜, 플랫폼, 기간, 줌 멘토링 여부, 테스트 여부를 제공해야 합니다.
  *     tags:
  *       - Subscription
  *     requestBody:
@@ -43,30 +42,52 @@ const sendSlack = async (message) => {
  *               - name
  *               - phoneNumber
  *               - email
- *               - type
+ *               - lang
  *               - plan
+ *               - platform
+ *               - duration
+ *               - zoom_mentoring
+ *               - test
  *             properties:
  *               name:
  *                 type: string
  *                 description: 사용자 이름
  *               phoneNumber:
  *                 type: string
- *                 description: 사용자 전화번호
+ *                 description: 사용자 전화번호 (국가 코드 포함)
  *               email:
  *                 type: string
  *                 description: 사용자 이메일
- *               type:
- *                 type: string
- *                 description: 구독 타입
+ *               lang:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 description: 사용자 언어 (예: ["KO", "EN"])
  *               plan:
- *                 type: string
- *                 description: 구독 플랜
- *               quiz:
- *                 type: string
- *                 description: 퀴즈 옵션
- *               zoom:
- *                 type: string
- *                 description: 줌 옵션
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 description: 구독 플랜 (예: ["beginners", "basic"])
+ *               platform:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 description: 사용 플랫폼 (예: ["telegram", "whatsapp"])
+ *               duration:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 description: 구독 기간 (예: ["1", "3", "12"])
+ *               zoom_mentoring:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 description: 줌 멘토링 여부 (예: ["yes", "no"])
+ *               test:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 description: 테스트 여부 (예: ["true", "false"])
  *     responses:
  *       200:
  *         description: 성공적으로 예약된 사용자 정보
@@ -78,9 +99,6 @@ const sendSlack = async (message) => {
  *                 message:
  *                   type: string
  *                   description: 사용자 등록 예약 메시지
- *                 code:
- *                   type: string
- *                   description: 텔레그램 코드 (텔레그램 플랜인 경우)
  *       400:
  *         description: 잘못된 요청 (필수 필드 누락, 형식 오류 등)
  *       500:
