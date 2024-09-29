@@ -13,15 +13,19 @@ const client = twilio(
 );
 
 const sendSlack = async (message) => {
-  let text = `${
-    process.env.NODE_ENV === "development" ? "[테스트 환경]" : ""
-  }${message}`;
-  const response = await slack.post(
-    "/T0684TBHDKQ/B07AEG61MR8/HnFpkqFfqpXIBgeTzTklvKJQ",
-    {
-      text,
-    }
-  );
+  try {
+    let text = `${
+      process.env.NODE_ENV === "development" ? "[테스트 환경]" : ""
+    }${message}`;
+    const response = await slack.post(
+      "/T0684TBHDKQ/B07AEG61MR8/GWc1HKf6Bk2U4gIsvfjV2M8I",
+      {
+        text,
+      }
+    );
+  } catch (error) {
+    console.error("Slack 메시지 전송 중 오류 발생:", error);
+  }
 };
 
 // 서버리스 DB에 데이터 삽입 함수 (Sequelize 사용)
