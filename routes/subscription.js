@@ -248,7 +248,7 @@ router.post("/", async (req, res) => {
   res.status(200).json({
     message:
       "사용자 등록이 예약되었습니다. 1분 이내로 안내 메세지가 발송됩니다.",
-    code: plan.includes("telegram") ? code : null,
+    code: convertedPlan.includes("telegram") ? code : null,
   });
 });
 
