@@ -177,10 +177,21 @@ router.post("/", async (req, res) => {
     }
   }
 
-  const month = duration;
+  const month = parseInt(duration[0]);
 
   const endDate = new Date(startDate);
-  endDate.setMonth(startDate.getMonth() + month);
+  endDate.setMonth(endDate.getMonth() + month);
+
+  // 날짜가 올바르게 설정되었는지 확인
+  console.log("시작 날짜:", startDate);
+  console.log("종료 날짜:", endDate);
+
+  if (endDate.getFullYear() > 2100) {
+    console.error("종료 날짜 오류 발생");
+    return res
+      .status(400)
+      .json({ error: "구독 기간 설정 중 오류가 발생했습니다." });
+  }
 
   let code;
   let codeGeneratedAt;
