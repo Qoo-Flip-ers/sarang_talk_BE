@@ -5,10 +5,13 @@ const db = require("../models");
 router.post("/login", async (req, res) => {
   const { username, password } = req.body;
 
-  if (
+  if ((
     username === process.env.ADMIN_USERNAME &&
     password === process.env.ADMIN_PASSWORD
-  ) {
+  ) || (
+    username === process.env.ADMIN_USERNAME2 &&
+    password === process.env.ADMIN_PASSWORD2
+  )) {
     return res.status(200).json({ token: process.env.AUTH_TOKEN });
   }
 
