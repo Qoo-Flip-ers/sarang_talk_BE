@@ -91,7 +91,6 @@ router.post("/", async (req, res) => {
   const {
     name,
     phoneNumber,
-    email,
     lang,
     plan,
     platform,
@@ -99,6 +98,7 @@ router.post("/", async (req, res) => {
     zoom_mentoring,
     test,
   } = req.body;
+  let { email } = req.body;
 
   console.log("새로운 요청:", req.body);
   // 새로운 형식을 기존 형식으로 변환
