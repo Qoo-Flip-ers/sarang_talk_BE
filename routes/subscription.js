@@ -109,7 +109,7 @@ router.post("/", async (req, res) => {
   const convertedTest = test && test[0] === "true" ? true : false;
 
   // 기존 유효성 검사 로직
-  if (!name || !phoneNumber || !email || !type || !convertedPlan) {
+  if (!name || !phoneNumber || !type || !convertedPlan) {
     console.log("[error] 모든 필드를 입력해주세요.");
     return res.status(400).json({ error: "모든 필드를 입력해주세요." });
   }
@@ -124,7 +124,7 @@ router.post("/", async (req, res) => {
   }
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
+  if (email && !emailRegex.test(email)) {
     console.log("[error] 이메일 형식이 올바르지 않습니다.");
     return res.status(400).json({ error: "이메일 형식이 올바르지 않습니다." });
   }
@@ -211,6 +211,7 @@ router.post("/", async (req, res) => {
     });
   }
 
+  if (!email) email = ''
   // Redis 주입
   await redis.lpush(
     "request_subscription",
