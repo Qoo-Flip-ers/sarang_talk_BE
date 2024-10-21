@@ -102,11 +102,11 @@ router.post("/", async (req, res) => {
 
   console.log("새로운 요청:", req.body);
   // 새로운 형식을 기존 형식으로 변환
-  const type = plan[0] === "beginners" ? "basic" : plan[0] || "";
-  const zoom = zoom_mentoring[0] === "yes" ? "zoom" : "";
-  const convertedPlan = `${platform[0]}_${duration[0]}`;
-  const convertedLang = lang[0] || "";
-  const convertedTest = test && test[0] === "true" ? true : false;
+  const type = plan === "beginners" ? "basic" : plan || "";
+  const zoom = zoom_mentoring === "yes" ? "zoom" : "";
+  const convertedPlan = `${platform}_${duration}`;
+  const convertedLang = lang || "";
+  const convertedTest = test === "true" ? true : false;
 
   // 기존 유효성 검사 로직
   if (!name || !phoneNumber || !type || !convertedPlan) {
@@ -177,7 +177,7 @@ router.post("/", async (req, res) => {
     }
   }
 
-  const month = parseInt(duration[0]);
+  const month = parseInt(duration);
 
   const endDate = new Date(startDate);
   endDate.setMonth(endDate.getMonth() + month);
