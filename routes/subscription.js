@@ -97,6 +97,7 @@ router.post("/", async (req, res) => {
     duration,
     zoom_mentoring,
     test,
+    gens_test
   } = req.body;
   let { email } = req.body;
 
@@ -168,7 +169,11 @@ router.post("/", async (req, res) => {
   }
 
   let startDate = new Date();
-  startDate.setDate(startDate.getDate() + 1);
+  if (gens_test) {
+
+  } else {
+    startDate.setDate(startDate.getDate() + 1);
+  }
 
   if (lang === "EN") {
     const canadaStartDate = new Date("2024-10-14T00:00:00-04:00"); // 캐나다 동부 시간 기준
