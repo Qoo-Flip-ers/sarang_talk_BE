@@ -103,7 +103,7 @@ router.post("/", async (req, res) => {
 
   console.log("새로운 요청:", req.body);
   // 새로운 형식을 기존 형식으로 변환
-  const type = plan === "beginners" ? "basic" : plan || "";
+  const type = (plan === "beginners") || (plan === 'Korean Alphabet') ? "basic" : plan || "";
   const zoom = zoom_mentoring === "yes" ? "zoom" : "";
   const convertedPlan = `${platform}_${duration}`;
   const convertedLang = lang || "";
@@ -138,19 +138,19 @@ router.post("/", async (req, res) => {
     "topik_variation",
   ];
 
-  const formattingType = type.split(",").map((t) => t.trim());
+  // const formattingType = type.split(",").map((t) => t.trim());
 
-  const formattingZoom = zoom ? zoom.split(",").map((t) => t.trim()) : [];
+  // const formattingZoom = zoom ? zoom.split(",").map((t) => t.trim()) : [];
 
-  if (
-    formattingType.length === 0 ||
-    !formattingType.every((t) => validTypes.includes(t))
-  ) {
-    console.log("[error] 유효하지 않은 구독 타입이 포함되어 있습니다.");
-    return res
-      .status(400)
-      .json({ error: "유효하지 않은 구독 타입이 포함되어 있습니다." });
-  }
+  // if (
+  //   formattingType.length === 0 ||
+  //   !formattingType.every((t) => validTypes.includes(t))
+  // ) {
+  //   console.log("[error] 유효하지 않은 구독 타입이 포함되어 있습니다.");
+  //   return res
+  //     .status(400)
+  //     .json({ error: "유효하지 않은 구독 타입이 포함되어 있습니다." });
+  // }
 
   const validPlans = [
     "telegram_1",
@@ -223,12 +223,14 @@ router.post("/", async (req, res) => {
     JSON.stringify({
       name,
       phoneNumber,
-      type: formattingType,
+      // type: formattingType,
+      type,
       plan: convertedPlan,
       email,
       startDate,
       endDate,
-      zoom: formattingZoom,
+      // zoom: formattingZoom,
+      zoom,
       code,
       codeGeneratedAt,
       lang: convertedLang.toUpperCase(),
