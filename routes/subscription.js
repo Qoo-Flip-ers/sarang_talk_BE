@@ -170,7 +170,7 @@ router.post("/", async (req, res) => {
 
   let startDate = new Date();
   if (gens_test) {
-
+    startDate.setDate(startDate.getDate() + 14);
   } else {
     startDate.setDate(startDate.getDate() + 1);
   }
