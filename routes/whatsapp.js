@@ -1216,7 +1216,7 @@ const getSendAt = (lang = "ID", type = "template") => {
     let date = canadaNow.getDate();
 
     // 캐나다 시간 기준 해당 날짜의 오전 9시를 UTC로 변환
-    let sendAt = new Date(Date.UTC(year, month, date, 13, 58, 0, 0));
+    let sendAt = new Date(Date.UTC(year, month, date, 14, 58, 0, 0));
 
     if (type === "image") {
       sendAt.setSeconds(sendAt.getSeconds() + 5);
@@ -1445,7 +1445,7 @@ cron.schedule("12 15 * * 0", async () => {
 
 // ------------------------ 캐나다 ------------------------
 // 캐나다용 DB 깨우기 (serverless 때문에)
-cron.schedule("0 13 * * *", async () => {
+cron.schedule("0 14 * * *", async () => {
   if (process.env.NODE_ENV === "development") {
     return;
   }
@@ -1460,7 +1460,7 @@ cron.schedule("0 13 * * *", async () => {
 });
 
 // 캐나다용 DB 깨우기 (serverless 때문에)
-cron.schedule("2 13 * * *", async () => {
+cron.schedule("2 14 * * *", async () => {
   if (process.env.NODE_ENV === "development") {
     return;
   }
@@ -1475,7 +1475,7 @@ cron.schedule("2 13 * * *", async () => {
 });
 
 // 캐나다용 메시지 발송
-cron.schedule("4 13 * * *", async () => {
+cron.schedule("4 14 * * *", async () => {
   if (process.env.NODE_ENV === "development") {
     return;
   }
@@ -1500,7 +1500,7 @@ cron.schedule("4 13 * * *", async () => {
   }
 });
 
-cron.schedule("5 13 * * *", async () => {
+cron.schedule("5 14 * * *", async () => {
   if (process.env.NODE_ENV === "development") {
     return;
   }
@@ -1525,7 +1525,7 @@ cron.schedule("5 13 * * *", async () => {
   }
 });
 
-cron.schedule("6 13 * * *", async () => {
+cron.schedule("6 14 * * *", async () => {
   if (process.env.NODE_ENV === "development") {
     return;
   }
@@ -1550,7 +1550,7 @@ cron.schedule("6 13 * * *", async () => {
   }
 });
 
-cron.schedule("7 13 * * *", async () => {
+cron.schedule("7 14 * * *", async () => {
   if (process.env.NODE_ENV === "development") {
     return;
   }
@@ -1577,7 +1577,7 @@ cron.schedule("7 13 * * *", async () => {
   }
 });
 
-cron.schedule("8 13 * * *", async () => {
+cron.schedule("8 14 * * *", async () => {
   if (process.env.NODE_ENV === "development") {
     return;
   }
@@ -1605,7 +1605,7 @@ cron.schedule("8 13 * * *", async () => {
 });
 
 // 캐나다용 주간 퀴즈
-cron.schedule("12 13 * * 0", async () => {
+cron.schedule("12 14 * * 0", async () => {
   if (process.env.NODE_ENV === "development") {
     return;
   }
