@@ -273,9 +273,8 @@ router.post("/daily", async (req, res) => {
   const to = `whatsapp:${phoneNumber}`;
 
   try {
-    const videoPath = todayWord.videoUrl?.split("windows.net/").map((t) => t.trim());
-    console.log("videoPath");
-    console.log(videoPath);
+    console.log("todayWord");
+    console.log(todayWord.videoUrl);
     const response = await client.messages.create({
       from: process.env.FROM_PHONE_NUMBER,
       messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
@@ -294,9 +293,11 @@ router.post("/daily", async (req, res) => {
           lang === "EN"
             ? todayWord.en_example_3?.trim()
             : todayWord.example_3?.trim(),
-        7: videoPath.length > 1 ? videoPath[1] : "video/d31417cc-dd9e-4297-be87-7f2158d3aaf6.mp4",
+        7: undefined
       }),
     });
+        // 7: todayWord.videoUrl || "video/d31417cc-dd9e-4297-be87-7f2158d3aaf6.mp4",
+
     // if (todayWord.audioUrl) {
     //   setTimeout(async () => {
     //     await client.messages.create({
@@ -785,9 +786,6 @@ const processCategorySubscriptions = async (
         return;
       }
 
-      const videoPath = todayWord.videoUrl?.split("windows.net/").map((t) => t.trim());
-      console.log("videoPath");
-      console.log(videoPath);
       const to = `whatsapp:${subscription.User.phoneNumber}`;
       try {
         const response = await client.messages.create({
@@ -816,9 +814,10 @@ const processCategorySubscriptions = async (
               lang === "EN"
                 ? todayWord.en_example_3?.trim()
                 : todayWord.example_3?.trim(),
-            7: videoPath.length > 1 ? videoPath[1] : "video/d31417cc-dd9e-4297-be87-7f2158d3aaf6.mp4",
+            7: undefined
           }),
         });
+            // 7: todayWord.videoUrl || "video/d31417cc-dd9e-4297-be87-7f2158d3aaf6.mp4",
         console.log(
           "예약된 메시지가 다음 사용자에게 전송되었습니다:",
           subscription.User.name
@@ -870,9 +869,6 @@ const processCategorySubscriptions = async (
         return;
       }
 
-      const videoPath = todayWord.videoUrl?.split("windows.net/").map((t) => t.trim());
-      console.log("videoPath");
-      console.log(videoPath);
       const to = `whatsapp:${subscription.User.phoneNumber}`;
       try {
         const response = await client.messages.create({
@@ -901,9 +897,10 @@ const processCategorySubscriptions = async (
               lang === "EN"
                 ? todayWord.en_example_3?.trim()
                 : todayWord.example_3?.trim(), // example_3 (에문 설명)
-            7: videoPath.length > 1 ? videoPath[1] : "video/d31417cc-dd9e-4297-be87-7f2158d3aaf6.mp4",
+            7: undefined
           }),
         });
+            // 7: todayWord.videoUrl || "video/d31417cc-dd9e-4297-be87-7f2158d3aaf6.mp4",
         console.log("Scheduled message sent to", subscription.User.name);
 
         await subscription.update({ lastWordId: todayWord.id });
@@ -951,9 +948,6 @@ const processCategorySubscriptions = async (
         return;
       }
 
-      const videoPath = todayWord.videoUrl?.split("windows.net/").map((t) => t.trim());
-      console.log("videoPath");
-      console.log(videoPath);
       const to = `whatsapp:${subscription.User.phoneNumber}`;
       try {
         const response = await client.messages.create({
@@ -982,9 +976,10 @@ const processCategorySubscriptions = async (
               lang === "EN"
                 ? todayWord.en_example_3?.trim()
                 : todayWord.example_3?.trim(), // example_3 (에문 설명)
-            7: videoPath.length > 1 ? videoPath[1] : "video/d31417cc-dd9e-4297-be87-7f2158d3aaf6.mp4",
+            7: undefined
           }),
         });
+          // 7: todayWord.videoUrl || "video/d31417cc-dd9e-4297-be87-7f2158d3aaf6.mp4",
         console.log(
           "예약된 메시지가 다음 사용자에게 전송되었습니다:",
           subscription.User.name
