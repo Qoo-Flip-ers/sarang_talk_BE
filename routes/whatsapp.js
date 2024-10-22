@@ -273,9 +273,9 @@ router.post("/daily", async (req, res) => {
   const to = `whatsapp:${phoneNumber}`;
 
   try {
-    console.log("todayWord");
-    console.log(todayWord);
-    const videoPath = todayWord.videoUrl.split("windows.net/").map((t) => t.trim());
+    const videoPath = todayWord.videoUrl?.split("windows.net/").map((t) => t.trim());
+    console.log("videoPath");
+    console.log(videoPath);
     const response = await client.messages.create({
       from: process.env.FROM_PHONE_NUMBER,
       messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
@@ -785,7 +785,9 @@ const processCategorySubscriptions = async (
         return;
       }
 
-      const videoPath = todayWord.videoUrl.split("windows.net/").map((t) => t.trim());
+      const videoPath = todayWord.videoUrl?.split("windows.net/").map((t) => t.trim());
+      console.log("videoPath");
+      console.log(videoPath);
       const to = `whatsapp:${subscription.User.phoneNumber}`;
       try {
         const response = await client.messages.create({
@@ -868,7 +870,9 @@ const processCategorySubscriptions = async (
         return;
       }
 
-      const videoPath = todayWord.videoUrl.split("windows.net/").map((t) => t.trim());
+      const videoPath = todayWord.videoUrl?.split("windows.net/").map((t) => t.trim());
+      console.log("videoPath");
+      console.log(videoPath);
       const to = `whatsapp:${subscription.User.phoneNumber}`;
       try {
         const response = await client.messages.create({
@@ -947,7 +951,9 @@ const processCategorySubscriptions = async (
         return;
       }
 
-      const videoPath = todayWord.videoUrl.split("windows.net/").map((t) => t.trim());
+      const videoPath = todayWord.videoUrl?.split("windows.net/").map((t) => t.trim());
+      console.log("videoPath");
+      console.log(videoPath);
       const to = `whatsapp:${subscription.User.phoneNumber}`;
       try {
         const response = await client.messages.create({
