@@ -97,17 +97,16 @@ router.post("/", async (req, res) => {
     duration,
     zoom_mentoring,
     test,
-    gens_test
   } = req.body;
   let { email } = req.body;
 
   console.log("새로운 요청:", req.body);
   // 새로운 형식을 기존 형식으로 변환
-  const type = (plan === "beginners") || (plan === 'Korean Alphabet') ? "basic" : plan || "";
-  const zoom = zoom_mentoring === "yes" ? "zoom" : "";
-  const convertedPlan = `${platform}_${duration}`;
-  const convertedLang = lang || "";
-  const convertedTest = test === "true" ? true : false;
+  const type = plan[0] === "beginners" ? "basic" : plan[0] || "";
+  const zoom = zoom_mentoring[0] === "yes" ? "zoom" : "";
+  const convertedPlan = `${platform[0]}_${duration[0]}`;
+  const convertedLang = lang[0] || "";
+  const convertedTest = test && test[0] === "true" ? true : false;
 
   // 기존 유효성 검사 로직
   if (!name || !phoneNumber || !type || !convertedPlan) {
@@ -138,19 +137,19 @@ router.post("/", async (req, res) => {
     "topik_variation",
   ];
 
-  // const formattingType = type.split(",").map((t) => t.trim());
+  const formattingType = type.split(",").map((t) => t.trim());
 
-  // const formattingZoom = zoom ? zoom.split(",").map((t) => t.trim()) : [];
+  const formattingZoom = zoom ? zoom.split(",").map((t) => t.trim()) : [];
 
-  // if (
-  //   formattingType.length === 0 ||
-  //   !formattingType.every((t) => validTypes.includes(t))
-  // ) {
-  //   console.log("[error] 유효하지 않은 구독 타입이 포함되어 있습니다.");
-  //   return res
-  //     .status(400)
-  //     .json({ error: "유효하지 않은 구독 타입이 포함되어 있습니다." });
-  // }
+  if (
+    formattingType.length === 0 ||
+    !formattingType.every((t) => validTypes.includes(t))
+  ) {
+    console.log("[error] 유효하지 않은 구독 타입이 포함되어 있습니다.");
+    return res
+      .status(400)
+      .json({ error: "유효하지 않은 구독 타입이 포함되어 있습니다." });
+  }
 
   const validPlans = [
     "telegram_1",
@@ -169,11 +168,7 @@ router.post("/", async (req, res) => {
   }
 
   let startDate = new Date();
-  if (gens_test) {
-    startDate.setDate(startDate.getDate() + 14);
-  } else {
-    startDate.setDate(startDate.getDate() + 1);
-  }
+  startDate.setDate(startDate.getDate() + 1);
 
   if (lang === "EN") {
     const canadaStartDate = new Date("2024-10-14T00:00:00-04:00"); // 캐나다 동부 시간 기준
@@ -182,7 +177,7 @@ router.post("/", async (req, res) => {
     }
   }
 
-  const month = parseInt(duration);
+  const month = parseInt(duration[0]);
 
   const endDate = new Date(startDate);
   endDate.setMonth(endDate.getMonth() + month);
@@ -223,14 +218,12 @@ router.post("/", async (req, res) => {
     JSON.stringify({
       name,
       phoneNumber,
-      // type: formattingType,
-      type,
+      type: formattingType,
       plan: convertedPlan,
       email,
       startDate,
       endDate,
-      // zoom: formattingZoom,
-      zoom,
+      zoom: formattingZoom,
       code,
       codeGeneratedAt,
       lang: convertedLang.toUpperCase(),
