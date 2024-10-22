@@ -1216,7 +1216,7 @@ const getSendAt = (lang = "ID", type = "template") => {
     let date = canadaNow.getDate();
 
     // 캐나다 시간 기준 해당 날짜의 오전 9시를 UTC로 변환
-    let sendAt = new Date(Date.UTC(year, month, date, 13, 0, 0, 0));
+    let sendAt = new Date(Date.UTC(year, month, date, 13, 58, 0, 0));
 
     if (type === "image") {
       sendAt.setSeconds(sendAt.getSeconds() + 5);
@@ -1238,7 +1238,7 @@ const getSendAt = (lang = "ID", type = "template") => {
   let date = koreaNow.getDate();
 
   // 한국 시간 기준 해당 날짜의 오전 11시를 UTC로 변환
-  let sendAt = new Date(Date.UTC(year, month, date, 2, 0, 0, 0));
+  let sendAt = new Date(Date.UTC(year, month, date, 2, 58, 0, 0));
 
   if (type === "image") {
     sendAt.setSeconds(sendAt.getSeconds() + 5);
