@@ -275,6 +275,7 @@ router.post("/daily", async (req, res) => {
   try {
     console.log("todayWord");
     console.log(todayWord);
+    const videoPath = todayWord.videoUrl.split("windows.net/").map((t) => t.trim());
     const response = await client.messages.create({
       from: process.env.FROM_PHONE_NUMBER,
       messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
@@ -293,7 +294,7 @@ router.post("/daily", async (req, res) => {
           lang === "EN"
             ? todayWord.en_example_3?.trim()
             : todayWord.example_3?.trim(),
-        7: todayWord.videoUrl || "video/d31417cc-dd9e-4297-be87-7f2158d3aaf6.mp4",
+        7: videoPath.length > 1 ? videoPath[1] : "video/d31417cc-dd9e-4297-be87-7f2158d3aaf6.mp4",
       }),
     });
     // if (todayWord.audioUrl) {
@@ -784,6 +785,7 @@ const processCategorySubscriptions = async (
         return;
       }
 
+      const videoPath = todayWord.videoUrl.split("windows.net/").map((t) => t.trim());
       const to = `whatsapp:${subscription.User.phoneNumber}`;
       try {
         const response = await client.messages.create({
@@ -812,7 +814,7 @@ const processCategorySubscriptions = async (
               lang === "EN"
                 ? todayWord.en_example_3?.trim()
                 : todayWord.example_3?.trim(),
-            7: todayWord.videoUrl || "video/d31417cc-dd9e-4297-be87-7f2158d3aaf6.mp4",
+            7: videoPath.length > 1 ? videoPath[1] : "video/d31417cc-dd9e-4297-be87-7f2158d3aaf6.mp4",
           }),
         });
         console.log(
@@ -866,6 +868,7 @@ const processCategorySubscriptions = async (
         return;
       }
 
+      const videoPath = todayWord.videoUrl.split("windows.net/").map((t) => t.trim());
       const to = `whatsapp:${subscription.User.phoneNumber}`;
       try {
         const response = await client.messages.create({
@@ -894,7 +897,7 @@ const processCategorySubscriptions = async (
               lang === "EN"
                 ? todayWord.en_example_3?.trim()
                 : todayWord.example_3?.trim(), // example_3 (에문 설명)
-            7: todayWord.videoUrl || "video/d31417cc-dd9e-4297-be87-7f2158d3aaf6.mp4",
+            7: videoPath.length > 1 ? videoPath[1] : "video/d31417cc-dd9e-4297-be87-7f2158d3aaf6.mp4",
           }),
         });
         console.log("Scheduled message sent to", subscription.User.name);
@@ -944,6 +947,7 @@ const processCategorySubscriptions = async (
         return;
       }
 
+      const videoPath = todayWord.videoUrl.split("windows.net/").map((t) => t.trim());
       const to = `whatsapp:${subscription.User.phoneNumber}`;
       try {
         const response = await client.messages.create({
@@ -972,7 +976,7 @@ const processCategorySubscriptions = async (
               lang === "EN"
                 ? todayWord.en_example_3?.trim()
                 : todayWord.example_3?.trim(), // example_3 (에문 설명)
-            7: todayWord.videoUrl || "video/d31417cc-dd9e-4297-be87-7f2158d3aaf6.mp4",
+            7: videoPath.length > 1 ? videoPath[1] : "video/d31417cc-dd9e-4297-be87-7f2158d3aaf6.mp4",
           }),
         });
         console.log(
