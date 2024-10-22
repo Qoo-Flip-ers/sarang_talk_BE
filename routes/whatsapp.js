@@ -446,6 +446,25 @@ router.post("/send-message", async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
+router.post("/send-message-test", async (req, res) => {
+  try {
+    const result = [];
+
+      // const phoneNumber = user.phoneNumber; // 가정: User 모델에 phoneNumber 필드가 있다고 가정합니다.
+      const phoneNumber = '+62895330880148'
+      // WhatsApp 메시지 발송 API 호출
+      const response = await sendDailyConversation(phoneNumber);
+      result.push(response.data);
+
+    res.json({
+      message: "WhatsApp 메시지가 성공적으로 발송되었습니다.",
+      response: result,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: error.message });
+  }
+});
 /**
  * @swagger
  * /whatsapp/welcome:
