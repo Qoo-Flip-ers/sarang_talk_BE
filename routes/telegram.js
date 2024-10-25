@@ -369,7 +369,7 @@ const sendWeeklyQuiz = async (platform) => {
 
   // 한국 시간 기준 해당 날짜의 오전 11시 1분을 UTC로 변환
   const sendAt = new Date(
-    Date.UTC(year, month, date, 2, 1, 0, 0)
+    Date.UTC(year, month, date, 2, 18, 0, 0)
   ).toISOString();
 
   try {
