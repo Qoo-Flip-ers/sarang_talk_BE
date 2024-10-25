@@ -345,37 +345,60 @@ router.post("/alphabet", async (req, res) => {
     return;
   }
 
+  // 4: todayWord.example_1?.trim(), // example_1
+  // 5: todayWord.example_2?.trim(), // example_2 (예문 발음기호)
+  // 6:
+  //   lang === "EN"
+  //     ? todayWord.en_example_3?.trim()
+  //     : todayWord.example_3?.trim(), // example_3 (에문 설명)
   const to = `whatsapp:${phoneNumber}`;
+  let contentVariables = {
+    1: todayWord.korean?.trim(), // korean
+    2: todayWord.pronunciation?.trim(), // pronunciation
+    3:
+      lang === "EN"
+        ? todayWord.en_description?.trim()
+        : todayWord.description?.trim(), // description
+    4: todayWord.example_1?.trim(), // example_1
+    5: todayWord.example_2?.trim(), // example_2 (예문 발음기호)
+    6:
+      lang === "EN"
+        ? todayWord.en_example_3?.trim()
+        : todayWord.example_3?.trim(), // example_3 (에문 설명)
+    // 7: undefined
+  };
+  if (!todayWord.example_1) {
+    // contentVariables[4] = todayWord.example_1?.trim()
+    delete contentVariables[4]
+  }
+  if (!todayWord.example_2) {
+    // contentVariables[4] = todayWord.example_1?.trim()
+    delete contentVariables[5]
+  }
+  6
+  if (!todayWord.example_3 || !todayWord.en_example_3) {
+    // contentVariables[4] = todayWord.example_1?.trim()
+    delete contentVariables[6]
+  }
+  // console.log(contentVariables);
+  let contentTweet = {
+    from: process.env.FROM_PHONE_NUMBER,
+    to,
+    contentSid:
+      lang === "EN"
+        ? todayWord.videoUrl
+          ? process.env.TEMPLATE_EN_WITH_VIDEO
+          : process.env.TEMPLATE_EN_BASIC
+        : todayWord.videoUrl
+          ? process.env.TEMPLATE_WITH_VIDEO
+          : process.env.TEMPLATE_BASIC,
+    messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
+    ...(force ? {} : { scheduleType: "fixed", sendAt: getSendAt(lang) }),
+    contentVariables: JSON.stringify(contentVariables),
+  };
+  console.log(contentTweet);
   try {
-    const response = await client.messages.create({
-      from: process.env.FROM_PHONE_NUMBER,
-      to,
-      contentSid:
-        lang === "EN"
-          ? todayWord.videoUrl
-            ? process.env.TEMPLATE_EN_WITH_VIDEO
-            : process.env.TEMPLATE_EN_BASIC
-          : todayWord.videoUrl
-            ? process.env.TEMPLATE_WITH_VIDEO
-            : process.env.TEMPLATE_BASIC,
-      messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
-      ...(force ? {} : { scheduleType: "fixed", sendAt: getSendAt(lang) }),
-      contentVariables: JSON.stringify({
-        1: todayWord.korean?.trim(), // korean
-        2: todayWord.pronunciation?.trim(), // pronunciation
-        3:
-          lang === "EN"
-            ? todayWord.en_description?.trim()
-            : todayWord.description?.trim(), // description
-        4: todayWord.example_1?.trim(), // example_1
-        5: todayWord.example_2?.trim(), // example_2 (예문 발음기호)
-        6:
-          lang === "EN"
-            ? todayWord.en_example_3?.trim()
-            : todayWord.example_3?.trim(), // example_3 (에문 설명)
-        7: undefined
-      }),
-    });
+    const response = await client.messages.create(contentTweet);
     // 7: todayWord.videoUrl || "video/d31417cc-dd9e-4297-be87-7f2158d3aaf6.mp4",
     console.log(
       "예약된 메시지가 다음 사용자에게 전송되었습니다:",
