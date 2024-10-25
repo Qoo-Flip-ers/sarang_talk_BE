@@ -411,6 +411,7 @@ router.post("/alphabet", async (req, res) => {
       );
     }
     console.log("Scheduled message sent to", phoneNumber);
+    return response;
   } catch (error) {
     console.log(e)
   }
