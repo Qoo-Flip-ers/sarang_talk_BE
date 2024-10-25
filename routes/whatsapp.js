@@ -375,7 +375,6 @@ router.post("/alphabet", async (req, res) => {
     // contentVariables[4] = todayWord.example_1?.trim()
     delete contentVariables[5]
   }
-  6
   if (!todayWord.example_3 || !todayWord.en_example_3) {
     // contentVariables[4] = todayWord.example_1?.trim()
     delete contentVariables[6]
@@ -397,6 +396,7 @@ router.post("/alphabet", async (req, res) => {
     contentVariables: JSON.stringify(contentVariables),
   };
   console.log(contentTweet);
+
   try {
     const response = await client.messages.create(contentTweet);
     // 7: todayWord.videoUrl || "video/d31417cc-dd9e-4297-be87-7f2158d3aaf6.mp4",
