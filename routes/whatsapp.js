@@ -345,12 +345,6 @@ router.post("/alphabet", async (req, res) => {
     return;
   }
 
-  // 4: todayWord.example_1?.trim(), // example_1
-  // 5: todayWord.example_2?.trim(), // example_2 (예문 발음기호)
-  // 6:
-  //   lang === "EN"
-  //     ? todayWord.en_example_3?.trim()
-  //     : todayWord.example_3?.trim(), // example_3 (에문 설명)
   const to = `whatsapp:${phoneNumber}`;
   let contentVariables = {
     1: todayWord.korean?.trim(), // korean
