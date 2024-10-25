@@ -293,7 +293,7 @@ router.post("/daily", async (req, res) => {
           lang === "EN"
             ? todayWord.en_example_3?.trim()
             : todayWord.example_3?.trim(),
-        7: undefined
+        // 7: undefined
       }),
     });
     // 7: todayWord.videoUrl || "video/d31417cc-dd9e-4297-be87-7f2158d3aaf6.mp4",
@@ -323,7 +323,7 @@ router.post("/daily", async (req, res) => {
 });
 
 router.post("/alphabet", async (req, res) => {
-  const { phoneNumber = "+821020252266", lang = "EN" } = req.body;
+  const { phoneNumber = "+821020252266", lang = "EN", sendAt = getSendAt(lang) } = req.body;
   const todayWord = await db.Word.findOne({
     where: {
       id: {
@@ -387,7 +387,8 @@ router.post("/alphabet", async (req, res) => {
           : process.env.TEMPLATE_BASIC,
     messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
     ...({ scheduleType: "fixed",
-      sendAt:  '2024-10-25T13:38:00.000Z'
+      sendAt
+      // sendAt:  '2024-10-25T13:38:00.000Z'
       // sendAt: getSendAt(lang)
     }),
     contentVariables: JSON.stringify(contentVariables),
@@ -906,7 +907,7 @@ const processCategorySubscriptions = async (
               lang === "EN"
                 ? todayWord.en_example_3?.trim()
                 : todayWord.example_3?.trim(),
-            7: undefined
+            // 7: undefined
           }),
         });
         // 7: todayWord.videoUrl || "video/d31417cc-dd9e-4297-be87-7f2158d3aaf6.mp4",
@@ -989,7 +990,7 @@ const processCategorySubscriptions = async (
               lang === "EN"
                 ? todayWord.en_example_3?.trim()
                 : todayWord.example_3?.trim(), // example_3 (에문 설명)
-            7: undefined
+            // 7: undefined
           }),
         });
         // 7: todayWord.videoUrl || "video/d31417cc-dd9e-4297-be87-7f2158d3aaf6.mp4",
@@ -1068,7 +1069,7 @@ const processCategorySubscriptions = async (
               lang === "EN"
                 ? todayWord.en_example_3?.trim()
                 : todayWord.example_3?.trim(), // example_3 (에문 설명)
-            7: undefined
+            // 7: undefined
           }),
         });
         // 7: todayWord.videoUrl || "video/d31417cc-dd9e-4297-be87-7f2158d3aaf6.mp4",
