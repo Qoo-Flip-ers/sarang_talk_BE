@@ -392,7 +392,7 @@ router.post("/alphabet", async (req, res) => {
           ? process.env.TEMPLATE_WITH_VIDEO
           : process.env.TEMPLATE_BASIC,
     messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
-    ...(force ? {} : { scheduleType: "fixed", sendAt: getSendAt(lang) }),
+    ...({ scheduleType: "fixed", sendAt: getSendAt(lang) }),
     contentVariables: JSON.stringify(contentVariables),
   };
   console.log(contentTweet);
