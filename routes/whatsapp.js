@@ -369,7 +369,7 @@ router.post("/alphabet", async (req, res) => {
     // contentVariables[4] = todayWord.example_1?.trim()
     delete contentVariables[5]
   }
-  if (!todayWord.example_3 || !todayWord.en_example_3) {
+  if (!todayWord.example_3 && !todayWord.en_example_3) {
     // contentVariables[4] = todayWord.example_1?.trim()
     delete contentVariables[6]
   }
