@@ -296,7 +296,7 @@ router.post("/daily", async (req, res) => {
         7: undefined
       }),
     });
-        // 7: todayWord.videoUrl || "video/d31417cc-dd9e-4297-be87-7f2158d3aaf6.mp4",
+    // 7: todayWord.videoUrl || "video/d31417cc-dd9e-4297-be87-7f2158d3aaf6.mp4",
 
     // if (todayWord.audioUrl) {
     //   setTimeout(async () => {
@@ -321,6 +321,77 @@ router.post("/daily", async (req, res) => {
     res.status(500).json({ message: "메시지 발송 중 오류가 발생했습니다." });
   }
 });
+
+router.post("/alphabet", async (req, res) => {
+  const { phoneNumber = "+821020252266", lang = "EN" } = req.body;
+  const todayWord = await db.Word.findOne({
+    where: {
+      id: {
+        [db.Sequelize.Op.gt]: 0,
+      },
+      type: {
+        [db.Sequelize.Op.eq]: "basic",
+      },
+      ...(lang === "EN"
+        ? { en_description: { [db.Sequelize.Op.ne]: null } }
+        : { description: { [db.Sequelize.Op.ne]: null } }),
+    },
+    order: [["id", "ASC"]],
+    limit: 1,
+  });
+
+  if (!todayWord) {
+    // sendSlack(`오늘의 단어가 없습니다.`);
+    return;
+  }
+
+  const to = `whatsapp:${phoneNumber}`;
+  try {
+    const response = await client.messages.create({
+      from: process.env.FROM_PHONE_NUMBER,
+      to,
+      contentSid:
+        lang === "EN"
+          ? todayWord.videoUrl
+            ? process.env.TEMPLATE_EN_WITH_VIDEO
+            : process.env.TEMPLATE_EN_BASIC
+          : todayWord.videoUrl
+            ? process.env.TEMPLATE_WITH_VIDEO
+            : process.env.TEMPLATE_BASIC,
+      messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
+      ...(force ? {} : { scheduleType: "fixed", sendAt: getSendAt(lang) }),
+      contentVariables: JSON.stringify({
+        1: todayWord.korean?.trim(), // korean
+        2: todayWord.pronunciation?.trim(), // pronunciation
+        3:
+          lang === "EN"
+            ? todayWord.en_description?.trim()
+            : todayWord.description?.trim(), // description
+        4: todayWord.example_1?.trim(), // example_1
+        5: todayWord.example_2?.trim(), // example_2 (예문 발음기호)
+        6:
+          lang === "EN"
+            ? todayWord.en_example_3?.trim()
+            : todayWord.example_3?.trim(), // example_3 (에문 설명)
+        7: undefined
+      }),
+    });
+    // 7: todayWord.videoUrl || "video/d31417cc-dd9e-4297-be87-7f2158d3aaf6.mp4",
+    console.log(
+      "예약된 메시지가 다음 사용자에게 전송되었습니다:",
+      phoneNumber
+    );
+    if (todayWord.videoUrl) {
+      console.log(
+        "비디오가 포함된 메시지가 전송되었습니다:",
+        phoneNumber
+      );
+    }
+    console.log("Scheduled message sent to", phoneNumber);
+  } catch (error) {
+    console.log(e)
+  }
+})
 
 /**
  * @swagger
@@ -453,11 +524,11 @@ router.post("/send-message-test", async (req, res) => {
   try {
     const result = [];
 
-      // const phoneNumber = user.phoneNumber; // 가정: User 모델에 phoneNumber 필드가 있다고 가정합니다.
-      const phoneNumber = '+62895330880148'
-      // WhatsApp 메시지 발송 API 호출
-      const response = await sendDailyConversation(phoneNumber);
-      result.push(response.data);
+    // const phoneNumber = user.phoneNumber; // 가정: User 모델에 phoneNumber 필드가 있다고 가정합니다.
+    const phoneNumber = '+62895330880148'
+    // WhatsApp 메시지 발송 API 호출
+    const response = await sendDailyConversation(phoneNumber);
+    result.push(response.data);
 
     res.json({
       message: "WhatsApp 메시지가 성공적으로 발송되었습니다.",
@@ -797,8 +868,8 @@ const processCategorySubscriptions = async (
                 ? process.env.TEMPLATE_EN_WITH_VIDEO
                 : process.env.TEMPLATE_EN_DAILY_CONVERSATION
               : todayWord.videoUrl
-              ? process.env.TEMPLATE_WITH_VIDEO
-              : process.env.TEMPLATE_DAILY_CONVERSATION,
+                ? process.env.TEMPLATE_WITH_VIDEO
+                : process.env.TEMPLATE_DAILY_CONVERSATION,
           messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
           ...(force ? {} : { scheduleType: "fixed", sendAt: getSendAt(lang) }),
           contentVariables: JSON.stringify({
@@ -817,7 +888,7 @@ const processCategorySubscriptions = async (
             7: undefined
           }),
         });
-            // 7: todayWord.videoUrl || "video/d31417cc-dd9e-4297-be87-7f2158d3aaf6.mp4",
+        // 7: todayWord.videoUrl || "video/d31417cc-dd9e-4297-be87-7f2158d3aaf6.mp4",
         console.log(
           "예약된 메시지가 다음 사용자에게 전송되었습니다:",
           subscription.User.name
@@ -880,8 +951,8 @@ const processCategorySubscriptions = async (
                 ? process.env.TEMPLATE_EN_WITH_VIDEO
                 : process.env.TEMPLATE_EN_TOPIK_WORD
               : todayWord.videoUrl
-              ? process.env.TEMPLATE_WITH_VIDEO
-              : process.env.TEMPLATE_TOPIK_WORD,
+                ? process.env.TEMPLATE_WITH_VIDEO
+                : process.env.TEMPLATE_TOPIK_WORD,
           messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
           ...(force ? {} : { scheduleType: "fixed", sendAt: getSendAt(lang) }),
           contentVariables: JSON.stringify({
@@ -900,7 +971,7 @@ const processCategorySubscriptions = async (
             7: undefined
           }),
         });
-            // 7: todayWord.videoUrl || "video/d31417cc-dd9e-4297-be87-7f2158d3aaf6.mp4",
+        // 7: todayWord.videoUrl || "video/d31417cc-dd9e-4297-be87-7f2158d3aaf6.mp4",
         console.log("Scheduled message sent to", subscription.User.name);
 
         await subscription.update({ lastWordId: todayWord.id });
@@ -959,8 +1030,8 @@ const processCategorySubscriptions = async (
                 ? process.env.TEMPLATE_EN_WITH_VIDEO
                 : process.env.TEMPLATE_EN_BASIC
               : todayWord.videoUrl
-              ? process.env.TEMPLATE_WITH_VIDEO
-              : process.env.TEMPLATE_BASIC,
+                ? process.env.TEMPLATE_WITH_VIDEO
+                : process.env.TEMPLATE_BASIC,
           messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
           ...(force ? {} : { scheduleType: "fixed", sendAt: getSendAt(lang) }),
           contentVariables: JSON.stringify({
@@ -979,7 +1050,7 @@ const processCategorySubscriptions = async (
             7: undefined
           }),
         });
-          // 7: todayWord.videoUrl || "video/d31417cc-dd9e-4297-be87-7f2158d3aaf6.mp4",
+        // 7: todayWord.videoUrl || "video/d31417cc-dd9e-4297-be87-7f2158d3aaf6.mp4",
         console.log(
           "예약된 메시지가 다음 사용자에게 전송되었습니다:",
           subscription.User.name
