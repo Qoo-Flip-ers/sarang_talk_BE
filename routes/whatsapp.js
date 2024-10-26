@@ -287,12 +287,13 @@ router.post("/daily", async (req, res) => {
           lang === "EN"
             ? todayWord.en_description?.trim()
             : todayWord.description?.trim(),
-        4: todayWord.example_1?.trim(),
-        5: todayWord.example_2?.trim(),
+        4: todayWord.example_1 ? todayWord.example_1.trim() : '  ',
+        5: todayWord.example_2 ? todayWord.example_2.trim() : '  ',
         6:
           lang === "EN"
-            ? todayWord.en_example_3?.trim()
-            : todayWord.example_3?.trim(),
+            ? todayWord.en_example_3 ? todayWord.en_example_3.trim() : '  '
+            : todayWord.example_3 ? todayWord.example_3.trim() : '  ',
+        7: 'https:/sarangtalk.kr'
         // 7: undefined
       }),
     });
@@ -353,13 +354,13 @@ router.post("/alphabet", async (req, res) => {
       lang === "EN"
         ? todayWord.en_description?.trim()
         : todayWord.description?.trim(), // description
-    4: todayWord.example_1?.trim(), // example_1
-    5: todayWord.example_2?.trim(), // example_2 (예문 발음기호)
+    4: todayWord.example_1 ? todayWord.example_1.trim() : '  ',
+    5: todayWord.example_2 ? todayWord.example_2.trim() : '  ', // example_2 (예문 발음기호)
     6:
       lang === "EN"
-        ? todayWord.en_example_3?.trim()
-        : todayWord.example_3?.trim(), // example_3 (에문 설명)
-    // 7: undefined
+        ? todayWord.en_example_3 ? todayWord.en_example_3.trim() : '  '
+        : todayWord.example_3 ? todayWord.example_3.trim() : '  ', // example_3 (에문 설명)
+    7: 'https:/sarangtalk.kr'
   };
   if (!todayWord.example_1) {
     // contentVariables[4] = todayWord.example_1?.trim()
@@ -386,7 +387,8 @@ router.post("/alphabet", async (req, res) => {
           ? process.env.TEMPLATE_WITH_VIDEO
           : process.env.TEMPLATE_BASIC,
     messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
-    ...({ scheduleType: "fixed",
+    ...({
+      scheduleType: "fixed",
       sendAt
       // sendAt:  '2024-10-25T13:38:00.000Z'
       // sendAt: getSendAt(lang)
