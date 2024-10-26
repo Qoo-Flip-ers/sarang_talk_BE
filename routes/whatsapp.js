@@ -293,7 +293,7 @@ router.post("/daily", async (req, res) => {
           lang === "EN"
             ? todayWord.en_example_3 ? todayWord.en_example_3.trim() : '  '
             : todayWord.example_3 ? todayWord.example_3.trim() : '  ',
-        7: 'https:/sarangtalk.kr'
+        7: 'https://sarangtalk.kr'
         // 7: undefined
       }),
     });
@@ -360,7 +360,7 @@ router.post("/alphabet", async (req, res) => {
       lang === "EN"
         ? todayWord.en_example_3 ? todayWord.en_example_3.trim() : '  '
         : todayWord.example_3 ? todayWord.example_3.trim() : '  ', // example_3 (에문 설명)
-    7: 'https:/sarangtalk.kr'
+    7: 'https://sarangtalk.kr'
   };
   if (!todayWord.example_1) {
     // contentVariables[4] = todayWord.example_1?.trim()
