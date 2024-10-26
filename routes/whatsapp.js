@@ -287,12 +287,13 @@ router.post("/daily", async (req, res) => {
           lang === "EN"
             ? todayWord.en_description?.trim()
             : todayWord.description?.trim(),
-        4: todayWord.example_1?.trim(),
-        5: todayWord.example_2?.trim(),
+        4: todayWord.example_1 ? todayWord.example_1.trim() : '  ',
+        5: todayWord.example_2 ? todayWord.example_2.trim() : '  ',
         6:
           lang === "EN"
-            ? todayWord.en_example_3?.trim()
-            : todayWord.example_3?.trim(),
+            ? todayWord.en_example_3 ? todayWord.en_example_3.trim() : '  '
+            : todayWord.example_3 ? todayWord.example_3.trim() : '  ',
+        7: 'https:/sarangtalk.kr'
         // 7: undefined
       }),
     });
