@@ -362,18 +362,18 @@ router.post("/alphabet", async (req, res) => {
         : todayWord.example_3 ? todayWord.example_3.trim() : '  ', // example_3 (에문 설명)
     7: 'https://sarangtalk.kr'
   };
-  if (!todayWord.example_1) {
-    // contentVariables[4] = todayWord.example_1?.trim()
-    delete contentVariables[4]
-  }
-  if (!todayWord.example_2) {
-    // contentVariables[4] = todayWord.example_1?.trim()
-    delete contentVariables[5]
-  }
-  if (!todayWord.example_3 && !todayWord.en_example_3) {
-    // contentVariables[4] = todayWord.example_1?.trim()
-    delete contentVariables[6]
-  }
+  // if (!todayWord.example_1) {
+  //   // contentVariables[4] = todayWord.example_1?.trim()
+  //   delete contentVariables[4]
+  // }
+  // if (!todayWord.example_2) {
+  //   // contentVariables[4] = todayWord.example_1?.trim()
+  //   delete contentVariables[5]
+  // }
+  // if (!todayWord.example_3 && !todayWord.en_example_3) {
+  //   // contentVariables[4] = todayWord.example_1?.trim()
+  //   delete contentVariables[6]
+  // }
   // console.log(contentVariables);
   let contentTweet = {
     from: process.env.FROM_PHONE_NUMBER,
