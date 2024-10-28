@@ -987,10 +987,10 @@ const processCategorySubscriptions = async (
               lang === "EN"
                 ? todayWord.en_description?.trim()
                 : todayWord.description?.trim(), // description
-            4: todayWord.example_1 ? todayWord.example_1.trim() : '  ',
-            5: todayWord.example_2 ? todayWord.example_2.trim() : '  ',
+            4: todayWord.example_1 ? todayWord.example_1.trim() : '  ',  // example_1
+            5: todayWord.example_2 ? todayWord.example_2.trim() : '  ',  // example_2 (예문 발음기호)
             6:
-              lang === "EN"
+              lang === "EN"  // example_3 (에문 설명)
                 ? todayWord.en_example_3 ? todayWord.en_example_3.trim() : '  '
                 : todayWord.example_3 ? todayWord.example_3.trim() : '  ',
             // 7: 'https://sarangtalk.kr'
@@ -1067,7 +1067,7 @@ const processCategorySubscriptions = async (
               lang === "EN"
                 ? todayWord.en_description?.trim()
                 : todayWord.description?.trim(), // description
-            4: todayWord.example_1 ? todayWord.example_1.trim() : '  ',
+            4: todayWord.example_1 ? todayWord.example_1.trim() : '  ', // example_1
             5: todayWord.example_2 ? todayWord.example_2.trim() : '  ', // example_2 (예문 발음기호)
             6:
               lang === "EN" // example_3 (에문 설명)
