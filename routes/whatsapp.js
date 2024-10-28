@@ -909,7 +909,7 @@ const processCategorySubscriptions = async (
               lang === "EN"
                 ? todayWord.en_example_3 ? todayWord.en_example_3.trim() : '  '
                 : todayWord.example_3 ? todayWord.example_3.trim() : '  ',
-            7: 'https://sarangtalk.kr'
+            // 7: 'https://sarangtalk.kr'
             // 7: undefined
           }),
         });
@@ -993,7 +993,7 @@ const processCategorySubscriptions = async (
               lang === "EN"
                 ? todayWord.en_example_3 ? todayWord.en_example_3.trim() : '  '
                 : todayWord.example_3 ? todayWord.example_3.trim() : '  ',
-            7: 'https://sarangtalk.kr'
+            // 7: 'https://sarangtalk.kr'
             // 7: undefined
           }),
         });
@@ -1073,7 +1073,7 @@ const processCategorySubscriptions = async (
               lang === "EN" // example_3 (에문 설명)
                 ? todayWord.en_example_3 ? todayWord.en_example_3.trim() : '  '
                 : todayWord.example_3 ? todayWord.example_3.trim() : '  ',
-            7: 'https://sarangtalk.kr'
+            // 7: 'https://sarangtalk.kr'
             // 7: undefined
           }),
         });
