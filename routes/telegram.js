@@ -316,7 +316,7 @@ const processCategorySubscriptions = async (category, subscriptions) => {
         //   error
         // );
         console.error(
-          `Error sending scheduled message to ${subscription.User.name}: `,
+          `Error sending scheduled message to ${subscription.User?.name}: `,
           error
         );
       }
