@@ -293,7 +293,7 @@ router.post("/daily", async (req, res) => {
           lang === "EN"
             ? todayWord.en_example_3 ? todayWord.en_example_3.trim() : '  '
             : todayWord.example_3 ? todayWord.example_3.trim() : '  ',
-        // 7: 'https://drive.google.com/file/d/1xqcokesGg4uL48uu-jv0UzJm9rybZvN6/view?usp=sharing'
+        7: 'sarang.svg?sp=r&st=2024-10-28T06:11:11Z&se=2025-04-05T14:11:11Z&sv=2022-11-02&sr=b&sig=HewDP2pM0DT7FegKcaOHxRmLZkrJ%2FyPwnActQCRyD%2FI%3D'
         // 7: undefined
       }),
     });
@@ -360,7 +360,7 @@ router.post("/alphabet", async (req, res) => {
       lang === "EN"
         ? todayWord.en_example_3 ? todayWord.en_example_3.trim() : '  '
         : todayWord.example_3 ? todayWord.example_3.trim() : '  ', // example_3 (에문 설명)
-    // // 7: 'https://drive.google.com/file/d/1xqcokesGg4uL48uu-jv0UzJm9rybZvN6/view?usp=sharing'
+    7: 'sarang.svg?sp=r&st=2024-10-28T06:11:11Z&se=2025-04-05T14:11:11Z&sv=2022-11-02&sr=b&sig=HewDP2pM0DT7FegKcaOHxRmLZkrJ%2FyPwnActQCRyD%2FI%3D'
   };
   // if (!todayWord.example_1) {
   //   // contentVariables[4] = todayWord.example_1?.trim()
@@ -399,7 +399,6 @@ router.post("/alphabet", async (req, res) => {
 
   try {
     const response = await client.messages.create(contentTweet);
-    // 7: todayWord.videoUrl || "video/d31417cc-dd9e-4297-be87-7f2158d3aaf6.mp4",
     console.log(
       "예약된 메시지가 다음 사용자에게 전송되었습니다:",
       phoneNumber
@@ -909,7 +908,7 @@ const processCategorySubscriptions = async (
               lang === "EN"
                 ? todayWord.en_example_3 ? todayWord.en_example_3.trim() : '  '
                 : todayWord.example_3 ? todayWord.example_3.trim() : '  ',
-            // // 7: 'https://drive.google.com/file/d/1xqcokesGg4uL48uu-jv0UzJm9rybZvN6/view?usp=sharing'
+            7: 'sarang.svg?sp=r&st=2024-10-28T06:11:11Z&se=2025-04-05T14:11:11Z&sv=2022-11-02&sr=b&sig=HewDP2pM0DT7FegKcaOHxRmLZkrJ%2FyPwnActQCRyD%2FI%3D'
             // 7: undefined
           }),
         });
@@ -993,7 +992,7 @@ const processCategorySubscriptions = async (
               lang === "EN"  // example_3 (에문 설명)
                 ? todayWord.en_example_3 ? todayWord.en_example_3.trim() : '  '
                 : todayWord.example_3 ? todayWord.example_3.trim() : '  ',
-            // 7: 'https://drive.google.com/file/d/1xqcokesGg4uL48uu-jv0UzJm9rybZvN6/view?usp=sharing'
+            7: 'sarang.svg?sp=r&st=2024-10-28T06:11:11Z&se=2025-04-05T14:11:11Z&sv=2022-11-02&sr=b&sig=HewDP2pM0DT7FegKcaOHxRmLZkrJ%2FyPwnActQCRyD%2FI%3D'
             // 7: undefined
           }),
         });
@@ -1073,7 +1072,7 @@ const processCategorySubscriptions = async (
               lang === "EN" // example_3 (에문 설명)
                 ? todayWord.en_example_3 ? todayWord.en_example_3.trim() : '  '
                 : todayWord.example_3 ? todayWord.example_3.trim() : '  ',
-            // 7: 'https://drive.google.com/file/d/1xqcokesGg4uL48uu-jv0UzJm9rybZvN6/view?usp=sharing'
+            7: 'sarang.svg?sp=r&st=2024-10-28T06:11:11Z&se=2025-04-05T14:11:11Z&sv=2022-11-02&sr=b&sig=HewDP2pM0DT7FegKcaOHxRmLZkrJ%2FyPwnActQCRyD%2FI%3D'
             // 7: undefined
           }),
         });
