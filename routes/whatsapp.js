@@ -293,7 +293,7 @@ router.post("/daily", async (req, res) => {
           lang === "EN"
             ? todayWord.en_example_3 ? todayWord.en_example_3.trim() : '  '
             : todayWord.example_3 ? todayWord.example_3.trim() : '  ',
-        7: 'https://drive.google.com/file/d/1xqcokesGg4uL48uu-jv0UzJm9rybZvN6/view?usp=sharing'
+        // 7: 'https://drive.google.com/file/d/1xqcokesGg4uL48uu-jv0UzJm9rybZvN6/view?usp=sharing'
         // 7: undefined
       }),
     });
@@ -360,7 +360,7 @@ router.post("/alphabet", async (req, res) => {
       lang === "EN"
         ? todayWord.en_example_3 ? todayWord.en_example_3.trim() : '  '
         : todayWord.example_3 ? todayWord.example_3.trim() : '  ', // example_3 (에문 설명)
-    7: 'https://drive.google.com/file/d/1xqcokesGg4uL48uu-jv0UzJm9rybZvN6/view?usp=sharing'
+    // // 7: 'https://drive.google.com/file/d/1xqcokesGg4uL48uu-jv0UzJm9rybZvN6/view?usp=sharing'
   };
   // if (!todayWord.example_1) {
   //   // contentVariables[4] = todayWord.example_1?.trim()
@@ -909,7 +909,7 @@ const processCategorySubscriptions = async (
               lang === "EN"
                 ? todayWord.en_example_3 ? todayWord.en_example_3.trim() : '  '
                 : todayWord.example_3 ? todayWord.example_3.trim() : '  ',
-            7: 'https://drive.google.com/file/d/1xqcokesGg4uL48uu-jv0UzJm9rybZvN6/view?usp=sharing'
+            // // 7: 'https://drive.google.com/file/d/1xqcokesGg4uL48uu-jv0UzJm9rybZvN6/view?usp=sharing'
             // 7: undefined
           }),
         });
@@ -993,7 +993,7 @@ const processCategorySubscriptions = async (
               lang === "EN"  // example_3 (에문 설명)
                 ? todayWord.en_example_3 ? todayWord.en_example_3.trim() : '  '
                 : todayWord.example_3 ? todayWord.example_3.trim() : '  ',
-            7: 'https://drive.google.com/file/d/1xqcokesGg4uL48uu-jv0UzJm9rybZvN6/view?usp=sharing'
+            // 7: 'https://drive.google.com/file/d/1xqcokesGg4uL48uu-jv0UzJm9rybZvN6/view?usp=sharing'
             // 7: undefined
           }),
         });
@@ -1073,7 +1073,7 @@ const processCategorySubscriptions = async (
               lang === "EN" // example_3 (에문 설명)
                 ? todayWord.en_example_3 ? todayWord.en_example_3.trim() : '  '
                 : todayWord.example_3 ? todayWord.example_3.trim() : '  ',
-            7: 'https://drive.google.com/file/d/1xqcokesGg4uL48uu-jv0UzJm9rybZvN6/view?usp=sharing'
+            // 7: 'https://drive.google.com/file/d/1xqcokesGg4uL48uu-jv0UzJm9rybZvN6/view?usp=sharing'
             // 7: undefined
           }),
         });
