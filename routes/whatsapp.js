@@ -293,7 +293,7 @@ router.post("/daily", async (req, res) => {
           lang === "EN"
             ? todayWord.en_example_3 ? todayWord.en_example_3.trim() : '  '
             : todayWord.example_3 ? todayWord.example_3.trim() : '  ',
-        7: 'images/sarang.svg?sp=r&st=2024-10-28T06:11:11Z&se=2025-04-05T14:11:11Z&sv=2022-11-02&sr=b&sig=HewDP2pM0DT7FegKcaOHxRmLZkrJ%2FyPwnActQCRyD%2FI%3D'
+        // 7: 'images/sarang.svg?sp=r&st=2024-10-28T06:11:11Z&se=2025-04-05T14:11:11Z&sv=2022-11-02&sr=b&sig=HewDP2pM0DT7FegKcaOHxRmLZkrJ%2FyPwnActQCRyD%2FI%3D'
         // 7: undefined
       }),
     });
@@ -360,7 +360,7 @@ router.post("/alphabet", async (req, res) => {
       lang === "EN"
         ? todayWord.en_example_3 ? todayWord.en_example_3.trim() : '  '
         : todayWord.example_3 ? todayWord.example_3.trim() : '  ', // example_3 (에문 설명)
-    7: 'images/sarang.svg?sp=r&st=2024-10-28T06:11:11Z&se=2025-04-05T14:11:11Z&sv=2022-11-02&sr=b&sig=HewDP2pM0DT7FegKcaOHxRmLZkrJ%2FyPwnActQCRyD%2FI%3D'
+    // 7: 'images/sarang.svg?sp=r&st=2024-10-28T06:11:11Z&se=2025-04-05T14:11:11Z&sv=2022-11-02&sr=b&sig=HewDP2pM0DT7FegKcaOHxRmLZkrJ%2FyPwnActQCRyD%2FI%3D'
   };
   // console.log(contentVariables);
   let contentTweet = {
@@ -896,7 +896,7 @@ const processCategorySubscriptions = async (
               lang === "EN"
                 ? todayWord.en_example_3 ? todayWord.en_example_3.trim() : '  '
                 : todayWord.example_3 ? todayWord.example_3.trim() : '  ',
-            7: 'images/sarang.svg?sp=r&st=2024-10-28T06:11:11Z&se=2025-04-05T14:11:11Z&sv=2022-11-02&sr=b&sig=HewDP2pM0DT7FegKcaOHxRmLZkrJ%2FyPwnActQCRyD%2FI%3D'
+            // 7: 'images/sarang.svg?sp=r&st=2024-10-28T06:11:11Z&se=2025-04-05T14:11:11Z&sv=2022-11-02&sr=b&sig=HewDP2pM0DT7FegKcaOHxRmLZkrJ%2FyPwnActQCRyD%2FI%3D'
             // 7: undefined
           }),
         });
@@ -980,7 +980,7 @@ const processCategorySubscriptions = async (
               lang === "EN"  // example_3 (에문 설명)
                 ? todayWord.en_example_3 ? todayWord.en_example_3.trim() : '  '
                 : todayWord.example_3 ? todayWord.example_3.trim() : '  ',
-            7: 'images/sarang.svg?sp=r&st=2024-10-28T06:11:11Z&se=2025-04-05T14:11:11Z&sv=2022-11-02&sr=b&sig=HewDP2pM0DT7FegKcaOHxRmLZkrJ%2FyPwnActQCRyD%2FI%3D'
+            // 7: 'images/sarang.svg?sp=r&st=2024-10-28T06:11:11Z&se=2025-04-05T14:11:11Z&sv=2022-11-02&sr=b&sig=HewDP2pM0DT7FegKcaOHxRmLZkrJ%2FyPwnActQCRyD%2FI%3D'
             // 7: undefined
           }),
         });
@@ -1060,7 +1060,7 @@ const processCategorySubscriptions = async (
               lang === "EN" // example_3 (에문 설명)
                 ? todayWord.en_example_3 ? todayWord.en_example_3.trim() : '  '
                 : todayWord.example_3 ? todayWord.example_3.trim() : '  ',
-            7: 'images/sarang.svg?sp=r&st=2024-10-28T06:11:11Z&se=2025-04-05T14:11:11Z&sv=2022-11-02&sr=b&sig=HewDP2pM0DT7FegKcaOHxRmLZkrJ%2FyPwnActQCRyD%2FI%3D'
+            // 7: 'images/sarang.svg?sp=r&st=2024-10-28T06:11:11Z&se=2025-04-05T14:11:11Z&sv=2022-11-02&sr=b&sig=HewDP2pM0DT7FegKcaOHxRmLZkrJ%2FyPwnActQCRyD%2FI%3D'
             // 7: undefined
           }),
         });
