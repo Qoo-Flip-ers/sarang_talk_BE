@@ -47,6 +47,26 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: true,
       },
+      zoom1n1: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+        allowNull: true,
+      },
+      zoom1n5: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+        allowNull: true,
+      },
+      lectureVideo: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+        allowNull: true,
+      },
+      liveStudy: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+        allowNull: true
+      }
     },
     {
       sequelize,
