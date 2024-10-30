@@ -34,7 +34,6 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
         defaultValue: 0,
       },
-
       plan: {
         type: DataTypes.STRING,
         defaultValue: "whatsapp_1",
@@ -47,6 +46,7 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: true,
       },
+      // AddOn1-1:1
       zoom1n1: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
@@ -57,11 +57,13 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: false,
         allowNull: true,
       },
+      // AddOn3-lecture
       lectureVideo: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
         allowNull: true,
       },
+      // AddOn4-recap
       liveStudy: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
