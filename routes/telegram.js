@@ -171,13 +171,13 @@ const processCategorySubscriptions = async (category, subscriptions) => {
       }
 
       try {
-        if (subscription.User.chatId) {
+        if (subscription.User?.chatId) {
           const text = `*${todayWord.korean?.trim()}*\n\[_${todayWord.pronunciation?.trim()}_\]\n${todayWord.description?.trim()}\n\n*Example*\n${todayWord.example_1?.trim()}\n\[_${todayWord.example_2?.trim()}_\]\n${todayWord.example_3?.trim()}\n\n*안녕! Annyeong! 👋🏻*\nSilakan rekam atau ketik balasan Anda sesuai dengan ungkapan dan contoh kalimat hari ini 😊\n\n_Sent from Annyeong WA_`;
 
           await redis.lpush(
             "telegram_message_queue",
             JSON.stringify({
-              chatId: subscription.User.chatId,
+              chatId: subscription.User?.chatId,
               text,
             })
           );
@@ -228,13 +228,13 @@ const processCategorySubscriptions = async (category, subscriptions) => {
       }
 
       try {
-        if (subscription.User.chatId) {
+        if (subscription.User?.chatId) {
           const text = `*${todayWord.korean?.trim()}*\n\[_${todayWord.pronunciation?.trim()}_\]\n${todayWord.description?.trim()}\n\n*Example*\n${todayWord.example_1?.trim()}\n\[_${todayWord.example_2?.trim()}_\]\n${todayWord.example_3?.trim()}\n\n*안녕! Annyeong! 👋🏻*\nSilakan rekam atau ketik balasan Anda sesuai dengan ungkapan dan contoh kalimat hari ini 😊\n\n_Sent from Annyeong WA_`;
 
           await redis.lpush(
             "telegram_message_queue",
             JSON.stringify({
-              chatId: subscription.User.chatId,
+              chatId: subscription.User?.chatId,
               text,
             })
           );
@@ -285,13 +285,13 @@ const processCategorySubscriptions = async (category, subscriptions) => {
       }
 
       try {
-        if (subscription.User.chatId) {
+        if (subscription.User?.chatId) {
           const text = `*${todayWord.korean?.trim()}*\n\[_${todayWord.pronunciation?.trim()}_\]\n${todayWord.description?.trim()}\n\n*Example*\n${todayWord.example_1?.trim()}\n\[_${todayWord.example_2?.trim()}_\]\n${todayWord.example_3?.trim()}\n\n*안녕! Annyeong! 👋🏻*\nSilakan rekam atau ketik balasan Anda sesuai dengan ungkapan dan contoh kalimat hari ini 😊\n\n_Sent from Annyeong WA_`;
 
           await redis.lpush(
             "telegram_message_queue",
             JSON.stringify({
-              chatId: subscription.User.chatId,
+              chatId: subscription.User?.chatId,
               text,
             })
           );
@@ -418,11 +418,11 @@ const sendWeeklyQuiz = async (platform) => {
           .map((word) => `\[${word.korean}\] :`)
           .join("\n");
 
-        if (subscription.User.chatId) {
+        if (subscription.User?.chatId) {
           await redis.lpush(
             "telegram_message_queue",
             JSON.stringify({
-              chatId: subscription.User.chatId,
+              chatId: subscription.User?.chatId,
               text: `*It's time for weekly QUIZ!*\n\n${quizContents}`,
             })
           );
