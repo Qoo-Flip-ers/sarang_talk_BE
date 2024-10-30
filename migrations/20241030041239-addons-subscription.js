@@ -13,13 +13,25 @@ module.exports = {
         type: Sequelize.BOOLEAN,
         defaultValue: false,
         allowNull: true,
+      }),
+      queryInterface.addColumn("Subscription", "addOn3-lecture", {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+        allowNull: true,
+      }),
+      queryInterface.addColumn("Subscription", "addOn4-recap", {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false,
+        allowNull: true,
       })
     ]);
   },
   async down(queryInterface, Sequelize) {
     await Promise.all([
       queryInterface.removeColumn("Subscription", "addOn1-1:1"),
-      queryInterface.removeColumn("Subscription", "addOn1-1:5")
+      queryInterface.removeColumn("Subscription", "addOn1-1:5"),
+      queryInterface.removeColumn("Subscription", "addOn3-lecture"),
+      queryInterface.removeColumn("Subscription", "addOn4-recap")
     ])
   }
 };
