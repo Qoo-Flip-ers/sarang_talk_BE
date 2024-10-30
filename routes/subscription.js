@@ -97,6 +97,10 @@ router.post("/", async (req, res) => {
     duration,
     zoom_mentoring,
     test,
+    AddOn1Zoom1n1,
+    AddOn2Zoom1n5,
+    AddOn3lecture,
+    AddOn4recap
   } = req.body;
   let { email } = req.body;
 
@@ -227,6 +231,10 @@ router.post("/", async (req, res) => {
       code,
       codeGeneratedAt,
       lang: convertedLang.toUpperCase(),
+      AddOn1Zoom1n1,
+      AddOn2Zoom1n5,
+      AddOn3lecture,
+      AddOn4recap
     })
   );
 
