@@ -23,6 +23,10 @@ async function insertIntoDatabase(data) {
     code,
     codeGeneratedAt,
     lang,
+    AddOn1Zoom1n1,
+    AddOn2Zoom1n5,
+    AddOn3lecture,
+    AddOn4recap
   } = data;
 
   try {
@@ -76,6 +80,10 @@ async function insertIntoDatabase(data) {
         plan,
         quiz: newQuiz,
         zoom: newZoom,
+        AddOn1Zoom1n1,
+        AddOn2Zoom1n5,
+        AddOn3lecture,
+        AddOn4recap
       });
     });
 
