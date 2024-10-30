@@ -2,7 +2,6 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    const tableDefinition = await queryInterface.describeTable("Subscription");
     await Promise.all([
       queryInterface.addColumn("Subscriptions", "addOn1-1:1", {
         type: Sequelize.BOOLEAN,
