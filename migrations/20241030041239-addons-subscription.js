@@ -4,22 +4,22 @@ module.exports = {
   async up(queryInterface, Sequelize) {
     const tableDefinition = await queryInterface.describeTable("Subscription");
     await Promise.all([
-      queryInterface.addColumn("Subscription", "addOn1-1:1", {
+      queryInterface.addColumn("Subscriptions", "addOn1-1:1", {
         type: Sequelize.BOOLEAN,
         defaultValue: false,
         allowNull: true,
       }),
-      queryInterface.addColumn("Subscription", "addOn1-1:5", {
+      queryInterface.addColumn("Subscriptions", "addOn1-1:5", {
         type: Sequelize.BOOLEAN,
         defaultValue: false,
         allowNull: true,
       }),
-      queryInterface.addColumn("Subscription", "addOn3-lecture", {
+      queryInterface.addColumn("Subscriptions", "addOn3-lecture", {
         type: Sequelize.BOOLEAN,
         defaultValue: false,
         allowNull: true,
       }),
-      queryInterface.addColumn("Subscription", "addOn4-recap", {
+      queryInterface.addColumn("Subscriptions", "addOn4-recap", {
         type: Sequelize.BOOLEAN,
         defaultValue: false,
         allowNull: true,
@@ -28,10 +28,10 @@ module.exports = {
   },
   async down(queryInterface, Sequelize) {
     await Promise.all([
-      queryInterface.removeColumn("Subscription", "addOn1-1:1"),
-      queryInterface.removeColumn("Subscription", "addOn1-1:5"),
-      queryInterface.removeColumn("Subscription", "addOn3-lecture"),
-      queryInterface.removeColumn("Subscription", "addOn4-recap")
+      queryInterface.removeColumn("Subscriptions", "addOn1-1:1"),
+      queryInterface.removeColumn("Subscriptions", "addOn1-1:5"),
+      queryInterface.removeColumn("Subscriptions", "addOn3-lecture"),
+      queryInterface.removeColumn("Subscriptions", "addOn4-recap")
     ])
   }
 };
