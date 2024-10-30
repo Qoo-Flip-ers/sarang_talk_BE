@@ -80,10 +80,10 @@ async function insertIntoDatabase(data) {
         plan,
         quiz: newQuiz,
         zoom: newZoom,
-        AddOn1Zoom1n1,
-        AddOn2Zoom1n5,
-        AddOn3lecture,
-        AddOn4recap
+        zoom1n1: AddOn1Zoom1n1,
+        zoom1n5: AddOn2Zoom1n5,
+        lectureVideo: AddOn3lecture,
+        liveStudy: AddOn4recap
       });
     });
 
