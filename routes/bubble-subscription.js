@@ -98,8 +98,10 @@ router.post("/", async (req, res) => {
     zoom_mentoring,
     test,
     gens_test,
-    // 'AddOn2-1:5',
-    // 'AddOn-1:5'
+    AddOn1Zoom1n1,
+    AddOn2Zoom1n5,
+    AddOn3lecture,
+    AddOn4recap
   } = req.body;
   let { email } = req.body;
 
@@ -225,17 +227,21 @@ router.post("/", async (req, res) => {
     JSON.stringify({
       name,
       phoneNumber,
-      // type: formattingType,
       type,
       plan: convertedPlan,
       email,
       startDate,
       endDate,
-      // zoom: formattingZoom,
       zoom,
       code,
       codeGeneratedAt,
       lang: convertedLang.toUpperCase(),
+      // zoom: formattingZoom,
+      // type: formattingType,
+      AddOn1Zoom1n1,
+      AddOn2Zoom1n5,
+      AddOn3lecture,
+      AddOn4recap
     })
   );
 
