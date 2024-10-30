@@ -360,7 +360,6 @@ router.post("/alphabet", async (req, res) => {
       lang === "EN"
         ? todayWord.en_example_3 ? todayWord.en_example_3.trim() : '  '
         : todayWord.example_3 ? todayWord.example_3.trim() : '  ', // example_3 (에문 설명)
-    7: 'images/sarang.jpg'
     // 7: 'images/sarang.jpg?sp=r&st=2024-10-28T09:49:31Z&se=2025-01-10T17:49:31Z&sv=2022-11-02&sr=b&sig=tfMPe73Eq6EOE3XB9qmSoEOzEt3nca%2Bcn6ZQKQvyVBE%3D'
   };
   // console.log(contentVariables);
