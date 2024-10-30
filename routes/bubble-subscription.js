@@ -97,7 +97,9 @@ router.post("/", async (req, res) => {
     duration,
     zoom_mentoring,
     test,
-    gens_test
+    gens_test,
+    // 'AddOn2-1:5',
+    // 'AddOn-1:5'
   } = req.body;
   let { email } = req.body;
 

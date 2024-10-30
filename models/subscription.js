@@ -46,28 +46,30 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: true,
       },
-      // // AddOn1-1:1
       // zoom1n1: {
       //   type: DataTypes.BOOLEAN,
       //   defaultValue: false,
       //   allowNull: true,
+      //   field: 'addOn1-1:1'
       // },
       // zoom1n5: {
       //   type: DataTypes.BOOLEAN,
       //   defaultValue: false,
       //   allowNull: true,
+      //   field: 'addOn1-1:5'
       // },
-      // // AddOn3-lecture
       // lectureVideo: {
       //   type: DataTypes.BOOLEAN,
       //   defaultValue: false,
       //   allowNull: true,
+      //   field: 'addOn3-lecture'
       // },
       // // AddOn4-recap
       // liveStudy: {
       //   type: DataTypes.BOOLEAN,
       //   defaultValue: false,
-      //   allowNull: true
+      //   allowNull: true,
+      //   field: 'addOn4-recap'
       // }
     },
     {
