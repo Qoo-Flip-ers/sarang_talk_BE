@@ -107,7 +107,7 @@ router.post("/", async (req, res) => {
 
   console.log("새로운 요청:", req.body);
   // 새로운 형식을 기존 형식으로 변환
-  const type = (plan === "beginners") || (plan === 'Korean Alphabet') ? "basic" : plan || "";
+  const type = (plan === "beginners") || (plan && plan.trim() === 'Korean Alphabet') ? "basic" : plan || "";
   const zoom = zoom_mentoring === "yes" ? "zoom" : "";
   const convertedPlan = `${platform}_${duration}`;
   const convertedLang = lang || "";
@@ -142,9 +142,11 @@ router.post("/", async (req, res) => {
     "topik_variation",
   ];
 
-  let typeArray = [type];
+  let typeArray = type + ''
+  let zoomArray = zoom
+  console.log(zoomArray);
+  console.log(typeArray);
   const formattingType = typeArray.split(",").map((t) => t.trim());
-  let zoomArray = [zoom];
   const formattingZoom = zoomArray ? zoomArray.split(",").map((t) => t.trim()) : [];
 
   if (
