@@ -149,7 +149,10 @@ router.post("/", async (req, res) => {
   console.log(formattingType);
   if (
     formattingType.length === 0 ||
-    !formattingType.every((t) => validTypes.includes(t))
+    !formattingType.every((t) => {
+      console.log(t);
+      return validTypes.includes(t)
+    })
   ) {
     console.log("[error] 유효하지 않은 구독 타입이 포함되어 있습니다.");
     return res
