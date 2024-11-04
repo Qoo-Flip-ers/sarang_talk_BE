@@ -138,10 +138,10 @@ router.post("/", async (req, res) => {
     "beginners",
     "daily_conversation",
     "kpop_lyrics",
+    'topik',
     "topik_word",
     "topik_variation",
-    "topik",
-    "daily"
+    'daily'
   ];
 
   const formattingType = type.split(",").map((t) => t.trim());
@@ -149,8 +149,9 @@ router.post("/", async (req, res) => {
   console.log(formattingType);
   if (
     formattingType.length === 0 ||
-    !formattingType.every((t) => {
+    formattingType.every((t) => {
       console.log(t);
+      console.log(validTypes);
       return validTypes.includes(t)
     })
   ) {
