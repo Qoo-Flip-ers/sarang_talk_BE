@@ -142,19 +142,20 @@ router.post("/", async (req, res) => {
     "topik_variation",
   ];
 
-  // const formattingType = type.split(",").map((t) => t.trim());
+  let typeArray = [type];
+  const formattingType = typeArray.split(",").map((t) => t.trim());
+  let zoomArray = [zoom];
+  const formattingZoom = zoomArray ? zoomArray.split(",").map((t) => t.trim()) : [];
 
-  // const formattingZoom = zoom ? zoom.split(",").map((t) => t.trim()) : [];
-
-  // if (
-  //   formattingType.length === 0 ||
-  //   !formattingType.every((t) => validTypes.includes(t))
-  // ) {
-  //   console.log("[error] 유효하지 않은 구독 타입이 포함되어 있습니다.");
-  //   return res
-  //     .status(400)
-  //     .json({ error: "유효하지 않은 구독 타입이 포함되어 있습니다." });
-  // }
+  if (
+    formattingType.length === 0 ||
+    !formattingType.every((t) => validTypes.includes(t))
+  ) {
+    console.log("[error] 유효하지 않은 구독 타입이 포함되어 있습니다.");
+    return res
+      .status(400)
+      .json({ error: "유효하지 않은 구독 타입이 포함되어 있습니다." });
+  }
 
   const validPlans = [
     "telegram_1",
@@ -173,10 +174,9 @@ router.post("/", async (req, res) => {
   }
 
   let startDate = new Date();
+  startDate.setDate(startDate.getDate() + 1);
   if (gens_test) {
-    startDate.setDate(startDate.getDate() + 14);
-  } else {
-    startDate.setDate(startDate.getDate() + 1);
+    startDate.setDate(startDate.getDate());
   }
 
   if (lang === "EN") {
@@ -186,7 +186,8 @@ router.post("/", async (req, res) => {
     }
   }
 
-  const month = parseInt(duration);
+  let durationArray = [duration];
+  const month = parseInt(durationArray[0]);
 
   const endDate = new Date(startDate);
   endDate.setMonth(endDate.getMonth() + month);
@@ -227,17 +228,15 @@ router.post("/", async (req, res) => {
     JSON.stringify({
       name,
       phoneNumber,
-      type,
+      type: formattingType,
       plan: convertedPlan,
       email,
       startDate,
       endDate,
-      zoom,
+      zoom: formattingZoom,
       code,
       codeGeneratedAt,
       lang: convertedLang.toUpperCase(),
-      // zoom: formattingZoom,
-      // type: formattingType,
       AddOn1Zoom1n1,
       AddOn2Zoom1n5,
       AddOn3lecture,
