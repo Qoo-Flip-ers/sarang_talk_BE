@@ -146,14 +146,9 @@ router.post("/", async (req, res) => {
 
   const formattingType = type.split(",").map((t) => t.trim());
   const formattingZoom = zoom ? zoom.split(",").map((t) => t.trim()) : [];
-  console.log(formattingType);
   if (
     formattingType.length === 0 ||
-    !formattingType.every((t) => {
-      console.log(t);
-      console.log(validTypes);
-      return validTypes.includes(t + '')
-    })
+    !formattingType.every((t) => validTypes.includes(t + ''))
   ) {
     console.log("[error] 유효하지 않은 구독 타입이 포함되어 있습니다.");
     return res
