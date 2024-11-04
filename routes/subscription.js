@@ -135,6 +135,8 @@ router.post("/", async (req, res) => {
   const validTypes = [
     "basic",
     "beginners",
+    'topik',
+    'daily',
     "daily_conversation",
     "kpop_lyrics",
     "topik_word",
