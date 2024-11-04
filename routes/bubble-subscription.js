@@ -142,8 +142,13 @@ router.post("/", async (req, res) => {
     "topik_variation",
   ];
 
+<<<<<<< HEAD
   let typeArray = [type];
   let zoomArray = [zoom];
+=======
+  let typeArray = type + ''
+  let zoomArray = zoom
+>>>>>>> 549150f7c4ab09357e561b5ffc944bcb1e54ee7d
   console.log(zoomArray);
   console.log(typeArray);
   const formattingType = typeArray.split(",").map((t) => t.trim());
