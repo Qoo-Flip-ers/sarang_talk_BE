@@ -146,6 +146,7 @@ router.post("/", async (req, res) => {
 
   const formattingType = type.split(",").map((t) => t.trim());
   const formattingZoom = zoom ? zoom.split(",").map((t) => t.trim()) : [];
+  console.log(formattingType);
   if (
     formattingType.length === 0 ||
     !formattingType.every((t) => validTypes.includes(t))
