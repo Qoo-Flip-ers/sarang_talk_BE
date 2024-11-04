@@ -45,13 +45,12 @@ db.sequelize.sync().then(() => {
   console.log("데이터베이스 연결 성공");
 });
 
-const server = app.listen(port, (req) => {
+const server = app.listen(port, () => {
   console.log(`서버가 ${port}번 포트에서 실행 중입니다.`);
   setTimeout(() => {
     swaggerDocs(app, port);
   }, 1000);
 
-  console.log(req);
   if (process.send) {
     process.send("ready");
   }
