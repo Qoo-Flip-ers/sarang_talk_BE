@@ -140,7 +140,8 @@ router.post("/", async (req, res) => {
     "kpop_lyrics",
     "topik_word",
     "topik_variation",
-    "topik"
+    "topik",
+    "daily"
   ];
 
   const formattingType = type.split(",").map((t) => t.trim());
