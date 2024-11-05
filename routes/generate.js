@@ -3,6 +3,7 @@ const router = express.Router();
 const { OpenAI } = require("openai");
 require("dotenv").config();
 const { Readable } = require("stream");
+const { generateUniqueOrderId } = require("../utils/bubble");
 
 // OpenAI API 설정
 const openai = new OpenAI({
@@ -420,5 +421,9 @@ async function getAudioDuration(filePath) {
     });
   });
 }
+
+router.get("/sarang/talk/orderID", (req, res) => {
+  return generateUniqueOrderId()
+})
 
 module.exports = router;
