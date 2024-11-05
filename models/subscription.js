@@ -48,26 +48,26 @@ module.exports = (sequelize, DataTypes) => {
       },
       zoom1n1: {
         type: DataTypes.BOOLEAN,
-        defaultValue: false,
+        // defaultValue: false,
         allowNull: true,
         field: 'addOn1-1:1'
       },
       zoom1n5: {
         type: DataTypes.BOOLEAN,
-        defaultValue: false,
+        // defaultValue: false,
         allowNull: true,
         field: 'addOn1-1:5'
       },
       lectureVideo: {
         type: DataTypes.BOOLEAN,
-        defaultValue: false,
+        // defaultValue: false,
         allowNull: true,
         field: 'addOn3-lecture'
       },
       // AddOn4-recap
       liveStudy: {
         type: DataTypes.BOOLEAN,
-        defaultValue: false,
+        // defaultValue: false,
         allowNull: true,
         field: 'addOn4-recap'
       }
