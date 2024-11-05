@@ -135,6 +135,7 @@ router.post("/", async (req, res) => {
   const validTypes = [
     "basic",
     "beginners",
+    'alphabet',
     'topik',
     'daily',
     "daily_conversation",
@@ -160,9 +161,11 @@ router.post("/", async (req, res) => {
   const validPlans = [
     "telegram_1",
     "telegram_3",
+    "telegram_6",
     "telegram_12",
     "whatsapp_1",
     "whatsapp_3",
+    "whatsapp_6",
     "whatsapp_12",
   ];
 

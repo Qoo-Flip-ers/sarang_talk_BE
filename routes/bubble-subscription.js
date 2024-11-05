@@ -107,7 +107,8 @@ router.post("/", async (req, res) => {
 
   console.log("새로운 요청:", req.body);
   // 새로운 형식을 기존 형식으로 변환
-  const type = (plan === "beginners") || (plan && plan.trim() === 'Korean Alphabet') ? "basic" : plan || "";
+  const type = (plan && ["beginners", "Korean Alphabet", 'alphabet'].includes(plan.trim())) 
+  ? "basic" : plan || "";
   const zoom = zoom_mentoring === "yes" ? "zoom" : "";
   const convertedPlan = `${platform}_${duration}`;
   const convertedLang = lang || "";
@@ -141,7 +142,8 @@ router.post("/", async (req, res) => {
     'topik',
     "topik_word",
     "topik_variation",
-    'daily'
+    'daily',
+    'alphabet'
   ];
 
   const formattingType = type.split(",").map((t) => t.trim());
