@@ -1726,7 +1726,7 @@ async function getSharedBlob(videoUrl) {
     containerName: "video", // Required
     blobName: videoName[1],
     permissions: BlobSASPermissions.parse("r"), // Required
-    expiresOn: new Date(new Date().valueOf() + 86400 * 1100), // Required. Date type
+    expiresOn: new Date(new Date().valueOf() + 86400 * 1600), // Required. Date type
     contentType: "video/mp4",
     protocol: SASProtocol.HttpsAndHttp, // Optional
   }, storageCredential).toString();
