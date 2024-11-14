@@ -3,7 +3,9 @@ const router = express.Router();
 const db = require("../models");
 const twilio = require("twilio");
 const cron = require("node-cron");
-const { BlobServiceClient, generateBlobSASQueryParameters, BlobSASPermissions, SASProtocol } = require("@azure/storage-blob");
+const { BlobServiceClient, generateBlobSASQueryParameters, BlobSASPermissions, SASProtocol
+  , StorageSharedKeyCredential
+} = require("@azure/storage-blob");
 
 const client = twilio(
   process.env.TWILIO_ACCOUNT_SID,
@@ -280,6 +282,18 @@ router.post("/daily", async (req, res) => {
   try {
     console.log("todayWord");
     console.log(todayWord.videoUrl);
+    const videoName = todayWord.videoUrl ? todayWord.videoUrl.split("video/") : ['base', '017c2fc6-7deb-441a-92aa-6b240ec10e59-2.mp4'];
+    const sasString = await generateBlobSASQueryParameters({
+      containerName: "video", // Required
+      blobName: videoName,
+      permissions: BlobSASPermissions.parse("r"), // Required
+      expiresOn: new Date(new Date().valueOf() + 86400 * 100), // Required. Date type
+      contentType: "video/mp4",
+      protocol: SASProtocol.HttpsAndHttp, // Optional
+    }, new StorageSharedKeyCredential(
+      process.env.AZURE_ACCOUNT,
+      process.env.AZURE_ACCOUNT_KEY)).toString();
+    console.log(sasString)
     const response = await client.messages.create({
       from: process.env.FROM_PHONE_NUMBER,
       messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
@@ -298,19 +312,10 @@ router.post("/daily", async (req, res) => {
           lang === "EN"
             ? todayWord.en_example_3 ? todayWord.en_example_3.trim() : '  '
             : todayWord.example_3 ? todayWord.example_3.trim() : '  ',
-        7: 'video/017c2fc6-7deb-441a-92aa-6b240ec10e59-2.mp4'
+        7: `${todayWord.videoUrl}?${sasString}`
       }),
     });
-    const sasString = await generateBlobSASQueryParameters({
-      containerName: "video", // Required
-      blobName: "017c2fc6-7deb-441a-92aa-6b240ec10e59", // Required
-      permissions: BlobSASPermissions.parse("r"), // Required
-      expiresOn: new Date(new Date().valueOf() + 86400 * 100), // Required. Date type
-      contentType: "video/mp4",
-      protocol: SASProtocol.HttpsAndHttp, // Optional
-    }).toString();
-    console.log(sasString)
-    // 7: todayWord.videoUrl || "video/d31417cc-dd9e-4297-be87-7f2158d3aaf6.mp4",
+    // 7: todayWord.videoUrl || "video/017c2fc6-7deb-441a-92aa-6b240ec10e59-2.mp4",
 
     // if (todayWord.audioUrl) {
     //   setTimeout(async () => {
@@ -373,7 +378,6 @@ router.post("/alphabet", async (req, res) => {
       lang === "EN"
         ? todayWord.en_example_3 ? todayWord.en_example_3.trim() : '  '
         : todayWord.example_3 ? todayWord.example_3.trim() : '  ', // example_3 (에문 설명)
-    // 7: 'images/sarang.jpg?sp=r&st=2024-10-28T09:49:31Z&se=2025-01-10T17:49:31Z&sv=2022-11-02&sr=b&sig=tfMPe73Eq6EOE3XB9qmSoEOzEt3nca%2Bcn6ZQKQvyVBE%3D'
   };
   // console.log(contentVariables);
   let contentTweet = {
