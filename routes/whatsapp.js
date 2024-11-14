@@ -303,7 +303,7 @@ router.post("/daily", async (req, res) => {
           lang === "EN"
             ? todayWord.en_example_3 ? todayWord.en_example_3.trim() : '  '
             : todayWord.example_3 ? todayWord.example_3.trim() : '  ',
-        7: todayWord.videoUrl || sharedVideoUri
+        7: sharedVideoUri || todayWord.videoUrl
       }),
     });
 
@@ -904,7 +904,7 @@ const processCategorySubscriptions = async (
               lang === "EN"
                 ? todayWord.en_example_3 ? todayWord.en_example_3.trim() : '  '
                 : todayWord.example_3 ? todayWord.example_3.trim() : '  ',
-            7: todayWord.videoUrl || sharedVideoUri
+            7: sharedVideoUri || todayWord.videoUrl
           }),
         });
         console.log(
@@ -987,7 +987,7 @@ const processCategorySubscriptions = async (
               lang === "EN"  // example_3 (에문 설명)
                 ? todayWord.en_example_3 ? todayWord.en_example_3.trim() : '  '
                 : todayWord.example_3 ? todayWord.example_3.trim() : '  ',
-            7: todayWord.videoUrl || sharedVideoUri
+            7: sharedVideoUri || todayWord.videoUrl
           }),
         });
         console.log("Scheduled message sent to", subscription.User.name);
@@ -1066,7 +1066,7 @@ const processCategorySubscriptions = async (
               lang === "EN" // example_3 (에문 설명)
                 ? todayWord.en_example_3 ? todayWord.en_example_3.trim() : '  '
                 : todayWord.example_3 ? todayWord.example_3.trim() : '  ',
-            7: todayWord.videoUrl || sharedVideoUri
+            7: sharedVideoUri || todayWord.videoUrl
           }),
         });
         console.log(
