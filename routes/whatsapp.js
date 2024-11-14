@@ -15,6 +15,10 @@ const client = twilio(
 const blobServiceClient = BlobServiceClient.fromConnectionString(
   process.env.AZURE_STORAGE_CONNECTION_STRING
 );
+const storageCredential = new StorageSharedKeyCredential(
+  process.env.AZURE_ACCOUNT,
+  process.env.AZURE_ACCOUNT_KEY
+);
 
 const sendDailyConversation = async (phoneNumber) => {
   const data = await db.Word.findOne({
@@ -280,25 +284,7 @@ router.post("/daily", async (req, res) => {
   const to = `whatsapp:${phoneNumber}`;
 
   try {
-    const videoName = todayWord.videoUrl ? todayWord.videoUrl.split("video/") : ['base', '017c2fc6-7deb-441a-92aa-6b240ec10e59-2.mp4'];
-    const sasString = await generateBlobSASQueryParameters({
-      containerName: "video", // Required
-      blobName: videoName[1],
-      permissions: BlobSASPermissions.parse("r"), // Required
-      expiresOn: new Date(new Date().valueOf() + 86400 * 100), // Required. Date type
-      contentType: "video/mp4",
-      protocol: SASProtocol.HttpsAndHttp, // Optional
-    }, new StorageSharedKeyCredential(
-      process.env.AZURE_ACCOUNT,
-      process.env.AZURE_ACCOUNT_KEY)
-    ).toString();
-    const sharedVideoUri = `video/${videoName[1]}?${sasString}`;
-    console.log("todayWord");
-    console.log(todayWord.videoUrl);
-    console.log(videoName[1]);
-    console.log(sasString)
-    console.log(sharedVideoUri);
-
+    const sharedVideoUri = await getSharedBlob(todayWord.videoUrl)
     const response = await client.messages.create({
       from: process.env.FROM_PHONE_NUMBER,
       messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
@@ -317,10 +303,9 @@ router.post("/daily", async (req, res) => {
           lang === "EN"
             ? todayWord.en_example_3 ? todayWord.en_example_3.trim() : '  '
             : todayWord.example_3 ? todayWord.example_3.trim() : '  ',
-        7: sharedVideoUri
+        7: todayWord.videoUrl || sharedVideoUri
       }),
     });
-    // 7: todayWord.videoUrl || "video/017c2fc6-7deb-441a-92aa-6b240ec10e59-2.mp4",
 
     // if (todayWord.audioUrl) {
     //   setTimeout(async () => {
@@ -892,6 +877,7 @@ const processCategorySubscriptions = async (
 
       const to = `whatsapp:${subscription.User.phoneNumber}`;
       try {
+        const sharedVideoUri = await getSharedBlob(todayWord.videoUrl);
         const response = await client.messages.create({
           from: process.env.FROM_PHONE_NUMBER,
           to,
@@ -918,11 +904,9 @@ const processCategorySubscriptions = async (
               lang === "EN"
                 ? todayWord.en_example_3 ? todayWord.en_example_3.trim() : '  '
                 : todayWord.example_3 ? todayWord.example_3.trim() : '  ',
-            // 7: 'images/sarang.svg?sp=r&st=2024-10-28T06:11:11Z&se=2025-04-05T14:11:11Z&sv=2022-11-02&sr=b&sig=HewDP2pM0DT7FegKcaOHxRmLZkrJ%2FyPwnActQCRyD%2FI%3D'
-            // 7: undefined
+            7: todayWord.videoUrl || sharedVideoUri
           }),
         });
-        // 7: todayWord.videoUrl || "video/d31417cc-dd9e-4297-be87-7f2158d3aaf6.mp4",
         console.log(
           "예약된 메시지가 다음 사용자에게 전송되었습니다:",
           subscription.User.name
@@ -976,6 +960,7 @@ const processCategorySubscriptions = async (
 
       const to = `whatsapp:${subscription.User.phoneNumber}`;
       try {
+        const sharedVideoUri = await getSharedBlob(todayWord.videoUrl)
         const response = await client.messages.create({
           from: process.env.FROM_PHONE_NUMBER,
           to,
@@ -1002,11 +987,9 @@ const processCategorySubscriptions = async (
               lang === "EN"  // example_3 (에문 설명)
                 ? todayWord.en_example_3 ? todayWord.en_example_3.trim() : '  '
                 : todayWord.example_3 ? todayWord.example_3.trim() : '  ',
-            // 7: 'images/sarang.svg?sp=r&st=2024-10-28T06:11:11Z&se=2025-04-05T14:11:11Z&sv=2022-11-02&sr=b&sig=HewDP2pM0DT7FegKcaOHxRmLZkrJ%2FyPwnActQCRyD%2FI%3D'
-            // 7: undefined
+            7: todayWord.videoUrl || sharedVideoUri
           }),
         });
-        // 7: todayWord.videoUrl || "video/d31417cc-dd9e-4297-be87-7f2158d3aaf6.mp4",
         console.log("Scheduled message sent to", subscription.User.name);
 
         await subscription.update({ lastWordId: todayWord.id });
@@ -1056,6 +1039,7 @@ const processCategorySubscriptions = async (
 
       const to = `whatsapp:${subscription.User.phoneNumber}`;
       try {
+        const sharedVideoUri = await getSharedBlob(todayWord.videoUrl);
         const response = await client.messages.create({
           from: process.env.FROM_PHONE_NUMBER,
           to,
@@ -1082,11 +1066,9 @@ const processCategorySubscriptions = async (
               lang === "EN" // example_3 (에문 설명)
                 ? todayWord.en_example_3 ? todayWord.en_example_3.trim() : '  '
                 : todayWord.example_3 ? todayWord.example_3.trim() : '  ',
-            // 7: 'images/sarang.svg?sp=r&st=2024-10-28T06:11:11Z&se=2025-04-05T14:11:11Z&sv=2022-11-02&sr=b&sig=HewDP2pM0DT7FegKcaOHxRmLZkrJ%2FyPwnActQCRyD%2FI%3D'
-            // 7: undefined
+            7: todayWord.videoUrl || sharedVideoUri
           }),
         });
-        // 7: todayWord.videoUrl || "video/d31417cc-dd9e-4297-be87-7f2158d3aaf6.mp4",
         console.log(
           "예약된 메시지가 다음 사용자에게 전송되었습니다:",
           subscription.User.name
@@ -1736,6 +1718,27 @@ cron.schedule("12 13 * * 0", async () => {
     }
   }
 });
+
+/**
+ * videoUrl: string
+ */
+async function getSharedBlob(videoUrl) {
+  const videoName = videoUrl ? videoUrl.split("video/") : ['base', '017c2fc6-7deb-441a-92aa-6b240ec10e59-2.mp4'];
+  const sasString = await generateBlobSASQueryParameters({
+    containerName: "video", // Required
+    blobName: videoName[1],
+    permissions: BlobSASPermissions.parse("r"), // Required
+    expiresOn: new Date(new Date().valueOf() + 86400 * 1100), // Required. Date type
+    contentType: "video/mp4",
+    protocol: SASProtocol.HttpsAndHttp, // Optional
+  }, storageCredential).toString();
+  const sharedVideoUri = `video/${videoName[1]}?${sasString}`;
+  // console.log(videoUrl);
+  // console.log(videoName[1]);
+  // console.log(sasString)
+  // console.log(sharedVideoUri);
+  return sharedVideoUri;
+}
 
 // ------------------------ // 캐나다 ------------------------
 
