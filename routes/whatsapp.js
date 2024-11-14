@@ -3,7 +3,7 @@ const router = express.Router();
 const db = require("../models");
 const twilio = require("twilio");
 const cron = require("node-cron");
-const { BlobServiceClient, generateBlobSASQueryParameters } = require("@azure/storage-blob");
+const { BlobServiceClient, generateBlobSASQueryParameters, BlobSASPermissions, SASProtocol } = require("@azure/storage-blob");
 
 const client = twilio(
   process.env.TWILIO_ACCOUNT_SID,
@@ -303,9 +303,8 @@ router.post("/daily", async (req, res) => {
     });
     const sasString = await generateBlobSASQueryParameters({
       containerName: "video", // Required
-      blobName: '017c2fc6-7deb-441a-92aa-6b240ec10e59', // Required
+      blobName: "017c2fc6-7deb-441a-92aa-6b240ec10e59", // Required
       permissions: BlobSASPermissions.parse("r"), // Required
-      startsOn: new Date(), // Optional
       expiresOn: new Date(new Date().valueOf() + 86400 * 100), // Required. Date type
       contentType: "video/mp4",
       protocol: SASProtocol.HttpsAndHttp, // Optional
