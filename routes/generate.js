@@ -3,7 +3,6 @@ const router = express.Router();
 const { OpenAI } = require("openai");
 require("dotenv").config();
 const { Readable } = require("stream");
-// const { generateUniqueOrderId } = require("../utils/bubble");
 
 // OpenAI API 설정
 const openai = new OpenAI({
@@ -427,7 +426,6 @@ router.get("/sarang/talk/orderID", () => {
   const randomComponent = Math.random().toString(36).substring(2);
   const fullHash = hashValue(timestamp + randomComponent);
   return fullHash.substring(0, 9);
-  // return generateUniqueOrderId()
 })
 
 module.exports = router;
