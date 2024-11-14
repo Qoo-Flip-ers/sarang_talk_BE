@@ -1733,9 +1733,9 @@ async function getSharedBlob(videoUrl) {
     protocol: SASProtocol.HttpsAndHttp, // Optional
   }, storageCredential).toString();
   const sharedVideoUri = `video/${videoName[1]}?${sasString}`;
-  // console.log(videoUrl);
-  // console.log(videoName[1]);
-  // console.log(sasString)
+  console.log(videoUrl);
+  console.log(videoName[1]);
+  console.log(sasString)
   // console.log(sharedVideoUri);
   return sharedVideoUri;
 }
