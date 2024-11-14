@@ -3,15 +3,20 @@ const router = express.Router();
 const db = require("../models");
 const twilio = require("twilio");
 const cron = require("node-cron");
+const { BlobServiceClient, generateBlobSASQueryParameters } = require("@azure/storage-blob");
 
 const client = twilio(
   process.env.TWILIO_ACCOUNT_SID,
   process.env.TWILIO_AUTH_TOKEN
 );
 
+const blobServiceClient = BlobServiceClient.fromConnectionString(
+  process.env.AZURE_STORAGE_CONNECTION_STRING
+);
+
 const sendDailyConversation = async (phoneNumber) => {
   const data = await db.Word.findOne({
-    where: { id: 1 },
+    where: { id: 111 },
   });
 
   if (!data) {
@@ -296,6 +301,16 @@ router.post("/daily", async (req, res) => {
         7: 'video/017c2fc6-7deb-441a-92aa-6b240ec10e59-2.mp4'
       }),
     });
+    const sasString = await generateBlobSASQueryParameters({
+      containerName: "video", // Required
+      blobName: '017c2fc6-7deb-441a-92aa-6b240ec10e59', // Required
+      permissions: BlobSASPermissions.parse("r"), // Required
+      startsOn: new Date(), // Optional
+      expiresOn: new Date(new Date().valueOf() + 86400 * 100), // Required. Date type
+      contentType: "video/mp4",
+      protocol: SASProtocol.HttpsAndHttp, // Optional
+    }).toString();
+    console.log(sasString)
     // 7: todayWord.videoUrl || "video/d31417cc-dd9e-4297-be87-7f2158d3aaf6.mp4",
 
     // if (todayWord.audioUrl) {
