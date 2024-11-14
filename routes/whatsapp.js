@@ -543,7 +543,7 @@ router.post("/send-message-test", async (req, res) => {
     const result = [];
 
     // WhatsApp 메시지 발송 API 호출
-    const response = await sendDailyConversation(req?.body?.phoneNumber);
+    const response = await sendDailyMessage(req?.body?.category, req?.body?.language);
     result.push(response.data);
 
     res.json({
