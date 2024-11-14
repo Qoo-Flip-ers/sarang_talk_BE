@@ -280,20 +280,25 @@ router.post("/daily", async (req, res) => {
   const to = `whatsapp:${phoneNumber}`;
 
   try {
-    console.log("todayWord");
-    console.log(todayWord.videoUrl);
     const videoName = todayWord.videoUrl ? todayWord.videoUrl.split("video/") : ['base', '017c2fc6-7deb-441a-92aa-6b240ec10e59-2.mp4'];
     const sasString = await generateBlobSASQueryParameters({
       containerName: "video", // Required
-      blobName: videoName,
+      blobName: videoName[1],
       permissions: BlobSASPermissions.parse("r"), // Required
       expiresOn: new Date(new Date().valueOf() + 86400 * 100), // Required. Date type
       contentType: "video/mp4",
       protocol: SASProtocol.HttpsAndHttp, // Optional
     }, new StorageSharedKeyCredential(
       process.env.AZURE_ACCOUNT,
-      process.env.AZURE_ACCOUNT_KEY)).toString();
+      process.env.AZURE_ACCOUNT_KEY)
+    ).toString();
+    const sharedVideoUri = `${todayWord.videoUrl}?${sasString}`;
+    console.log("todayWord");
+    console.log(todayWord.videoUrl);
+    console.log(videoName[1]);
     console.log(sasString)
+    console.log(sharedVideoUri);
+
     const response = await client.messages.create({
       from: process.env.FROM_PHONE_NUMBER,
       messagingServiceSid: process.env.MESSAGING_SERVICE_SID,
@@ -312,7 +317,7 @@ router.post("/daily", async (req, res) => {
           lang === "EN"
             ? todayWord.en_example_3 ? todayWord.en_example_3.trim() : '  '
             : todayWord.example_3 ? todayWord.example_3.trim() : '  ',
-        7: `${todayWord.videoUrl}?${sasString}`
+        7: sharedVideoUri
       }),
     });
     // 7: todayWord.videoUrl || "video/017c2fc6-7deb-441a-92aa-6b240ec10e59-2.mp4",
