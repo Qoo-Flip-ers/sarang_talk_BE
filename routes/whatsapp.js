@@ -542,10 +542,8 @@ router.post("/send-message-test", async (req, res) => {
   try {
     const result = [];
 
-    // const phoneNumber = user.phoneNumber; // 가정: User 모델에 phoneNumber 필드가 있다고 가정합니다.
-    const phoneNumber = '+62895330880148'
     // WhatsApp 메시지 발송 API 호출
-    const response = await sendDailyConversation(phoneNumber);
+    const response = await sendDailyConversation(req?.body?.phoneNumber);
     result.push(response.data);
 
     res.json({
