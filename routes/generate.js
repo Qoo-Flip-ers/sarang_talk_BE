@@ -381,9 +381,6 @@ router.post("/combine-gif-audio", async (req, res) => {
     const containerClient = blobServiceClient.getContainerClient("video");
     const blobName = `${uuidv4()}.mp4`;
     const blockBlobClient = containerClient.getBlockBlobClient(blobName);
-    // await containerClient.generateSasStringToSign
-    blockBlobClient.url
-    // generateBlobSASQueryParameters()
     await blockBlobClient.uploadFile(tempOutputPath);
 
     // 임시 파일들 삭제
