@@ -18,7 +18,7 @@ const blobServiceClient = BlobServiceClient.fromConnectionString(
 
 const sendDailyConversation = async (phoneNumber) => {
   const data = await db.Word.findOne({
-    where: { id: 111 },
+    where: { id: 1 },
   });
 
   if (!data) {
@@ -268,7 +268,7 @@ router.post("/daily", async (req, res) => {
         ? { en_description: { [db.Sequelize.Op.ne]: null } }
         : { description: { [db.Sequelize.Op.ne]: null } }),
     },
-    order: [["id", "ASC"]],
+    order: [["id", "DESC"]],
     limit: 1,
   });
 
