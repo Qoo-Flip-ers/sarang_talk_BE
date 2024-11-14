@@ -292,7 +292,7 @@ router.post("/daily", async (req, res) => {
       process.env.AZURE_ACCOUNT,
       process.env.AZURE_ACCOUNT_KEY)
     ).toString();
-    const sharedVideoUri = `${todayWord.videoUrl}?${sasString}`;
+    const sharedVideoUri = `video/${videoName[1]}?${sasString}`;
     console.log("todayWord");
     console.log(todayWord.videoUrl);
     console.log(videoName[1]);
