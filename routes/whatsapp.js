@@ -293,8 +293,7 @@ router.post("/daily", async (req, res) => {
           lang === "EN"
             ? todayWord.en_example_3 ? todayWord.en_example_3.trim() : '  '
             : todayWord.example_3 ? todayWord.example_3.trim() : '  ',
-        7: 'video/017c2fc6-7deb-441a-92aa-6b240ec10e59.mp4?sp=r&st=2024-11-14T02:44:27Z&se=2025-01-11T10:44:27Z&spr=https&sv=2022-11-02&sr=b&sig=qDMlS5ft%2BBwkCx8WBKr5qdgWHlpvg%2FwhMWlqosi463s%3D'
-        // 7: undefined
+        7: 'video/017c2fc6-7deb-441a-92aa-6b240ec10e59-2.mp4'
       }),
     });
     // 7: todayWord.videoUrl || "video/d31417cc-dd9e-4297-be87-7f2158d3aaf6.mp4",
