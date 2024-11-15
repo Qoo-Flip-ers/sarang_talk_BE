@@ -106,7 +106,7 @@ async function fetchActiveSubscriptions(category) {
       },
       type: category,
       plan: {
-        [db.Sequelize.Op.in]: ["telegram_1", "telegram_3", "telegram_12"],
+        [db.Sequelize.Op.in]: ["telegram_1", "telegram_3", "telegram_6", "telegram_12"],
       },
     },
     include: [

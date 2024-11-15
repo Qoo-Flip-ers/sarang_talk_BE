@@ -796,7 +796,7 @@ async function fetchActiveSubscriptions(category, lang = "ID") {
       },
       type: category,
       plan: {
-        [db.Sequelize.Op.in]: ["whatsapp_1", "whatsapp_3", "whatsapp_12"],
+        [db.Sequelize.Op.in]: ["whatsapp_1", "whatsapp_3", "whatsapp_6", "whatsapp_12"],
       },
     },
     include: [
