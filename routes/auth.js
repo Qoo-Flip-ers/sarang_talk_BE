@@ -11,6 +11,9 @@ router.post("/login", async (req, res) => {
   ) || (
     username === process.env.ADMIN_USERNAME2 &&
     password === process.env.ADMIN_PASSWORD2
+  ) || (
+    username === process.env.ADMIN_USERNAME3 &&
+    password === process.env.ADMIN_PASSWORD3
   )) {
     return res.status(200).json({ token: process.env.AUTH_TOKEN });
   }
