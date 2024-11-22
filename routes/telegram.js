@@ -447,6 +447,23 @@ const sendWeeklyQuiz = async (platform) => {
   }
 };
 
+async function generateText(todayWord, language) {
+  let text = `*${todayWord.korean?.trim()}*\n\[_${todayWord.pronunciation?.trim()}_\]\n`;
+  if (['EN', 'en'].includes(language)) {
+    const description = todayWord.en_description ? todayWord.en_description : todayWord.description;
+    const example_3 = todayWord.en_example_3 ? todayWord.en_example_3 : todayWord.example_3;
+    text += `${description.trim()}\n\n`
+      + `*Example*\n${todayWord.example_1?.trim()}\n\[_${todayWord.example_2?.trim()}_\]\n`
+      + `${example_3.trim()}\n\n`
+  } else {
+    text += `${todayWord.description?.trim()}\n\n`
+      + `*Example*\n${todayWord.example_1?.trim()}\n\[_${todayWord.example_2?.trim()}_\]\n`
+      + `${todayWord.example_3?.trim()}\n\n`
+  }
+  text += `*안녕! Annyeong! 👋🏻*\nSilakan rekam atau ketik balasan Anda sesuai dengan ungkapan dan contoh kalimat hari ini 😊\n\n_Sent from Annyeong WA_`;
+  return text;
+}
+
 cron.schedule("0 2 * * *", async () => {
   // 매일 한국시간 오전 11시 (UTC+9)
   if (process.env.NODE_ENV === "development") {
