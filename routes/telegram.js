@@ -191,6 +191,8 @@ const processCategorySubscriptions = async (category, subscriptions) => {
             wordId: todayWord.id,
             receivedDate: new Date(),
           });
+          console.log(text);
+          generateText(todayWord, subscription.User.language);
         } else {
           // sendSlack(
           //   `[${category}] ${subscription.User.name}의 chatId가 없습니다.`
@@ -447,7 +449,9 @@ const sendWeeklyQuiz = async (platform) => {
   }
 };
 
-async function generateText(todayWord, language) {
+function generateText(todayWord, language) {
+  console.log(todayWord);
+  console.log(language);
   let text = `*${todayWord.korean?.trim()}*\n\[_${todayWord.pronunciation?.trim()}_\]\n`;
   if (['EN', 'en'].includes(language)) {
     const description = todayWord.en_description ? todayWord.en_description : todayWord.description;
@@ -461,6 +465,7 @@ async function generateText(todayWord, language) {
       + `${todayWord.example_3?.trim()}\n\n`
   }
   text += `*안녕! Annyeong! 👋🏻*\nSilakan rekam atau ketik balasan Anda sesuai dengan ungkapan dan contoh kalimat hari ini 😊\n\n_Sent from Annyeong WA_`;
+  console.log(text);
   return text;
 }
 
