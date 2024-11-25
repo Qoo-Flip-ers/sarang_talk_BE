@@ -113,7 +113,7 @@ async function fetchActiveSubscriptions(category) {
     include: [
       {
         model: db.User,
-        attributes: ["id", "name", "phoneNumber", "chatId"],
+        attributes: ["id", "name", "phoneNumber", "chatId", "language"],
       },
     ],
   });
@@ -173,8 +173,7 @@ const processCategorySubscriptions = async (category, subscriptions) => {
 
       try {
         if (subscription.User?.chatId) {
-          const text = `*${todayWord.korean?.trim()}*\n\[_${todayWord.pronunciation?.trim()}_\]\n${todayWord.description?.trim()}\n\n*Example*\n${todayWord.example_1?.trim()}\n\[_${todayWord.example_2?.trim()}_\]\n${todayWord.example_3?.trim()}\n\n*안녕! Annyeong! 👋🏻*\nSilakan rekam atau ketik balasan Anda sesuai dengan ungkapan dan contoh kalimat hari ini 😊\n\n_Sent from Annyeong WA_`;
-
+          const text = generateText(todayWord, subscription.User?.language);
           await redis.lpush(
             "telegram_message_queue",
             JSON.stringify({
@@ -192,8 +191,6 @@ const processCategorySubscriptions = async (category, subscriptions) => {
             wordId: todayWord.id,
             receivedDate: new Date(),
           });
-          console.log(text);
-          generateText(todayWord, subscription.User?.language);
         } else {
           // sendSlack(
           //   `[${category}] ${subscription.User.name}의 chatId가 없습니다.`
@@ -289,8 +286,7 @@ const processCategorySubscriptions = async (category, subscriptions) => {
 
       try {
         if (subscription.User?.chatId) {
-          const text = `*${todayWord.korean?.trim()}*\n\[_${todayWord.pronunciation?.trim()}_\]\n${todayWord.description?.trim()}\n\n*Example*\n${todayWord.example_1?.trim()}\n\[_${todayWord.example_2?.trim()}_\]\n${todayWord.example_3?.trim()}\n\n*안녕! Annyeong! 👋🏻*\nSilakan rekam atau ketik balasan Anda sesuai dengan ungkapan dan contoh kalimat hari ini 😊\n\n_Sent from Annyeong WA_`;
-
+          const text = generateText(todayWord, subscription.User?.language)
           await redis.lpush(
             "telegram_message_queue",
             JSON.stringify({
@@ -308,8 +304,6 @@ const processCategorySubscriptions = async (category, subscriptions) => {
             wordId: todayWord.id,
             receivedDate: new Date(),
           });
-          console.log(text);
-          generateText(todayWord, subscription.User?.language)
         } else {
           // sendSlack(
           //   `[${category}] ${subscription.User.name}의 chatId가 없습니다.`
@@ -456,8 +450,8 @@ const sendWeeklyQuiz = async (platform) => {
 };
 
 function generateText(todayWord, language) {
-  console.log(todayWord);
-  console.log(language);
+  // console.log(todayWord);
+  console.log('language' + language);
   let text = `*${todayWord.korean?.trim()}*\n\[_${todayWord.pronunciation?.trim()}_\]\n`;
   if (['EN', 'en'].includes(language)) {
     const description = todayWord.en_description ? todayWord.en_description : todayWord.description;
@@ -465,12 +459,13 @@ function generateText(todayWord, language) {
     text += `${description.trim()}\n\n`
       + `*Example*\n${todayWord.example_1?.trim()}\n\[_${todayWord.example_2?.trim()}_\]\n`
       + `${example_3.trim()}\n\n`
+      + `*안녕! Annyeong! 👋🏻*\nSilakan rekam atau ketik balasan Anda sesuai dengan ungkapan dan contoh kalimat hari ini 😊\n\n_Sent from Annyeong WA_`;
   } else {
     text += `${todayWord.description?.trim()}\n\n`
       + `*Example*\n${todayWord.example_1?.trim()}\n\[_${todayWord.example_2?.trim()}_\]\n`
       + `${todayWord.example_3?.trim()}\n\n`
+      + `*안녕! Annyeong! 👋🏻*\nSilakan rekam atau ketik balasan Anda sesuai dengan ungkapan dan contoh kalimat hari ini 😊\n\n_Sent from Annyeong WA_`;
   }
-  text += `*안녕! Annyeong! 👋🏻*\nSilakan rekam atau ketik balasan Anda sesuai dengan ungkapan dan contoh kalimat hari ini 😊\n\n_Sent from Annyeong WA_`;
   console.log(text);
   return text;
 }
