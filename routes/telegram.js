@@ -5,6 +5,7 @@ const twilio = require("twilio");
 const cron = require("node-cron");
 const redis = require("../redis");
 const { bot } = require("../services/telegramBot"); // 텔레그램 봇 가져오기
+const { User } = require("discord.js");
 
 const client = twilio(
   process.env.TWILIO_ACCOUNT_SID,
@@ -192,7 +193,7 @@ const processCategorySubscriptions = async (category, subscriptions) => {
             receivedDate: new Date(),
           });
           console.log(text);
-          generateText(todayWord, subscription.User.language);
+          generateText(todayWord, subscription.User?.language);
         } else {
           // sendSlack(
           //   `[${category}] ${subscription.User.name}의 chatId가 없습니다.`
@@ -307,6 +308,8 @@ const processCategorySubscriptions = async (category, subscriptions) => {
             wordId: todayWord.id,
             receivedDate: new Date(),
           });
+          console.log(text);
+          generateText(todayWord, subscription.User?.language)
         } else {
           // sendSlack(
           //   `[${category}] ${subscription.User.name}의 chatId가 없습니다.`
@@ -339,6 +342,9 @@ const sendScheduledMessages = async () => {
     if (message) {
       count++;
       const { chatId, text } = JSON.parse(message);
+      // for debugging
+      console.log(chatId);
+      console.log(text);
       // 메시지 처리 (예: 텔레그램 봇으로 전송)
       await bot.sendMessage(chatId, text, { parse_mode: "Markdown" });
 
