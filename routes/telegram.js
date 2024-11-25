@@ -229,8 +229,7 @@ const processCategorySubscriptions = async (category, subscriptions) => {
 
       try {
         if (subscription.User?.chatId) {
-          const text = `*${todayWord.korean?.trim()}*\n\[_${todayWord.pronunciation?.trim()}_\]\n${todayWord.description?.trim()}\n\n*Example*\n${todayWord.example_1?.trim()}\n\[_${todayWord.example_2?.trim()}_\]\n${todayWord.example_3?.trim()}\n\n*안녕! Annyeong! 👋🏻*\nSilakan rekam atau ketik balasan Anda sesuai dengan ungkapan dan contoh kalimat hari ini 😊\n\n_Sent from Annyeong WA_`;
-
+          const text = generateText(todayWord, subscription.User?.language);
           await redis.lpush(
             "telegram_message_queue",
             JSON.stringify({
@@ -337,7 +336,7 @@ const sendScheduledMessages = async () => {
       count++;
       const { chatId, text } = JSON.parse(message);
       // for debugging
-      console.log(chatId);
+      // console.log(chatId);
       console.log(text);
       // 메시지 처리 (예: 텔레그램 봇으로 전송)
       await bot.sendMessage(chatId, text, { parse_mode: "Markdown" });
@@ -450,8 +449,8 @@ const sendWeeklyQuiz = async (platform) => {
 };
 
 function generateText(todayWord, language) {
+  console.log('language:  ' + language);
   // console.log(todayWord);
-  console.log('language' + language);
   let text = `*${todayWord.korean?.trim()}*\n\[_${todayWord.pronunciation?.trim()}_\]\n`;
   if (['EN', 'en'].includes(language)) {
     const description = todayWord.en_description ? todayWord.en_description : todayWord.description;
@@ -459,7 +458,7 @@ function generateText(todayWord, language) {
     text += `${description.trim()}\n\n`
       + `*Example*\n${todayWord.example_1?.trim()}\n\[_${todayWord.example_2?.trim()}_\]\n`
       + `${example_3.trim()}\n\n`
-      + `*안녕! Annyeong! 👋🏻*\nSilakan rekam atau ketik balasan Anda sesuai dengan ungkapan dan contoh kalimat hari ini 😊\n\n_Sent from Annyeong WA_`;
+      + `*안녕! Annyeong Hello! 👋🏻\nStart practicing by recording or typing your reply to today's expression and examples 😊\n\n_Sent from Sarang Talk_`
   } else {
     text += `${todayWord.description?.trim()}\n\n`
       + `*Example*\n${todayWord.example_1?.trim()}\n\[_${todayWord.example_2?.trim()}_\]\n`
