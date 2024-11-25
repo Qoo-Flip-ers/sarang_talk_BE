@@ -5,7 +5,6 @@ const twilio = require("twilio");
 const cron = require("node-cron");
 const redis = require("../redis");
 const { bot } = require("../services/telegramBot"); // 텔레그램 봇 가져오기
-const { User } = require("discord.js");
 
 const client = twilio(
   process.env.TWILIO_ACCOUNT_SID,
