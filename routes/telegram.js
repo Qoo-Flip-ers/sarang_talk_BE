@@ -79,6 +79,10 @@ router.post("/send", async (req, res) => {
   return count;
 });
 
+router.post("/send/current", async (req, res) => {
+  await sendScheduledMessages();
+})
+
 // 구독기간이 현재 진행 중인 사용자 목록을 가져오는 함수
 async function fetchActiveSubscriptions(category) {
   const now = new Date();
@@ -336,7 +340,7 @@ const sendScheduledMessages = async () => {
       const { chatId, text } = JSON.parse(message);
       // for debugging
       // console.log(chatId);
-      console.log(text);
+      console.log('telegram: ' + text);
       // 메시지 처리 (예: 텔레그램 봇으로 전송)
       await bot.sendMessage(chatId, text, { parse_mode: "Markdown" });
 
