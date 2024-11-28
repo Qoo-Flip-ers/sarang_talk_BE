@@ -461,7 +461,7 @@ function generateText(todayWord, language) {
     text += `${description.trim()}\n\n`
       + `*Example*\n${todayWord.example_1?.trim()}\n\[_${todayWord.example_2?.trim()}_\]\n`
       + `${example_3.trim()}\n\n`
-      + `*안녕! Annyeong Hello! 👋🏻\nStart practicing by recording or typing your reply to today's expression and examples 😊\n\n_Sent from Annyeong WA_`
+      + `*안녕! Annyeong! 👋🏻*\nStart practicing by recording or typing your reply to today's expression and examples 😊\n\n_Sent from Annyeong WA_`
   } else {
     text += `${todayWord.description?.trim()}\n\n`
       + `*Example*\n${todayWord.example_1?.trim()}\n\[_${todayWord.example_2?.trim()}_\]\n`
